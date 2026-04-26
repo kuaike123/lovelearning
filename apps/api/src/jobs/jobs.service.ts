@@ -3,7 +3,7 @@ import {randomUUID} from 'node:crypto';
 
 import {mapLessonToScenes} from '../../../../packages/lesson-engine/src/map-lesson-to-scenes';
 import {parseProblem} from '../../../../packages/lesson-engine/src/parse-problem';
-import {planLinearEquationLesson} from '../../../../packages/lesson-engine/src/plan-linear-equation-lesson';
+import {planLessonForProblem} from '../../../../packages/lesson-engine/src/plan-lesson-for-problem';
 import {runJob} from '../../../../packages/job-runner/src/run-job';
 import {renderProject} from '../../../../packages/job-runner/src/render-project';
 import {storeArtifacts} from '../../../../packages/job-runner/src/store-artifacts';
@@ -12,7 +12,7 @@ import {buildSubtitles} from '../../../../packages/tts-service/src/build-subtitl
 import {synthesizeSceneAudio} from '../../../../packages/tts-service/src/synthesize-scene-audio';
 import {getArtifactRoot} from '../artifacts/artifact-root';
 import {CreateJobDto} from './dto/create-job.dto';
-import {listRecoveredJobsFromArtifacts, recoverJobFromArtifacts} from './job-artifacts';
+import {listRecoveredJobsFromArtifacts, recoverJobFromArtifacts, removeJobArtifacts} from './job-artifacts';
 import {JobsRepository} from './jobs.repository';
 
 @Injectable()
@@ -51,6 +51,40 @@ export class JobsService {
     };
   }
 
+  remove(jobId: string) {
+    const deletedFromMemory = this.jobsRepository.delete(jobId);
+    const deletedArtifacts = removeJobArtifacts(jobId);
+
+    return {
+      deleted: deletedFromMemory || deletedArtifacts
+    };
+  }
+
+  regenerate(jobId: string) {
+    const source = this.find(jobId);
+
+    if (!source) {
+      return null;
+    }
+
+    const sourceJob = source as {problemText?: unknown; taskName?: unknown};
+    const problemText = readString(sourceJob.problemText);
+
+    if (!problemText) {
+      return null;
+    }
+
+    const sourceTaskName = readString(sourceJob.taskName) ?? problemText;
+
+    return this.create({
+      subject: 'math',
+      sourceType: 'text',
+      grade: 'junior',
+      content: problemText,
+      taskName: `${sourceTaskName}\uff08\u91cd\u65b0\u751f\u6210\uff09`
+    });
+  }
+
   private async completeJob(jobId: string, input: ProblemInput) {
     try {
       const result = await runJob(input, {
@@ -65,7 +99,7 @@ export class JobsService {
           this.jobsRepository.update(jobId, progress);
         },
         parseProblem,
-        planLesson: planLinearEquationLesson,
+        planLesson: planLessonForProblem,
         mapLessonToScenes,
         synthesizeSceneAudio,
         buildSubtitles,
@@ -99,5 +133,7 @@ const buildTaskName = (input: ProblemInput) => {
 
   if (explicitName) return explicitName;
 
-  return input.content.trim().slice(0, 80) || '数学讲解任务';
+  return input.content.trim().slice(0, 80) || '\u6570\u5b66\u8bb2\u89e3\u4efb\u52a1';
 };
+
+const readString = (value: unknown) => (typeof value === 'string' && value.trim() ? value : undefined);

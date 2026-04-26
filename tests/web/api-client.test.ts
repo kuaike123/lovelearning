@@ -1,6 +1,6 @@
 import {afterEach, describe, expect, it, vi} from 'vitest';
 
-import {createJob, getJob, getLessonPlan, listJobs} from '../../apps/web/src/lib/api-client';
+import {createJob, deleteJob, getJob, getLessonPlan, listJobs, regenerateJob} from '../../apps/web/src/lib/api-client';
 
 describe('api client', () => {
   afterEach(() => {
@@ -90,6 +90,36 @@ describe('api client', () => {
 
     expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/jobs');
     expect(result).toEqual({jobs: [{jobId: 'job-1', status: 'completed'}]});
+  });
+
+  it('deletes a job through the API', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({deleted: true})
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await deleteJob('job-1');
+
+    expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/jobs/job-1', {
+      method: 'DELETE'
+    });
+    expect(result).toEqual({deleted: true});
+  });
+
+  it('regenerates a job through the API', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({jobId: 'job-2', status: 'queued'})
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await regenerateJob('job-1');
+
+    expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/jobs/job-1/regenerate', {
+      method: 'POST'
+    });
+    expect(result).toEqual({jobId: 'job-2', status: 'queued'});
   });
 
   it('loads a lesson plan from its artifact URL', async () => {

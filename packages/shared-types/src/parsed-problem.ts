@@ -3,7 +3,7 @@ import {z} from 'zod';
 export const parsedProblemSchema = z.object({
   subject: z.literal('math'),
   grade: z.literal('junior'),
-  problemType: z.literal('linear_equation_one_variable'),
+  problemType: z.enum(['linear_equation_one_variable', 'word_problem_quantity_relation']),
   difficulty: z.enum(['easy', 'medium', 'hard']),
   originalText: z.string().min(1),
   normalizedExpression: z.string().min(1),

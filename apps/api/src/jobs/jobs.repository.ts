@@ -22,6 +22,10 @@ export class JobsRepository {
     return this.jobs.get(jobId) ?? null;
   }
 
+  delete(jobId: string) {
+    return this.jobs.delete(jobId);
+  }
+
   listRecent(limit = 20) {
     return Array.from(this.jobs.values()).reverse().slice(0, limit);
   }

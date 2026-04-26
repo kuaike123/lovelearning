@@ -2,7 +2,7 @@
 
 import React, {useEffect, useState} from 'react';
 
-import {getJob, getLessonPlan} from '../../../lib/api-client';
+import {getJob, getLessonPlan, regenerateJob} from '../../../lib/api-client';
 
 type Job = {
   jobId: string;
@@ -30,6 +30,36 @@ type LessonPlan = {
   }[];
 };
 
+const copy = {
+  actionsHome: '\u8fd4\u56de\u9996\u9875',
+  actionsRegenerate: '\u91cd\u65b0\u751f\u6210',
+  assetCover: '\u5c01\u9762',
+  assetDownloadTitle: '\u4e0b\u8f7d\u6587\u4ef6',
+  assetJson: '\u8bb2\u89e3 JSON',
+  assetSubtitle: '\u5b57\u5e55',
+  assetVideo: '\u89c6\u9891',
+  coverAlt: '\u751f\u6210\u7684\u8bb2\u89e3\u89c6\u9891\u5c01\u9762',
+  errorDefault: '\u4efb\u52a1\u751f\u6210\u5931\u8d25',
+  errorLoad: '\u4efb\u52a1\u52a0\u8f7d\u5931\u8d25',
+  errorParser:
+    '\u5f53\u524d\u7248\u672c\u4ec5\u652f\u6301\u4e00\u5143\u4e00\u6b21\u65b9\u7a0b\u89e3\u6790\uff0c\u8bf7\u8f93\u5165\u7c7b\u4f3c\u201c\u89e3\u65b9\u7a0b\uff1a2x + 3 = 11\u201d\u7684\u9898\u76ee\u3002',
+  errorPrefix: '\u9519\u8bef\uff1a',
+  fieldJobId: '\u4efb\u52a1 ID\uff1a',
+  fieldTaskName: '\u4efb\u52a1\u540d\u79f0\uff1a',
+  generatedNotice: '\u89c6\u9891\u6b63\u5728\u751f\u6210\u4e2d\uff0c\u672c\u9875\u9762\u4f1a\u81ea\u52a8\u5237\u65b0\u3002',
+  lessonOutline: '\u8bb2\u89e3\u5927\u7eb2',
+  loadingProgress: '\u751f\u6210\u8fdb\u5ea6',
+  mainEyebrow: '\u89c6\u9891\u751f\u6210\u4efb\u52a1',
+  mainTitle: '\u6570\u5b66\u8bb2\u89e3\u89c6\u9891\u9884\u89c8',
+  stagePrefix: '\u9636\u6bb5\uff1a',
+  statusPrefix: '\u72b6\u6001\uff1a',
+  progressPrefix: '\u8fdb\u5ea6\uff1a',
+  summaryPrefix: '\u603b\u7ed3\uff1a',
+  unnamedTask: '\u672a\u547d\u540d\u4efb\u52a1',
+  visualIntentPrefix: '\u753b\u9762\u8bbe\u8ba1\uff1a',
+  learningGoalPrefix: '\u5b66\u4e60\u76ee\u6807\uff1a'
+};
+
 export function JobResultPanel({jobId}: {jobId: string}) {
   const [job, setJob] = useState<Job | null>(null);
   const [lessonPlan, setLessonPlan] = useState<LessonPlan | null>(null);
@@ -52,7 +82,7 @@ export function JobResultPanel({jobId}: {jobId: string}) {
           timeoutId = setTimeout(loadJob, 3000);
         }
       } catch {
-        if (active) setError('任务加载失败');
+        if (active) setError(copy.errorLoad);
       }
     };
 
@@ -88,24 +118,53 @@ export function JobResultPanel({jobId}: {jobId: string}) {
     };
   }, [job?.lessonPlanUrl, job?.status]);
 
+  const handleRegenerate = async () => {
+    const nextJob = await regenerateJob(jobId);
+    window.location.assign(`/jobs/${nextJob.jobId}`);
+  };
+
   if (error) {
     return <p role="alert">{error}</p>;
   }
 
   return (
     <section style={panelStyle}>
-      <p style={eyebrowStyle}>视频生成任务</p>
-      <h1 style={titleStyle}>数学讲解视频预览</h1>
-      <p>任务名称：{job?.taskName ?? '未命名任务'}</p>
-      <p style={mutedTextStyle}>任务 ID：{jobId}</p>
+      <p style={eyebrowStyle}>{copy.mainEyebrow}</p>
+      <h1 style={titleStyle}>{copy.mainTitle}</h1>
+      <p>
+        {copy.fieldTaskName}
+        {job?.taskName ?? copy.unnamedTask}
+      </p>
+      <p style={mutedTextStyle}>
+        {copy.fieldJobId}
+        {jobId}
+      </p>
+      <JobResultActions jobId={jobId} onRegenerate={handleRegenerate} />
       <JobStatusSummary job={job ?? {jobId, status: 'loading'}} />
-      {job && !isTerminalJobStatus(job.status) ? (
-        <p aria-live="polite">视频正在生成中，本页面会自动刷新。</p>
-      ) : null}
+      {job && !isTerminalJobStatus(job.status) ? <p aria-live="polite">{copy.generatedNotice}</p> : null}
       {job?.status === 'failed' ? <p role="alert">{formatJobError(job.error)}</p> : null}
       {job ? <JobAssetList job={job} /> : null}
       {lessonPlan ? <LessonPlanSummary lessonPlan={lessonPlan} /> : null}
     </section>
+  );
+}
+
+export function JobResultActions({
+  jobId,
+  onRegenerate
+}: {
+  jobId: string;
+  onRegenerate: (jobId: string) => void | Promise<void>;
+}) {
+  return (
+    <div style={actionsStyle}>
+      <a href="/" style={homeLinkStyle}>
+        {copy.actionsHome}
+      </a>
+      <button type="button" onClick={() => void onRegenerate(jobId)} style={regenerateButtonStyle}>
+        {copy.actionsRegenerate}
+      </button>
+    </div>
   );
 }
 
@@ -115,15 +174,38 @@ export function JobStatusSummary({job}: {job: Pick<Job, 'error' | 'progress' | '
   return (
     <>
       <div style={statusGridStyle}>
-        {job.taskName ? <p>任务名称：{job.taskName}</p> : null}
-        <p>状态：{formatJobStatus(job.status)}</p>
-        {job.stage ? <p>阶段：{formatJobStage(job.stage)}</p> : null}
-        {progress !== null ? <p>进度：{progress}%</p> : null}
-        {job.status === 'failed' ? <p>错误：{formatJobError(job.error)}</p> : null}
+        {job.taskName ? (
+          <p>
+            {copy.fieldTaskName}
+            {job.taskName}
+          </p>
+        ) : null}
+        <p>
+          {copy.statusPrefix}
+          {formatJobStatus(job.status)}
+        </p>
+        {job.stage ? (
+          <p>
+            {copy.stagePrefix}
+            {formatJobStage(job.stage)}
+          </p>
+        ) : null}
+        {progress !== null ? (
+          <p>
+            {copy.progressPrefix}
+            {progress}%
+          </p>
+        ) : null}
+        {job.status === 'failed' ? (
+          <p>
+            {copy.errorPrefix}
+            {formatJobError(job.error)}
+          </p>
+        ) : null}
       </div>
       {progress !== null ? (
         <div
-          aria-label="生成进度"
+          aria-label={copy.loadingProgress}
           aria-valuemax={100}
           aria-valuemin={0}
           aria-valuenow={progress}
@@ -146,29 +228,18 @@ export function JobAssetList({job}: {job: Job}) {
     <div style={assetGridStyle}>
       <div style={previewCardStyle}>
         {job.videoUrl ? (
-          <video
-            controls
-            poster={job.coverUrl}
-            src={job.videoUrl}
-            style={videoStyle}
-          >
-            <a href={job.videoUrl}>视频</a>
+          <video controls poster={job.coverUrl} src={job.videoUrl} style={videoStyle}>
+            <a href={job.videoUrl}>{copy.assetVideo}</a>
           </video>
         ) : null}
-        {job.coverUrl ? (
-          <img
-            alt="生成的讲解视频封面"
-            src={job.coverUrl}
-            style={coverStyle}
-          />
-        ) : null}
+        {job.coverUrl ? <img alt={copy.coverAlt} src={job.coverUrl} style={coverStyle} /> : null}
       </div>
       <div style={linkCardStyle}>
-        <p style={eyebrowStyle}>下载文件</p>
-        {job.videoUrl ? <a href={job.videoUrl}>视频</a> : null}
-        {job.coverUrl ? <a href={job.coverUrl}>封面</a> : null}
-        {job.subtitleUrl ? <a href={job.subtitleUrl}>字幕</a> : null}
-        {job.lessonPlanUrl ? <a href={job.lessonPlanUrl}>讲解 JSON</a> : null}
+        <p style={eyebrowStyle}>{copy.assetDownloadTitle}</p>
+        {job.videoUrl ? <a href={job.videoUrl}>{copy.assetVideo}</a> : null}
+        {job.coverUrl ? <a href={job.coverUrl}>{copy.assetCover}</a> : null}
+        {job.subtitleUrl ? <a href={job.subtitleUrl}>{copy.assetSubtitle}</a> : null}
+        {job.lessonPlanUrl ? <a href={job.lessonPlanUrl}>{copy.assetJson}</a> : null}
       </div>
     </div>
   );
@@ -177,9 +248,14 @@ export function JobAssetList({job}: {job: Job}) {
 export function LessonPlanSummary({lessonPlan}: {lessonPlan: LessonPlan}) {
   return (
     <section style={lessonPanelStyle}>
-      <p style={eyebrowStyle}>讲解大纲</p>
+      <p style={eyebrowStyle}>{copy.lessonOutline}</p>
       <h2 style={lessonTitleStyle}>{lessonPlan.title}</h2>
-      {lessonPlan.learningGoal ? <p>学习目标：{lessonPlan.learningGoal}</p> : null}
+      {lessonPlan.learningGoal ? (
+        <p>
+          {copy.learningGoalPrefix}
+          {lessonPlan.learningGoal}
+        </p>
+      ) : null}
       {lessonPlan.steps?.length ? (
         <ol style={stepListStyle}>
           {lessonPlan.steps.map((step, index) => (
@@ -188,7 +264,12 @@ export function LessonPlanSummary({lessonPlan}: {lessonPlan: LessonPlan}) {
                 {index + 1}. {step.teachingGoal ?? step.id}
               </h3>
               <p>{step.narration}</p>
-              {step.visualIntent ? <p style={mutedTextStyle}>画面设计：{step.visualIntent}</p> : null}
+              {step.visualIntent ? (
+                <p style={mutedTextStyle}>
+                  {copy.visualIntentPrefix}
+                  {step.visualIntent}
+                </p>
+              ) : null}
               {step.keyText?.length ? (
                 <div style={keyTextListStyle}>
                   {step.keyText.map((text) => (
@@ -202,7 +283,12 @@ export function LessonPlanSummary({lessonPlan}: {lessonPlan: LessonPlan}) {
           ))}
         </ol>
       ) : null}
-      {lessonPlan.summary ? <p style={summaryStyle}>总结：{lessonPlan.summary}</p> : null}
+      {lessonPlan.summary ? (
+        <p style={summaryStyle}>
+          {copy.summaryPrefix}
+          {lessonPlan.summary}
+        </p>
+      ) : null}
     </section>
   );
 }
@@ -213,11 +299,11 @@ export const isTerminalJobStatus = (status: string) => {
 
 const formatJobStatus = (status: string) => {
   const labels: Record<string, string> = {
-    completed: '已完成',
-    failed: '失败',
-    loading: '加载中',
-    queued: '排队中',
-    running: '生成中'
+    completed: '\u5df2\u5b8c\u6210',
+    failed: '\u5931\u8d25',
+    loading: '\u52a0\u8f7d\u4e2d',
+    queued: '\u6392\u961f\u4e2d',
+    running: '\u751f\u6210\u4e2d'
   };
 
   return labels[status] ?? status;
@@ -225,30 +311,30 @@ const formatJobStatus = (status: string) => {
 
 const formatJobStage = (stage: string) => {
   const labels: Record<string, string> = {
-    audio: '生成配音',
-    done: '完成',
-    job_runner: '任务执行',
-    loading: '加载中',
-    map: '生成分镜',
-    parse: '解析题目',
-    plan: '规划讲解',
-    queued: '排队中',
-    render: '渲染视频',
-    store: '保存文件',
-    subtitles: '生成字幕'
+    audio: '\u751f\u6210\u914d\u97f3',
+    done: '\u5b8c\u6210',
+    job_runner: '\u4efb\u52a1\u6267\u884c',
+    loading: '\u52a0\u8f7d\u4e2d',
+    map: '\u751f\u6210\u5206\u955c',
+    parse: '\u89e3\u6790\u9898\u76ee',
+    plan: '\u89c4\u5212\u8bb2\u89e3',
+    queued: '\u6392\u961f\u4e2d',
+    render: '\u6e32\u67d3\u89c6\u9891',
+    store: '\u4fdd\u5b58\u6587\u4ef6',
+    subtitles: '\u751f\u6210\u5b57\u5e55'
   };
 
   return labels[stage] ?? stage;
 };
 
 const formatJobError = (error: string | undefined) => {
-  if (!error) return '任务生成失败';
+  if (!error) return copy.errorDefault;
 
   if (
     error.includes('Unsupported input for V1 linear equation parser') ||
-    error.includes('当前版本仅支持一元一次方程解析')
+    error.includes('\u5f53\u524d\u7248\u672c\u4ec5\u652f\u6301\u4e00\u5143\u4e00\u6b21\u65b9\u7a0b\u89e3\u6790')
   ) {
-    return '当前版本仅支持一元一次方程解析，请输入类似“解方程：2x + 3 = 11”的题目。';
+    return copy.errorParser;
   }
 
   return error;
@@ -277,6 +363,33 @@ const titleStyle = {
   fontSize: 44,
   lineHeight: 1.1,
   margin: '8px 0 16px'
+};
+
+const actionsStyle = {
+  display: 'flex',
+  flexWrap: 'wrap' as const,
+  gap: 10,
+  margin: '18px 0'
+};
+
+const homeLinkStyle = {
+  alignItems: 'center',
+  background: '#fffaf1',
+  border: '1px solid #d7c8a9',
+  borderRadius: 999,
+  color: '#1f2937',
+  display: 'inline-flex',
+  padding: '8px 14px',
+  textDecoration: 'none'
+};
+
+const regenerateButtonStyle = {
+  background: '#1f5134',
+  border: 0,
+  borderRadius: 999,
+  color: '#ffffff',
+  cursor: 'pointer',
+  padding: '8px 14px'
 };
 
 const assetGridStyle = {

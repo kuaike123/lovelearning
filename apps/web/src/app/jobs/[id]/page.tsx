@@ -11,7 +11,7 @@ type JobResultPageProps = {
 export default function JobResultPage({params}: JobResultPageProps) {
   return (
     <main>
-      <h1>Generation Result</h1>
+      <h1>{'\u751f\u6210\u7ed3\u679c'}</h1>
       <JobResultPanel jobId={params.id} />
     </main>
   );

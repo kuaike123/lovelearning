@@ -2,6 +2,7 @@ import 'reflect-metadata';
 
 import type {INestApplication} from '@nestjs/common';
 import {NestFactory} from '@nestjs/core';
+import {existsSync} from 'node:fs';
 import {mkdir, rm, writeFile} from 'node:fs/promises';
 import {join} from 'node:path';
 import request from 'supertest';
@@ -62,5 +63,13 @@ describe('job artifact recovery', () => {
 
     expect(response.status).toBe(200);
     expect(response.body.jobs.some((job: {jobId: string}) => job.jobId === jobId)).toBe(true);
+  });
+
+  it('deletes recovered artifact jobs from disk', async () => {
+    const response = await (request(app.getHttpServer()) as any).delete(`/jobs/${jobId}`).send({});
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({deleted: true});
+    expect(existsSync(jobDir)).toBe(false);
   });
 });

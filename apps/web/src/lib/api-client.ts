@@ -36,6 +36,30 @@ export const listJobs = async () => {
   return response.json();
 };
 
+export const deleteJob = async (jobId: string) => {
+  const response = await fetch(`${apiBaseUrl}/jobs/${jobId}`, {
+    method: 'DELETE'
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to delete job');
+  }
+
+  return response.json();
+};
+
+export const regenerateJob = async (jobId: string) => {
+  const response = await fetch(`${apiBaseUrl}/jobs/${jobId}/regenerate`, {
+    method: 'POST'
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to regenerate job');
+  }
+
+  return response.json();
+};
+
 export const getLessonPlan = async (lessonPlanUrl: string) => {
   const response = await fetch(lessonPlanUrl);
 

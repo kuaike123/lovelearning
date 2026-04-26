@@ -21,14 +21,29 @@ describe('parseProblem', () => {
     const parsed = await parseProblem({
       subject: 'math',
       sourceType: 'text',
-      content: '解方程：3x + 4  = 11'
+      content: '\u89e3\u65b9\u7a0b\uff1a3x + 4  = 11'
     });
 
     expect(parsed.isSupported).toBe(true);
+    expect(parsed.problemType).toBe('linear_equation_one_variable');
     expect(parsed.normalizedExpression).toBe('3x + 4 = 11');
   });
 
-  it('rejects unsupported free-form prompts', async () => {
+  it('classifies a supported quantity relation word problem', async () => {
+    const parsed = await parseProblem({
+      subject: 'math',
+      sourceType: 'text',
+      content:
+        '\u5df2\u77e5\u4e24\u6570\u548c\u4e3a11\uff0c\u5176\u4e2d\u4e00\u4e2a\u6570\u662f\u53e6\u4e00\u4e2a\u6570\u76842\u500d\uff0c\u6c42\u8fd9\u4e24\u4e2a\u6570\u3002'
+    });
+
+    expect(parsed.problemType).toBe('word_problem_quantity_relation');
+    expect(parsed.isSupported).toBe(true);
+    expect(parsed.normalizedExpression).toBe('x + 2x = 11');
+    expect(parsed.knowledgePoints).toContain('\u6570\u91cf\u5173\u7cfb');
+  });
+
+  it('rejects unsupported free-form prompts with a Chinese reason', async () => {
     const parsed = await parseProblem({
       subject: 'math',
       sourceType: 'text',
@@ -39,6 +54,6 @@ describe('parseProblem', () => {
     expect(parsed.subject).toBe('math');
     expect(parsed.grade).toBe('junior');
     expect(parsed.isSupported).toBe(false);
-    expect(parsed.rejectionReason).toContain('仅支持一元一次方程');
+    expect(parsed.rejectionReason).toContain('\u5f53\u524d V1 \u652f\u6301');
   });
 });

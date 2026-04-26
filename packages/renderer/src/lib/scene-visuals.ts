@@ -1,13 +1,32 @@
 import type {VideoScene} from '../../../shared-types/src';
 
+import {getSceneRenderer} from './scene-renderer-registry';
+
 export type SceneVisuals = {
   detail?: string;
   formulas: string[];
   heading: string;
+  layoutLabel?: string;
+  motionPreset?: string;
   narration: string;
 };
 
 export const getSceneVisuals = (scene: VideoScene): SceneVisuals => {
+  if (scene.visualInstruction) {
+    const visual = scene.visualInstruction;
+    const renderer = getSceneRenderer(visual.layout);
+    const formulas = visual.formulaBlocks?.filter((item) => item.trim().length > 0) ?? [];
+
+    return {
+      detail: visual.detail,
+      formulas: formulas.length > 0 ? formulas : [visual.primaryText ?? scene.subtitle],
+      heading: visual.primaryText ?? scene.subtitle,
+      layoutLabel: renderer.label,
+      motionPreset: visual.motionPreset,
+      narration: scene.subtitle
+    };
+  }
+
   const props = scene.props as {
     keyText?: unknown;
     learningGoal?: unknown;
