@@ -1,0 +1,8 @@
+{
+  "name": "api",
+  "private": true,
+  "scripts": {
+    "start:dev": "tsx watch src/main.ts",
+    "test": "vitest run ../../tests/api"
+  }
+}
