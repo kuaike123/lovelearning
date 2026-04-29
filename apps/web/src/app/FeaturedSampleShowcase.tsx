@@ -154,29 +154,14 @@ const renderSampleCard = (sample: FeaturedSample) => (
         <strong style={insightValueStyle}>{sample.conversionScenario}</strong>
       </div>
     </div>
+    <p style={summaryLineStyle}>
+      {`适合 ${sample.gradeBand}，默认 ${sample.targetDurationSec} 秒，${sample.style === 'exam' ? '偏提分讲解' : '偏标准讲解'}。`}
+    </p>
     <div style={metaRowStyle}>
       <span style={metaChipStyle}>{`${sample.targetDurationSec} \u79d2`}</span>
       <span style={metaChipStyle}>{sample.style === 'exam' ? '\u5e94\u8bd5\u63d0\u5206' : '\u8001\u5e08\u8bb2\u89e3'}</span>
       <span style={metaChipStyle}>{sample.voice === 'female_clear' ? '\u6e05\u6670\u5973\u58f0' : '\u6e29\u67d4\u5973\u58f0'}</span>
       <span style={metaChipStyle}>{sample.publishedAt}</span>
-    </div>
-    <div style={detailBlockStyle}>
-      <p style={detailTitleStyle}>{'\u9002\u7528\u573a\u666f'}</p>
-      <div style={detailListStyle}>
-        {sample.useCases.map((useCaseItem) => (
-          <span key={useCaseItem} style={detailChipStyle}>
-            {useCaseItem}
-          </span>
-        ))}
-      </div>
-    </div>
-    <div style={detailBlockStyle}>
-      <p style={detailTitleStyle}>{'\u8bb2\u89e3\u4eae\u70b9'}</p>
-      <ul style={bulletListStyle}>
-        {sample.highlights.map((highlight) => (
-          <li key={highlight}>{highlight}</li>
-        ))}
-      </ul>
     </div>
     <div style={actionRowStyle}>
       <a href={`/samples/${sample.slug}`} style={secondaryActionLinkStyle}>
@@ -454,6 +439,12 @@ const metaRowStyle = {
   gap: 8
 };
 
+const summaryLineStyle = {
+  color: '#4b5563',
+  lineHeight: 1.6,
+  margin: 0
+};
+
 const metaChipStyle = {
   background: '#E7F0DA',
   borderRadius: 999,
@@ -488,41 +479,6 @@ const secondaryActionLinkStyle = {
   justifyContent: 'center',
   padding: '10px 16px',
   textDecoration: 'none'
-};
-
-const detailBlockStyle = {
-  display: 'grid',
-  gap: 8
-};
-
-const detailTitleStyle = {
-  color: '#102A43',
-  fontSize: 13,
-  fontWeight: 800,
-  letterSpacing: 1,
-  margin: 0
-};
-
-const detailListStyle = {
-  display: 'flex',
-  flexWrap: 'wrap' as const,
-  gap: 8
-};
-
-const detailChipStyle = {
-  background: '#FFF4CC',
-  borderRadius: 999,
-  color: '#7C4A03',
-  fontSize: 12,
-  fontWeight: 700,
-  padding: '6px 10px'
-};
-
-const bulletListStyle = {
-  color: '#374151',
-  lineHeight: 1.6,
-  margin: 0,
-  paddingLeft: 18
 };
 
 const emptyStateStyle = {

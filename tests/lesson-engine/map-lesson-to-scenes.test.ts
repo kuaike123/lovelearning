@@ -8,6 +8,11 @@ describe('mapLessonToScenes', () => {
   it('adds title, step, and summary scenes in deterministic order', () => {
     const project = mapLessonToScenes({
       title: 'Equation lesson',
+      presentation: {
+        coverTone: '考点直入',
+        narrationTone: '提分拆解',
+        coverLayout: 'equation_focus'
+      },
       learningGoal: 'Solve the equation',
       summary: 'The answer is x = 4',
       steps: [
@@ -38,6 +43,11 @@ describe('mapLessonToScenes', () => {
   it('adds structured visual instructions for every generated scene', () => {
     const project = mapLessonToScenes({
       title: 'Equation lesson',
+      presentation: {
+        coverTone: '考点直入',
+        narrationTone: '提分拆解',
+        coverLayout: 'equation_focus'
+      },
       learningGoal: 'Solve the equation',
       summary: 'The answer is x = 4',
       steps: [
@@ -76,7 +86,9 @@ describe('mapLessonToScenes', () => {
           visualInstruction: expect.objectContaining({
             layout: 'title_card',
             motionPreset: 'reveal',
-            primaryText: 'Equation lesson'
+            primaryText: 'Equation lesson',
+            eyebrow: '考点直入',
+            coverLayout: 'equation_focus'
           })
         }),
         expect.objectContaining({
@@ -101,7 +113,8 @@ describe('mapLessonToScenes', () => {
           visualInstruction: expect.objectContaining({
             layout: 'summary',
             answer: 'x = 4',
-            motionPreset: 'emphasis'
+            motionPreset: 'emphasis',
+            takeaway: '提分拆解：先抓关键关系，再把答案稳稳写成 x = 4。'
           })
         })
       ])
@@ -150,5 +163,35 @@ describe('mapLessonToScenes', () => {
     );
     expect(project.scenes.at(-2)?.sceneType).toBe('warning');
     expect(project.scenes.at(-1)?.sceneType).toBe('summary');
+  });
+
+  it('maps quantity-relation lessons onto a condition-style title cover', () => {
+    const project = mapLessonToScenes({
+      title: 'Quantity relation lesson',
+      presentation: {
+        coverTone: '已知条件拆开讲',
+        narrationTone: '关系梳理',
+        coverLayout: 'quantity_story'
+      },
+      learningGoal: 'Set the unknown and list the relation',
+      steps: [
+        {
+          id: 's1',
+          stepType: 'show_problem',
+          teachingGoal: 'Read the conditions',
+          narration: 'Find the sum and the multiplier relation.',
+          visualIntent: 'Highlight the known relation in the prompt',
+          keyText: ['和 = 12', '倍数 = 2']
+        }
+      ]
+    } satisfies LessonPlan);
+
+    expect(project.scenes[0]?.visualInstruction).toEqual(
+      expect.objectContaining({
+        layout: 'title_card',
+        eyebrow: '已知条件拆开讲',
+        coverLayout: 'quantity_story'
+      })
+    );
   });
 });

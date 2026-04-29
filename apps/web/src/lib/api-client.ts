@@ -72,6 +72,8 @@ export const getLessonPlan = async (lessonPlanUrl: string) => {
 
 export const previewTts = async (input: {
   text: string;
+  style?: 'teacher' | 'kids' | 'exam';
+  targetDurationSec?: 30 | 45 | 60;
   voice?: 'female_warm' | 'female_clear' | 'male_calm';
   speechRate?: 'slow' | 'normal' | 'fast';
 }) => {

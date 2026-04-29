@@ -2,11 +2,14 @@ import {z} from 'zod';
 
 export const visualInstructionSchema = z.object({
   layout: z.enum(['title_card', 'problem_card', 'formula_focus', 'comparison', 'summary', 'diagram']),
+  coverLayout: z.enum(['equation_focus', 'quantity_story']).optional(),
+  eyebrow: z.string().min(1).optional(),
   primaryText: z.string().min(1).optional(),
   detail: z.string().min(1).optional(),
   formulaBlocks: z.array(z.string().min(1)).optional(),
   highlights: z.array(z.string().min(1)).optional(),
   answer: z.string().min(1).optional(),
+  takeaway: z.string().min(1).optional(),
   mistake: z
     .object({
       wrong: z.string().min(1),

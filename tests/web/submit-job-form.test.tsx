@@ -11,6 +11,12 @@ describe('SubmitJobForm', () => {
     );
 
     expect(html).toContain('Solve equation: 2x + 3 = 11');
+    expect(html).toContain('data-form-section="problem-input"');
+    expect(html).toContain('data-form-section="generation-settings"');
+    expect(html).toContain('data-form-section="voice-preview"');
+    expect(html).toContain('\u9898\u76ee\u8f93\u5165');
+    expect(html).toContain('\u751f\u6210\u8bbe\u7f6e');
+    expect(html).toContain('\u8bd5\u542c\u4e0e\u914d\u97f3\u9009\u62e9');
     expect(html).toContain('\u4efb\u52a1\u540d\u79f0');
     expect(html).toContain('\u751f\u6210\u89c6\u9891');
     expect(html).toContain('\u5bf9\u6bd4\u4e09\u79cd\u97f3\u8272');

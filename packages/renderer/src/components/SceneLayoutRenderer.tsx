@@ -11,9 +11,46 @@ type SceneLayoutRendererProps = {
 
 export const SceneLayoutRenderer: React.FC<SceneLayoutRendererProps> = ({sceneType, visuals}) => {
   if (visuals.layout === 'title_card') {
+    if (visuals.coverLayout === 'quantity_story') {
+      return (
+        <section style={heroStyle}>
+          <div style={heroEyebrowStyle}>{visuals.eyebrow ?? '\u5df2\u77e5\u6761\u4ef6\u62c6\u5f00\u8bb2'}</div>
+          <h1 style={heroTitleStyle}>{visuals.heading}</h1>
+          {visuals.detail ? (
+            <div style={goalCardStyle}>
+              <strong>{'\u5b66\u4e60\u76ee\u6807'}</strong>
+              <span>{visuals.detail}</span>
+            </div>
+          ) : null}
+          <div style={coverStoryGridStyle}>
+            <section style={coverStoryCardStyle}>
+              <strong>{'\u5df2\u77e5\u6761\u4ef6'}</strong>
+              <div style={chipRowStyle}>
+                {visuals.formulas.slice(0, 1).map((item, index) => (
+                  <span key={`${item}-${index}`} style={highlightChipStyle}>
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </section>
+            <section style={coverStoryCardStyle}>
+              <strong>{'\u5173\u7cfb\u7ebf\u7d22'}</strong>
+              <div style={chipRowStyle}>
+                {visuals.formulas.slice(1).map((item, index) => (
+                  <span key={`${item}-${index}`} style={highlightChipStyle}>
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </section>
+          </div>
+        </section>
+      );
+    }
+
     return (
       <section style={heroStyle}>
-        <div style={heroEyebrowStyle}>{'\u77e5\u8bc6\u70b9\u5feb\u901f\u5165\u95e8'}</div>
+        <div style={heroEyebrowStyle}>{visuals.eyebrow ?? '\u77e5\u8bc6\u70b9\u5feb\u901f\u5165\u95e8'}</div>
         <h1 style={heroTitleStyle}>{visuals.heading}</h1>
         {visuals.detail ? (
           <div style={goalCardStyle}>
@@ -66,7 +103,12 @@ export const SceneLayoutRenderer: React.FC<SceneLayoutRendererProps> = ({sceneTy
         ) : null}
         <div style={takeawayCardStyle}>
           <strong>{'\u5e26\u8d70\u4e00\u53e5'}</strong>
-          <span>{visuals.answer ? `\u5148\u5217\u51fa\u5173\u952e\u5173\u7cfb\uff0c\u518d\u628a\u7b54\u6848\u5199\u6210 ${visuals.answer}\u3002` : '\u5148\u627e\u5173\u952e\u6761\u4ef6\uff0c\u518d\u6309\u6b65\u9aa4\u5199\u51fa\u7ed3\u8bba\u3002'}</span>
+          <span>
+            {visuals.takeaway ??
+              (visuals.answer
+                ? `\u5148\u5217\u51fa\u5173\u952e\u5173\u7cfb\uff0c\u518d\u628a\u7b54\u6848\u5199\u6210 ${visuals.answer}\u3002`
+                : '\u5148\u627e\u5173\u952e\u6761\u4ef6\uff0c\u518d\u6309\u6b65\u9aa4\u5199\u51fa\u7ed3\u8bba\u3002')}
+          </span>
         </div>
         <FormulaBoard formulas={visuals.formulas} highlights={visuals.highlights} sceneType={sceneType} />
       </section>
@@ -217,6 +259,22 @@ const chipRowStyle = {
   display: 'flex',
   flexWrap: 'wrap' as const,
   gap: 12
+};
+
+const coverStoryGridStyle = {
+  display: 'grid',
+  gap: 18,
+  gridTemplateColumns: 'repeat(2, minmax(0, 1fr))'
+};
+
+const coverStoryCardStyle = {
+  background: 'linear-gradient(135deg, rgba(220,252,231,0.92), rgba(255,255,255,0.98))',
+  border: '2px solid rgba(34, 197, 94, 0.18)',
+  borderRadius: 24,
+  color: '#14532D',
+  display: 'grid',
+  gap: 14,
+  padding: 22
 };
 
 const keywordCardStyle = {

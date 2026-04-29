@@ -24,7 +24,11 @@ describe('app router page props', () => {
       } as never)
     );
 
-    expect(markup).toContain('\u6570\u5b66\u8bb2\u89e3\u89c6\u9891\u751f\u6210\u5668');
     expect(markup).toContain('Solve equation: 2x + 3 = 11');
+    expect(markup).toContain('data-home-layout="workspace"');
+    expect(markup).toContain('\u4e2d\u5c0f\u5b66\u6559\u57f9\u89c6\u9891\u5de5\u5382');
+    expect(markup).toContain('\u4ece\u9898\u76ee\u5230\u77ed\u89c6\u9891');
+    expect(markup).toContain('\u751f\u6210\u5de5\u4f5c\u53f0');
+    expect(markup).toContain('\u8fd1\u671f\u8fd0\u8425\u9762\u677f');
   });
 });

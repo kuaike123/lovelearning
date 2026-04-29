@@ -106,7 +106,17 @@ export class JobsService {
           this.jobsRepository.update(jobId, progress);
         },
         parseProblem,
-        planLesson: planLessonForProblem,
+        planLesson: async (parsedProblem: Parameters<typeof planLessonForProblem>[0]) => ({
+          ...(await planLessonForProblem(parsedProblem)),
+          presentation: {
+            narrationTone: recommendation.narrationTone,
+            coverTone: recommendation.coverTone,
+            coverLayout:
+              parsedProblem.problemType === 'word_problem_quantity_relation'
+                ? 'quantity_story'
+                : 'equation_focus'
+          }
+        }),
         mapLessonToScenes,
         synthesizeSceneAudio: (scene: Parameters<typeof synthesizeSceneAudio>[0]) =>
           synthesizeSceneAudio(scene, {

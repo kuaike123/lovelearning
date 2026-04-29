@@ -86,6 +86,8 @@ describe('getSceneVisuals', () => {
         sceneType: 'title',
         visuals: {
           heading: '\u4e00\u5143\u4e00\u6b21\u65b9\u7a0b',
+          eyebrow: '\u8003\u70b9\u76f4\u5165',
+          coverLayout: 'equation_focus',
           detail: '\u638c\u63e1\u79fb\u9879\u548c\u5316\u7b80',
           formulas: ['\u4e00\u5143\u4e00\u6b21\u65b9\u7a0b'],
           layout: 'title_card',
@@ -96,8 +98,33 @@ describe('getSceneVisuals', () => {
     );
 
     expect(html).toContain('\u5b66\u4e60\u76ee\u6807');
+    expect(html).toContain('\u8003\u70b9\u76f4\u5165');
     expect(html).toContain('\u638c\u63e1\u79fb\u9879\u548c\u5316\u7b80');
     expect(html).toContain('\u4e00\u5143\u4e00\u6b21\u65b9\u7a0b');
+  });
+
+  it('renders quantity-relation title cards with condition-style cover blocks', () => {
+    const html = renderToStaticMarkup(
+      React.createElement(SceneLayoutRenderer, {
+        sceneType: 'title',
+        visuals: {
+          heading: '\u6570\u91cf\u5173\u7cfb\u5e94\u7528\u9898',
+          eyebrow: '\u5df2\u77e5\u6761\u4ef6\u62c6\u5f00\u8bb2',
+          coverLayout: 'quantity_story',
+          detail: '\u5148\u62c6\u5df2\u77e5\u6761\u4ef6\uff0c\u518d\u5217\u51fa\u5173\u7cfb\u5f0f',
+          formulas: ['\u548c = 12', '\u500d\u6570 = 2'],
+          highlights: ['\u548c = 12', '\u500d\u6570 = 2'],
+          layout: 'title_card',
+          layoutLabel: '\u5c01\u9762\u7247\u5934',
+          narration: '\u5148\u627e\u51fa\u9898\u76ee\u91cc\u7684\u548c\u500d\u6570'
+        }
+      })
+    );
+
+    expect(html).toContain('\u5df2\u77e5\u6761\u4ef6');
+    expect(html).toContain('\u5173\u7cfb\u7ebf\u7d22');
+    expect(html).toContain('\u548c = 12');
+    expect(html).toContain('\u500d\u6570 = 2');
   });
 
   it('renders summary scenes with a dedicated answer block', () => {
@@ -109,6 +136,7 @@ describe('getSceneVisuals', () => {
           detail: '\u56de\u987e\u89e3\u9898\u5957\u8def',
           formulas: ['2x = 8', 'x = 4'],
           answer: 'x = 4',
+          takeaway: '\u63d0\u5206\u62c6\u89e3\uff1a\u5148\u6293\u5173\u952e\u5173\u7cfb\uff0c\u518d\u5199\u51fa\u6700\u7ec8\u7ed3\u8bba\u3002',
           layout: 'summary',
           layoutLabel: '\u603b\u7ed3\u6536\u675f',
           narration: '\u6240\u4ee5\u6700\u7ec8\u7b54\u6848\u662f x \u7b49\u4e8e 4'
@@ -120,6 +148,7 @@ describe('getSceneVisuals', () => {
     expect(html).toContain('x = 4');
     expect(html).toContain('\u89e3\u9898\u5957\u8def');
     expect(html).toContain('\u5e26\u8d70\u4e00\u53e5');
+    expect(html).toContain('\u63d0\u5206\u62c6\u89e3\uff1a\u5148\u6293\u5173\u952e\u5173\u7cfb\uff0c\u518d\u5199\u51fa\u6700\u7ec8\u7ed3\u8bba\u3002');
   });
 
   it('renders problem scenes with a dedicated keyword block', () => {

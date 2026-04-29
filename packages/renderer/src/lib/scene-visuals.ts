@@ -4,7 +4,9 @@ import {getSceneRenderer} from './scene-renderer-registry';
 
 export type SceneVisuals = {
   answer?: string;
+  coverLayout?: 'equation_focus' | 'quantity_story';
   detail?: string;
+  eyebrow?: string;
   formulas: string[];
   heading: string;
   highlights?: string[];
@@ -17,6 +19,7 @@ export type SceneVisuals = {
   };
   motionPreset?: string;
   narration: string;
+  takeaway?: string;
 };
 
 export const getSceneVisuals = (scene: VideoScene): SceneVisuals => {
@@ -27,7 +30,9 @@ export const getSceneVisuals = (scene: VideoScene): SceneVisuals => {
 
     return {
       answer: visual.answer,
+      coverLayout: visual.coverLayout,
       detail: visual.detail,
+      eyebrow: visual.eyebrow,
       formulas: formulas.length > 0 ? formulas : [visual.primaryText ?? scene.subtitle],
       heading: visual.primaryText ?? scene.subtitle,
       highlights: visual.highlights,
@@ -36,6 +41,8 @@ export const getSceneVisuals = (scene: VideoScene): SceneVisuals => {
       mistake: visual.mistake,
       motionPreset: visual.motionPreset,
       narration: scene.subtitle
+      ,
+      takeaway: visual.takeaway
     };
   }
 

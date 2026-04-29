@@ -19,11 +19,13 @@ describe('tts preview api', () => {
     await app.close();
   });
 
-  it('returns a playable preview audio artifact url', async () => {
+  it('returns a playable preview audio artifact url with strategy-aware preview copy', async () => {
     const response = await request(app.getHttpServer()).post('/tts/preview').send({
       text: '我们先来看这道方程题。',
       voice: 'female_warm',
-      speechRate: 'slow'
+      speechRate: 'slow',
+      style: 'kids',
+      targetDurationSec: 45
     });
 
     expect(response.status).toBe(201);
@@ -32,5 +34,7 @@ describe('tts preview api', () => {
     expect(response.body.durationSec).toBeGreaterThanOrEqual(3);
     expect(response.body.voice).toBe('female_warm');
     expect(response.body.speechRate).toBe('slow');
+    expect(response.body.narrationTone).toBe('鼓励启发');
+    expect(response.body.previewText).toContain('我们先来看这道方程题');
   }, 30000);
 });

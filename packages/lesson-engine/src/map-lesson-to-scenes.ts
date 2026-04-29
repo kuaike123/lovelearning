@@ -13,8 +13,8 @@ export const mapLessonToScenes = (plan: LessonPlan): VideoProject => {
     sceneType: stepToSceneType(step.stepType),
     durationSec: step.expectedDurationSec ?? 8,
     subtitle: step.narration,
-    transition: 'slide' as const,
-    visualInstruction: buildVisualInstruction(step),
+    transition: 'slide',
+    visualInstruction: buildVisualInstruction(step, plan),
     props: {
       teachingGoal: step.teachingGoal,
       visualIntent: step.visualIntent,
@@ -29,8 +29,10 @@ export const mapLessonToScenes = (plan: LessonPlan): VideoProject => {
       sceneType: 'title',
       durationSec: 3,
       subtitle: plan.title,
-      transition: 'fade' as const,
+      transition: 'fade',
       visualInstruction: {
+        coverLayout: plan.presentation?.coverLayout,
+        eyebrow: plan.presentation?.coverTone,
         layout: 'title_card',
         primaryText: plan.title,
         detail: plan.learningGoal,
@@ -70,7 +72,7 @@ const injectWarningScene = (stepScenes: VideoScene[], plan: LessonPlan) => {
   return [...stepScenes.slice(0, firstSummaryIndex), warningScene, ...stepScenes.slice(firstSummaryIndex)];
 };
 
-const buildVisualInstruction = (step: LessonStep): VisualInstruction => {
+const buildVisualInstruction = (step: LessonStep, plan: LessonPlan): VisualInstruction => {
   const formulaBlocks = step.keyText?.filter((item) => item.trim().length > 0) ?? [];
   const base = {
     primaryText: step.teachingGoal,
@@ -92,6 +94,7 @@ const buildVisualInstruction = (step: LessonStep): VisualInstruction => {
       ...base,
       layout: 'summary',
       answer: formulaBlocks[0] ?? step.teachingGoal,
+      takeaway: buildSummaryTakeaway(step, step.teachingGoal, plan.presentation?.narrationTone),
       motionPreset: 'emphasis'
     };
   }
@@ -108,6 +111,16 @@ const buildVisualInstruction = (step: LessonStep): VisualInstruction => {
     ...base,
     layout: 'formula_focus'
   };
+};
+
+const buildSummaryTakeaway = (step: LessonStep, fallback: string, tone?: string) => {
+  const answer = step.keyText?.[0] ?? fallback;
+
+  if (tone) {
+    return `${tone}：先抓关键关系，再把答案稳稳写成 ${answer}。`;
+  }
+
+  return undefined;
 };
 
 const createWarningScene = (plan: LessonPlan): VideoScene => {

@@ -3,6 +3,7 @@
 import React, {useEffect, useState} from 'react';
 
 import {getJob, getLessonPlan, regenerateJob} from '../../../lib/api-client';
+import {createButtonStyle, createCardStyle} from '../../ui-primitives';
 
 type Job = {
   jobId: string;
@@ -36,43 +37,43 @@ type LessonPlan = {
 };
 
 const copy = {
-  actionsHome: '\u8fd4\u56de\u9996\u9875',
-  actionsRegenerate: '\u91cd\u65b0\u751f\u6210',
-  assetCover: '\u5c01\u9762',
-  assetDeliveryList: '\u4ea4\u4ed8\u6e05\u5355',
-  assetDownloadTitle: '\u4e0b\u8f7d\u6587\u4ef6',
-  assetAudio: '\u914d\u97f3\u97f3\u9891',
-  assetJson: '\u8bb2\u89e3 JSON',
-  assetPositioningTitle: '\u6210\u7247\u5b9a\u4f4d',
-  assetUsageTitle: '\u53ef\u76f4\u63a5\u7528\u4e8e',
-  assetSubtitle: '\u5b57\u5e55',
-  assetVideo: '\u89c6\u9891',
-  coverAlt: '\u751f\u6210\u7684\u8bb2\u89e3\u89c6\u9891\u5c01\u9762',
-  errorDefault: '\u4efb\u52a1\u751f\u6210\u5931\u8d25',
-  errorLoad: '\u4efb\u52a1\u52a0\u8f7d\u5931\u8d25',
-  errorParser:
-    '\u5f53\u524d\u7248\u672c\u4ec5\u652f\u6301\u4e00\u5143\u4e00\u6b21\u65b9\u7a0b\u89e3\u6790\uff0c\u8bf7\u8f93\u5165\u7c7b\u4f3c\u201c\u89e3\u65b9\u7a0b\uff1a2x + 3 = 11\u201d\u7684\u9898\u76ee\u3002',
-  errorPrefix: '\u9519\u8bef\uff1a',
-  fieldJobId: '\u4efb\u52a1 ID\uff1a',
-  fieldTaskName: '\u4efb\u52a1\u540d\u79f0\uff1a',
-  generatedNotice: '\u89c6\u9891\u6b63\u5728\u751f\u6210\u4e2d\uff0c\u672c\u9875\u9762\u4f1a\u81ea\u52a8\u5237\u65b0\u3002',
-  lessonOutline: '\u8bb2\u89e3\u5927\u7eb2',
-  loadingProgress: '\u751f\u6210\u8fdb\u5ea6',
-  mainEyebrow: '\u89c6\u9891\u751f\u6210\u4efb\u52a1',
-  mainTitle: '\u6570\u5b66\u8bb2\u89e3\u89c6\u9891\u9884\u89c8',
-  overviewEyebrow: '\u4efb\u52a1\u6982\u89c8',
-  overviewOutcome: '\u9884\u8ba1\u7ed3\u679c',
-  overviewVoice: '\u914d\u97f3\u8bbe\u7f6e',
-  overviewTone: '\u8bb2\u89e3\u7b56\u7565',
-  overviewStage: '\u5f53\u524d\u751f\u6210\u9636\u6bb5',
-  overviewTask: '\u5f53\u524d\u4efb\u52a1',
-  stagePrefix: '\u9636\u6bb5\uff1a',
-  statusPrefix: '\u72b6\u6001\uff1a',
-  progressPrefix: '\u8fdb\u5ea6\uff1a',
-  summaryPrefix: '\u603b\u7ed3\uff1a',
-  unnamedTask: '\u672a\u547d\u540d\u4efb\u52a1',
-  visualIntentPrefix: '\u753b\u9762\u8bbe\u8ba1\uff1a',
-  learningGoalPrefix: '\u5b66\u4e60\u76ee\u6807\uff1a'
+  actionsHome: '返回首页',
+  actionsRegenerate: '重新生成',
+  assetCover: '封面',
+  assetDeliveryList: '交付清单',
+  assetDownloadTitle: '下载文件',
+  assetAudio: '配音音频',
+  assetJson: '讲解 JSON',
+  assetPositioningTitle: '成片定位',
+  assetPreviewTitle: '成片预览',
+  assetUsageTitle: '可直接用于',
+  assetSubtitle: '字幕',
+  assetVideo: '视频',
+  coverAlt: '生成的讲解视频封面',
+  errorDefault: '任务生成失败',
+  errorLoad: '任务加载失败',
+  errorParser: '当前版本仅支持一元一次方程解析，请输入类似“解方程：2x + 3 = 11”的题目。',
+  errorPrefix: '错误：',
+  fieldJobId: '任务 ID：',
+  fieldTaskName: '任务名称：',
+  generatedNotice: '视频正在生成中，本页面会自动刷新。',
+  lessonOutline: '讲解大纲',
+  loadingProgress: '生成进度',
+  mainEyebrow: '视频生成任务',
+  mainTitle: '数学讲解视频预览',
+  overviewEyebrow: '任务概览',
+  overviewOutcome: '预计结果',
+  overviewVoice: '配音设置',
+  overviewTone: '讲解策略',
+  overviewStage: '当前生成阶段',
+  overviewTask: '当前任务',
+  stagePrefix: '阶段：',
+  statusPrefix: '状态：',
+  progressPrefix: '进度：',
+  summaryPrefix: '总结：',
+  unnamedTask: '未命名任务',
+  visualIntentPrefix: '画面设计：',
+  learningGoalPrefix: '学习目标：'
 };
 
 export function JobResultPanel({jobId}: {jobId: string}) {
@@ -146,18 +147,24 @@ export function JobResultPanel({jobId}: {jobId: string}) {
     <section style={panelStyle}>
       <p style={eyebrowStyle}>{copy.mainEyebrow}</p>
       <h1 style={titleStyle}>{copy.mainTitle}</h1>
-      <p>
+      <p style={mutedTextStyle}>
         {copy.fieldTaskName}
         {job?.taskName ?? copy.unnamedTask}
-      </p>
-      <p style={mutedTextStyle}>
+        {' · '}
         {copy.fieldJobId}
         {jobId}
       </p>
-      <JobResultActions jobId={jobId} onRegenerate={handleRegenerate} />
-      <JobStatusSummary job={job ?? {jobId, status: 'loading'}} />
-      {job && !isTerminalJobStatus(job.status) ? <p aria-live="polite">{copy.generatedNotice}</p> : null}
-      {job?.status === 'failed' ? <p role="alert">{formatJobError(job.error)}</p> : null}
+
+      <section style={heroGridStyle}>
+        <div style={heroPrimaryStyle}>
+          <JobStatusSummary job={job ?? {jobId, status: 'loading'}} />
+          <JobResultActions jobId={jobId} onRegenerate={handleRegenerate} />
+          {job && !isTerminalJobStatus(job.status) ? <p aria-live="polite">{copy.generatedNotice}</p> : null}
+          {job?.status === 'failed' ? <p role="alert">{formatJobError(job.error)}</p> : null}
+        </div>
+        {job ? <JobAssetPreview job={job} /> : null}
+      </section>
+
       {job ? <JobAssetList job={job} /> : null}
       {lessonPlan ? <LessonPlanSummary lessonPlan={lessonPlan} /> : null}
     </section>
@@ -198,7 +205,7 @@ export function JobStatusSummary({
 
   return (
     <>
-      <section style={overviewCardStyle}>
+      <section data-result-section="result-overview" style={overviewCardStyle}>
         <p style={eyebrowStyle}>{copy.overviewEyebrow}</p>
         <div style={overviewGridStyle}>
           <div style={overviewItemStyle}>
@@ -222,13 +229,14 @@ export function JobStatusSummary({
           <div style={overviewItemStyle}>
             <span style={overviewLabelStyle}>{copy.overviewTone}</span>
             <strong style={overviewValueStyle}>
-              {job.narrationTone ?? '\u6e05\u6670\u8bb2\u9898'}
+              {job.narrationTone ?? '清晰讲题'}
               {' / '}
-              {job.coverTone ?? '\u6807\u51c6\u9898\u89e3\u6a21\u677f'}
+              {job.coverTone ?? '标准题解模板'}
             </strong>
           </div>
         </div>
       </section>
+
       <div style={statusGridStyle}>
         {job.taskName ? (
           <p>
@@ -259,6 +267,7 @@ export function JobStatusSummary({
           </p>
         ) : null}
       </div>
+
       {progress !== null ? (
         <div
           aria-label={copy.loadingProgress}
@@ -275,13 +284,14 @@ export function JobStatusSummary({
   );
 }
 
-export function JobAssetList({job}: {job: Job}) {
-  if (job.status !== 'completed') {
+export function JobAssetPreview({job}: {job: Job}) {
+  if (!job.videoUrl && !job.coverUrl) {
     return null;
   }
 
   return (
-    <div style={assetGridStyle}>
+    <section style={previewPanelStyle}>
+      <p style={eyebrowStyle}>{copy.assetPreviewTitle}</p>
       <div style={previewCardStyle}>
         {job.videoUrl ? (
           <video controls poster={job.coverUrl} src={job.videoUrl} style={videoStyle}>
@@ -290,16 +300,27 @@ export function JobAssetList({job}: {job: Job}) {
         ) : null}
         {job.coverUrl ? <img alt={copy.coverAlt} src={job.coverUrl} style={coverStyle} /> : null}
       </div>
+    </section>
+  );
+}
+
+export function JobAssetList({job}: {job: Job}) {
+  if (job.status !== 'completed') {
+    return null;
+  }
+
+  return (
+    <section data-result-section="delivery-assets" style={deliverySectionStyle}>
       <div style={linkCardStyle}>
         <p style={eyebrowStyle}>{copy.assetDownloadTitle}</p>
         <div style={deliveryBlockStyle}>
           <p style={deliveryTitleStyle}>{copy.assetDeliveryList}</p>
           <div style={deliveryChipListStyle}>
-            <span style={deliveryChipStyle}>{'\u7ad6\u5c4f\u8bb2\u89e3\u89c6\u9891'}</span>
-            <span style={deliveryChipStyle}>{'\u914d\u97f3\u97f3\u8f68'}</span>
-            <span style={deliveryChipStyle}>{'\u4e2d\u6587\u5b57\u5e55\u6587\u4ef6'}</span>
-            <span style={deliveryChipStyle}>{'\u8bb2\u89e3\u811a\u672c JSON'}</span>
-            <span style={deliveryChipStyle}>{'\u5c01\u9762\u9884\u89c8\u56fe'}</span>
+            <span style={deliveryChipStyle}>竖屏讲解视频</span>
+            <span style={deliveryChipStyle}>配音音轨</span>
+            <span style={deliveryChipStyle}>中文字幕文件</span>
+            <span style={deliveryChipStyle}>讲解脚本 JSON</span>
+            <span style={deliveryChipStyle}>封面预览图</span>
           </div>
         </div>
         {job.videoUrl ? <a href={job.videoUrl}>{copy.assetVideo}</a> : null}
@@ -321,19 +342,19 @@ export function JobAssetList({job}: {job: Job}) {
         <div style={usageBlockStyle}>
           <p style={deliveryTitleStyle}>{copy.assetUsageTitle}</p>
           <ul style={usageListStyle}>
-            <li>{'\u62db\u751f\u77ed\u89c6\u9891\u53d1\u5e03'}</li>
-            <li>{'\u9519\u9898\u8bb2\u89e3\u56de\u4f20'}</li>
-            <li>{'\u5bb6\u957f\u793a\u8303\u4e0e\u73ed\u8bfe\u9884\u4e60'}</li>
+            <li>招生短视频发布</li>
+            <li>错题讲解回传</li>
+            <li>家长示范与班课预习</li>
           </ul>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 
 export function LessonPlanSummary({lessonPlan}: {lessonPlan: LessonPlan}) {
   return (
-    <section style={lessonPanelStyle}>
+    <section data-result-section="lesson-outline" style={lessonPanelStyle}>
       <p style={eyebrowStyle}>{copy.lessonOutline}</p>
       <h2 style={lessonTitleStyle}>{lessonPlan.title}</h2>
       {lessonPlan.learningGoal ? (
@@ -385,11 +406,11 @@ export const isTerminalJobStatus = (status: string) => {
 
 const formatJobStatus = (status: string) => {
   const labels: Record<string, string> = {
-    completed: '\u5df2\u5b8c\u6210',
-    failed: '\u5931\u8d25',
-    loading: '\u52a0\u8f7d\u4e2d',
-    queued: '\u6392\u961f\u4e2d',
-    running: '\u751f\u6210\u4e2d'
+    completed: '已完成',
+    failed: '失败',
+    loading: '加载中',
+    queued: '排队中',
+    running: '生成中'
   };
 
   return labels[status] ?? status;
@@ -397,17 +418,17 @@ const formatJobStatus = (status: string) => {
 
 const formatJobStage = (stage: string) => {
   const labels: Record<string, string> = {
-    audio: '\u751f\u6210\u914d\u97f3',
-    done: '\u5b8c\u6210',
-    job_runner: '\u4efb\u52a1\u6267\u884c',
-    loading: '\u52a0\u8f7d\u4e2d',
-    map: '\u751f\u6210\u5206\u955c',
-    parse: '\u89e3\u6790\u9898\u76ee',
-    plan: '\u89c4\u5212\u8bb2\u89e3',
-    queued: '\u6392\u961f\u4e2d',
-    render: '\u6e32\u67d3\u89c6\u9891',
-    store: '\u4fdd\u5b58\u6587\u4ef6',
-    subtitles: '\u751f\u6210\u5b57\u5e55'
+    audio: '生成配音',
+    done: '完成',
+    job_runner: '任务执行',
+    loading: '加载中',
+    map: '生成分镜',
+    parse: '解析题目',
+    plan: '规划讲解',
+    queued: '排队中',
+    render: '渲染视频',
+    store: '保存文件',
+    subtitles: '生成字幕'
   };
 
   return labels[stage] ?? stage;
@@ -415,42 +436,42 @@ const formatJobStage = (stage: string) => {
 
 const formatVoice = (voice: Job['voice']) => {
   const labels: Record<NonNullable<Job['voice']>, string> = {
-    female_clear: '\u6e05\u6670\u5973\u58f0',
-    female_warm: '\u6e29\u67d4\u5973\u58f0',
-    male_calm: '\u6c89\u7a33\u7537\u58f0'
+    female_clear: '清晰女声',
+    female_warm: '温柔女声',
+    male_calm: '沉稳男声'
   };
 
-  return voice ? labels[voice] : '\u6e29\u67d4\u5973\u58f0';
+  return voice ? labels[voice] : '温柔女声';
 };
 
 const formatSpeechRate = (speechRate: Job['speechRate']) => {
   const labels: Record<NonNullable<Job['speechRate']>, string> = {
-    fast: '\u5feb\u901f',
-    normal: '\u6b63\u5e38',
-    slow: '\u6162\u901f'
+    fast: '快速',
+    normal: '正常',
+    slow: '慢速'
   };
 
-  return speechRate ? labels[speechRate] : '\u6b63\u5e38';
+  return speechRate ? labels[speechRate] : '正常';
 };
 
 const describeOutcome = (status: string, progress: number | null) => {
   if (status === 'completed') {
-    return '\u89c6\u9891\u3001\u5b57\u5e55\u548c\u5c01\u9762\u5df2\u53ef\u4e0b\u8f7d';
+    return '视频、字幕和封面已可下载';
   }
 
   if (status === 'failed') {
-    return '\u672c\u6b21\u751f\u6210\u672a\u6210\u529f\uff0c\u53ef\u91cd\u65b0\u53d1\u8d77\u4efb\u52a1';
+    return '本次生成未成功，可重新发起任务';
   }
 
   if (progress !== null && progress >= 85) {
-    return '\u5373\u5c06\u8f93\u51fa\u6210\u7247\uff0c\u8bf7\u7a0d\u5019';
+    return '即将输出成片，请稍候';
   }
 
   if (progress !== null && progress >= 45) {
-    return '\u6b63\u5728\u7ec4\u88c5\u914d\u97f3\u3001\u52a8\u753b\u548c\u5b57\u5e55';
+    return '正在组装配音、动画和字幕';
   }
 
-  return '\u6b63\u5728\u51c6\u5907\u8bb2\u89e3\u811a\u672c\u4e0e\u89c6\u9891\u6750\u6599';
+  return '正在准备讲解脚本与视频材料';
 };
 
 const formatJobError = (error: string | undefined) => {
@@ -458,7 +479,7 @@ const formatJobError = (error: string | undefined) => {
 
   if (
     error.includes('Unsupported input for V1 linear equation parser') ||
-    error.includes('\u5f53\u524d\u7248\u672c\u4ec5\u652f\u6301\u4e00\u5143\u4e00\u6b21\u65b9\u7a0b\u89e3\u6790')
+    error.includes('当前版本仅支持一元一次方程解析')
   ) {
     return copy.errorParser;
   }
@@ -491,44 +512,47 @@ const titleStyle = {
   margin: '8px 0 16px'
 };
 
+const mutedTextStyle = {
+  color: '#6b7280'
+};
+
+const heroGridStyle = {
+  alignItems: 'start',
+  display: 'grid',
+  gap: 24,
+  gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+  marginTop: 24
+};
+
+const heroPrimaryStyle = {
+  display: 'grid',
+  gap: 14
+};
+
 const actionsStyle = {
   display: 'flex',
   flexWrap: 'wrap' as const,
   gap: 10,
-  margin: '18px 0'
+  marginTop: 4
 };
 
 const homeLinkStyle = {
+  ...createButtonStyle({tone: 'secondary'}),
   alignItems: 'center',
-  background: '#fffaf1',
-  border: '1px solid #d7c8a9',
-  borderRadius: 999,
-  color: '#1f2937',
-  display: 'inline-flex',
-  padding: '8px 14px',
-  textDecoration: 'none'
-};
-
-const regenerateButtonStyle = {
-  background: '#1f5134',
-  border: 0,
-  borderRadius: 999,
-  color: '#ffffff',
-  cursor: 'pointer',
   padding: '8px 14px'
 };
 
-const assetGridStyle = {
-  display: 'grid',
-  gap: 24,
-  gridTemplateColumns: 'minmax(0, 2fr) minmax(240px, 1fr)',
-  marginTop: 24
+const regenerateButtonStyle = {
+  ...createButtonStyle({tone: 'primary'}),
+  background: '#1f5134',
+  border: '1px solid #1f5134',
+  padding: '8px 14px'
 };
 
 const statusGridStyle = {
   display: 'flex',
-  gap: 18,
-  flexWrap: 'wrap' as const
+  flexWrap: 'wrap' as const,
+  gap: 18
 };
 
 const overviewCardStyle = {
@@ -537,7 +561,6 @@ const overviewCardStyle = {
   borderRadius: 20,
   display: 'grid',
   gap: 16,
-  margin: '20px 0 18px',
   padding: 20
 };
 
@@ -577,6 +600,10 @@ const progressFillStyle = {
   height: '100%'
 };
 
+const previewPanelStyle = {
+  ...createCardStyle()
+};
+
 const previewCardStyle = {
   display: 'grid',
   gap: 16
@@ -596,14 +623,13 @@ const coverStyle = {
   width: '100%'
 };
 
+const deliverySectionStyle = {
+  marginTop: 24
+};
+
 const linkCardStyle = {
-  alignSelf: 'start',
-  background: '#fffaf1',
-  border: '1px solid #eadfca',
-  borderRadius: 20,
-  display: 'grid',
-  gap: 12,
-  padding: 20
+  ...createCardStyle(),
+  gap: 12
 };
 
 const deliveryBlockStyle = {
@@ -656,9 +682,7 @@ const positioningTextStyle = {
 };
 
 const lessonPanelStyle = {
-  background: '#fffaf1',
-  border: '1px solid #eadfca',
-  borderRadius: 20,
+  ...createCardStyle(),
   marginTop: 24,
   padding: 24
 };
@@ -688,10 +712,6 @@ const stepCardStyle = {
 const stepTitleStyle = {
   fontSize: 18,
   margin: '0 0 8px'
-};
-
-const mutedTextStyle = {
-  color: '#6b7280'
 };
 
 const keyTextListStyle = {

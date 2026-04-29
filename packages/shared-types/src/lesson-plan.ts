@@ -15,6 +15,13 @@ export const lessonPlanSchema = z.object({
   title: z.string().min(1),
   hook: z.string().optional(),
   learningGoal: z.string().min(1),
+  presentation: z
+    .object({
+      coverTone: z.string().min(1),
+      narrationTone: z.string().min(1),
+      coverLayout: z.enum(['equation_focus', 'quantity_story']).optional()
+    })
+    .optional(),
   summary: z.string().optional(),
   steps: z.array(lessonStepSchema).min(1),
   commonMistakes: z.array(z.string()).optional()
