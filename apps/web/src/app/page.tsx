@@ -1,15 +1,10 @@
 import React from 'react';
 
-import {FeaturedSampleShowcase} from './FeaturedSampleShowcase';
-import {RecentJobsPanel} from './RecentJobsPanel';
-import {SubmitJobForm} from './SubmitJobForm';
-import {SupportedScope} from './SupportedScope';
+import {HomeWorkspaceSwitcher} from './HomeWorkspaceSwitcher';
 import {
   appShellStyle,
   contentShellStyle,
-  createCardStyle,
-  sectionIntroStyle as sharedSectionIntroStyle,
-  workspaceGridStyle as sharedWorkspaceGridStyle
+  sectionIntroStyle as sharedSectionIntroStyle
 } from './ui-primitives';
 
 type HomePageProps = {
@@ -18,6 +13,7 @@ type HomePageProps = {
     style?: 'teacher' | 'kids' | 'exam';
     targetDurationSec?: string;
     taskName?: string;
+    view?: 'create' | 'samples' | 'jobs';
     voice?: 'female_warm' | 'female_clear' | 'male_calm';
     speechRate?: 'slow' | 'normal' | 'fast';
   }>;
@@ -33,6 +29,7 @@ export default async function HomePage({searchParams}: HomePageProps = {}) {
   const initialStyle = parseStyle(resolvedSearchParams?.style);
   const initialVoice = parseVoice(resolvedSearchParams?.voice);
   const initialSpeechRate = parseSpeechRate(resolvedSearchParams?.speechRate);
+  const initialView = parseView(resolvedSearchParams?.view);
 
   return (
     <main data-home-layout="workspace" style={appShellStyle}>
@@ -74,45 +71,22 @@ export default async function HomePage({searchParams}: HomePageProps = {}) {
           </div>
         </section>
 
-        <section id="generator-workbench" style={sharedWorkspaceGridStyle}>
-          <div style={primaryColumnStyle}>
-            <div style={sharedSectionIntroStyle}>
-              <p style={sectionEyebrowStyle}>{'\u751f\u6210\u5de5\u4f5c\u53f0'}</p>
-              <h2 style={sectionTitleStyle}>{'\u5148\u63d0\u4ea4\u9898\u76ee\uff0c\u518d\u9009\u97f3\u8272\u548c\u8bb2\u89e3\u7b56\u7565'}</h2>
-              <p style={sectionDescriptionStyle}>
-                {
-                  '\u8fd9\u91cc\u4fdd\u7559\u6700\u6838\u5fc3\u7684\u751f\u6210\u64cd\u4f5c\uff1a\u8f93\u5165\u9898\u76ee\u3001\u9009\u8bbe\u5b9a\u3001\u8bd5\u542c\u914d\u97f3\uff0c\u6700\u540e\u76f4\u63a5\u751f\u6210\u4efb\u52a1\u3002'
-                }
-              </p>
-            </div>
-            <div style={createCardStyle({tone: 'elevated'})}>
-              <SubmitJobForm
-                initialContent={initialContent}
-                initialStyle={initialStyle}
-                initialTargetDurationSec={initialTargetDurationSec}
-                initialTaskName={initialTaskName}
-                initialVoice={initialVoice}
-                initialSpeechRate={initialSpeechRate}
-              />
-            </div>
-          </div>
-
-          <aside style={sidebarStyle}>
-            <div style={sharedSectionIntroStyle}>
-              <p style={sectionEyebrowStyle}>{'\u8fd1\u671f\u8fd0\u8425\u9762\u677f'}</p>
-              <h2 style={sectionTitleStyle}>{'\u770b\u6700\u8fd1\u5728\u751f\u6210\u4ec0\u4e48\uff0c\u4e5f\u770b\u5f53\u524d\u80fd\u529b\u8fb9\u754c'}</h2>
-              <p style={sectionDescriptionStyle}>
-                {
-                  '\u628a\u8fd1\u671f\u4efb\u52a1\u548c V1 \u652f\u6301\u8303\u56f4\u6536\u5728\u53f3\u4fa7\uff0c\u8ba9\u9996\u9875\u66f4\u50cf\u4e00\u4e2a\u6b63\u5f0f\u7684\u5185\u5bb9\u751f\u4ea7\u5de5\u4f5c\u53f0\u3002'
-                }
-              </p>
-            </div>
-            <RecentJobsPanel />
-            <SupportedScope />
-          </aside>
+        <section id="generator-workbench" style={sharedSectionIntroStyle}>
+          <p style={sectionEyebrowStyle}>{'\u5de5\u4f5c\u533a\u5207\u6362'}</p>
+          <h2 style={sectionTitleStyle}>{'\u5148\u9009\u64cd\u4f5c\u5165\u53e3\uff0c\u518d\u8fdb\u5165\u5bf9\u5e94\u754c\u9762'}</h2>
+          <p style={sectionDescriptionStyle}>
+            {'\u4e0d\u518d\u628a\u6240\u6709\u5185\u5bb9\u6324\u5728\u4e00\u5c4f\uff0c\u70b9\u51fb\u4e0b\u9762\u4e09\u4e2a\u5165\u53e3\u5373\u53ef\u5728\u540c\u4e00\u9875\u5185\u5b8c\u6210\u5207\u6362\u3002'}
+          </p>
+          <HomeWorkspaceSwitcher
+            initialContent={initialContent}
+            initialStyle={initialStyle}
+            initialTargetDurationSec={initialTargetDurationSec}
+            initialTaskName={initialTaskName}
+            initialView={initialView}
+            initialVoice={initialVoice}
+            initialSpeechRate={initialSpeechRate}
+          />
         </section>
-
-        <FeaturedSampleShowcase />
       </div>
     </main>
   );
@@ -150,6 +124,14 @@ const parseSpeechRate = (value: string | undefined): 'slow' | 'normal' | 'fast' 
   }
 
   return undefined;
+};
+
+const parseView = (value: string | undefined): 'create' | 'samples' | 'jobs' => {
+  if (value === 'create' || value === 'samples' || value === 'jobs') {
+    return value;
+  }
+
+  return 'create';
 };
 
 const heroStyle = {
@@ -251,16 +233,6 @@ const secondaryHeroActionStyle = {
   justifyContent: 'center',
   padding: '12px 18px',
   textDecoration: 'none'
-};
-
-const primaryColumnStyle = {
-  display: 'grid',
-  gap: 16
-};
-
-const sidebarStyle = {
-  display: 'grid',
-  gap: 16
 };
 
 const sectionEyebrowStyle = {

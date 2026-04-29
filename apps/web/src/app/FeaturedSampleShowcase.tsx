@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 
 import {
   buildFeaturedSampleGenerationHref,
@@ -31,10 +31,29 @@ export function FeaturedSampleShowcase() {
   const [problemCategory, setProblemCategory] = useState<ProblemCategoryFilter>('all');
   const [useCase, setUseCase] = useState<UseCaseFilter>('all');
 
-  const visibleSamples = sortFeaturedSamplesByRecommendation(
-    filterFeaturedSamples(featuredSamples, {problemCategory, useCase})
+  const visibleSamples = useMemo(
+    () =>
+      sortFeaturedSamplesByRecommendation(
+        filterFeaturedSamples(featuredSamples, {problemCategory, useCase})
+      ),
+    [problemCategory, useCase]
   );
   const groupedSamples = splitFeaturedSamples(visibleSamples);
+  const [activeSampleSlug, setActiveSampleSlug] = useState<string | null>(visibleSamples[0]?.slug ?? null);
+
+  useEffect(() => {
+    if (visibleSamples.length === 0) {
+      setActiveSampleSlug(null);
+      return;
+    }
+
+    if (!visibleSamples.some((sample) => sample.slug === activeSampleSlug)) {
+      setActiveSampleSlug(visibleSamples[0].slug);
+    }
+  }, [activeSampleSlug, visibleSamples]);
+
+  const activeSample =
+    visibleSamples.find((sample) => sample.slug === activeSampleSlug) ?? visibleSamples[0] ?? null;
   const resultSummary =
     visibleSamples.length > 0
       ? `\u5f53\u524d\u5171 ${visibleSamples.length} \u4e2a\u6837\u7247`
@@ -46,9 +65,12 @@ export function FeaturedSampleShowcase() {
         <p style={eyebrowStyle}>{'\u7cbe\u9009\u6837\u7247'}</p>
         <h2 style={titleStyle}>{'\u7cbe\u9009\u6837\u7247\u5e93'}</h2>
         <p style={descriptionStyle}>
-          {'\u4e3a\u6f14\u793a\u3001\u6c47\u62a5\u548c\u62db\u751f\u573a\u666f\u51c6\u5907\u7684\u6807\u51c6 demo\uff0c\u4e00\u952e\u5e26\u5165\u9898\u76ee\u3001\u4efb\u52a1\u540d\u79f0\u3001\u65f6\u957f\u548c\u914d\u97f3\u7b56\u7565\u3002'}
+          {
+            '\u4e3a\u6f14\u793a\u3001\u6c47\u62a5\u548c\u62db\u751f\u573a\u666f\u51c6\u5907\u7684\u6807\u51c6 demo\uff0c\u4e00\u952e\u5e26\u5165\u9898\u76ee\u3001\u4efb\u52a1\u540d\u79f0\u3001\u65f6\u957f\u548c\u914d\u97f3\u7b56\u7565\u3002'
+          }
         </p>
       </div>
+
       <div style={filterPanelStyle}>
         <div style={filterGroupStyle}>
           <p style={filterTitleStyle}>{'\u6837\u7247\u7b5b\u9009'}</p>
@@ -89,6 +111,103 @@ export function FeaturedSampleShowcase() {
           </div>
         </div>
       </div>
+
+      {activeSample ? (
+        <section data-featured-stage={activeSample.slug} style={previewStageStyle}>
+          <div style={previewStageCopyStyle}>
+            <span style={stageEyebrowStyle}>{'\u5c01\u9762\u9884\u89c8\u6d41'}</span>
+            <h3 style={stageTitleStyle}>{'\u5f53\u524d\u9884\u89c8\u6837\u7247'}</h3>
+            <p style={stageDescriptionStyle}>
+              {
+                '\u5148\u770b\u5c01\u9762\u8868\u73b0\u548c\u6210\u7247\u5b9a\u4f4d\uff0c\u518d\u51b3\u5b9a\u662f\u5426\u8fdb\u5165\u8be6\u60c5\u9875\u6216\u4e00\u952e\u5957\u7528\u751f\u6210\u3002'
+              }
+            </p>
+          </div>
+
+          <div style={stagePanelStyle}>
+            <SamplePosterPreview sample={activeSample} variant="hero" />
+            <div style={stageInfoStyle}>
+              <div style={stageMetaTopStyle}>
+                <span style={stageSampleLabelStyle}>{'\u4e3b\u89c6\u89c9\u6837\u7247'}</span>
+                <span style={stageDateStyle}>{activeSample.publishedAt}</span>
+              </div>
+              <h4 style={stageSampleTitleStyle}>{activeSample.title}</h4>
+              <p style={stageSampleDescriptionStyle}>{activeSample.description}</p>
+              <div style={stageInsightGridStyle}>
+                <div style={stageInsightCardStyle}>
+                  <span style={insightLabelStyle}>{'\u63a8\u8350\u6307\u6570'}</span>
+                  <strong style={stageInsightValueStyle}>{`${activeSample.recommendationScore}/100`}</strong>
+                </div>
+                <div style={stageInsightCardStyle}>
+                  <span style={insightLabelStyle}>{'\u9002\u5408\u5e74\u7ea7'}</span>
+                  <strong style={stageInsightValueStyle}>{activeSample.gradeBand}</strong>
+                </div>
+                <div style={stageInsightCardStyle}>
+                  <span style={insightLabelStyle}>{'\u8f6c\u5316\u573a\u666f'}</span>
+                  <strong style={stageInsightValueStyle}>{activeSample.conversionScenario}</strong>
+                </div>
+              </div>
+              <div style={metaRowStyle}>
+                <span style={metaChipStyle}>{`${activeSample.targetDurationSec} \u79d2`}</span>
+                <span style={metaChipStyle}>
+                  {activeSample.style === 'exam' ? '\u5e94\u8bd5\u63d0\u5206' : '\u8001\u5e08\u8bb2\u89e3'}
+                </span>
+                <span style={metaChipStyle}>
+                  {activeSample.voice === 'female_clear' ? '\u6e05\u6670\u5973\u58f0' : '\u6e29\u67d4\u5973\u58f0'}
+                </span>
+              </div>
+              <div style={actionRowStyle}>
+                <a href={`/samples/${activeSample.slug}`} style={secondaryActionLinkStyle}>
+                  {'\u67e5\u770b\u6837\u7247\u8be6\u60c5'}
+                </a>
+                <a href={buildFeaturedSampleGenerationHref(activeSample)} style={actionLinkStyle}>
+                  {'\u4e00\u952e\u751f\u6210\u540c\u6b3e'}
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div data-featured-rail="sample-switcher" style={previewRailStyle}>
+            <div style={previewRailHeaderStyle}>
+              <span style={previewRailTitleStyle}>{'\u5207\u6362\u6837\u7247'}</span>
+              <span style={previewRailBodyStyle}>
+                {'\u5148\u770b\u5c01\u9762\uff0c\u518d\u5f80\u4e0b\u6d4f\u89c8\u5b8c\u6574\u6837\u7247\u5e93\u3002'}
+              </span>
+            </div>
+            <div style={previewRailGridStyle}>
+              {visibleSamples.map((sample) => {
+                const selected = sample.slug === activeSample.slug;
+
+                return (
+                  <button
+                    key={sample.slug}
+                    type="button"
+                    onClick={() => setActiveSampleSlug(sample.slug)}
+                    style={{
+                      ...previewRailItemStyle,
+                      ...(selected ? previewRailItemActiveStyle : {})
+                    }}
+                  >
+                    <div style={previewRailPosterStyle}>
+                      <SamplePosterPreview sample={sample} variant="thumbnail" />
+                    </div>
+                    <div style={previewRailCopyStyle}>
+                      <strong style={previewRailItemTitleStyle}>{sample.title}</strong>
+                      <span style={previewRailItemMetaStyle}>
+                        {sample.problemCategory === 'equation'
+                          ? '\u65b9\u7a0b'
+                          : '\u5e94\u7528\u9898'}{' '}
+                        · {sample.targetDurationSec} {'\u79d2'}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
       {visibleSamples.length > 0 ? (
         <div style={stackStyle}>
           {groupedSamples.featured.length > 0 ? (
@@ -99,7 +218,9 @@ export function FeaturedSampleShowcase() {
                   {'\u5f53\u524d\u4f18\u5148\u7528\u4e8e\u9996\u5c4f\u5c55\u793a\u3001\u8f6c\u5316\u6d4b\u8bd5\u548c\u5bf9\u5916\u6f14\u793a\u7684\u6837\u7247\u3002'}
                 </p>
               </div>
-              <div style={gridStyle}>{groupedSamples.featured.map(renderSampleCard)}</div>
+              <div style={gridStyle}>
+                {groupedSamples.featured.map((sample) => renderSampleCard(sample, setActiveSampleSlug))}
+              </div>
             </section>
           ) : null}
           <section style={sectionBandStyle}>
@@ -109,7 +230,9 @@ export function FeaturedSampleShowcase() {
                 {'\u6309\u63a8\u8350\u6307\u6570\u6392\u5e8f\u7684\u5168\u91cf\u6837\u7247\u5e93\uff0c\u7528\u4e8e\u7ee7\u7eed\u6269\u5bb9\u9898\u578b\u548c\u5185\u5bb9\u7b56\u7565\u3002'}
               </p>
             </div>
-            <div style={gridStyle}>{groupedSamples.library.map(renderSampleCard)}</div>
+            <div style={gridStyle}>
+              {groupedSamples.library.map((sample) => renderSampleCard(sample, setActiveSampleSlug))}
+            </div>
           </section>
         </div>
       ) : (
@@ -124,22 +247,64 @@ export function FeaturedSampleShowcase() {
   );
 }
 
-const renderSampleCard = (sample: FeaturedSample) => (
-  <article key={sample.taskName} style={cardStyle}>
-    <p style={cardEyebrowStyle}>{'\u6807\u51c6\u6837\u7247'}</p>
-    <h3 style={cardTitleStyle}>{sample.title}</h3>
-    <div style={posterPreviewStyle}>
+function SamplePosterPreview({
+  sample,
+  variant
+}: {
+  sample: FeaturedSample;
+  variant: 'hero' | 'card' | 'thumbnail';
+}) {
+  const compact = variant === 'thumbnail';
+  const hero = variant === 'hero';
+
+  return (
+    <div
+      style={{
+        ...posterPreviewStyle,
+        ...(hero ? heroPosterPreviewStyle : {}),
+        ...(compact ? thumbnailPosterPreviewStyle : {})
+      }}
+    >
       <div style={posterTopRowStyle}>
         <span style={posterKickerStyle}>{sample.posterKicker}</span>
         <span style={posterBrandStyle}>{'Love Learning'}</span>
       </div>
-      <div style={posterFormulaStyle}>{sample.content}</div>
-      <p style={posterCaptionStyle}>{sample.posterCaption}</p>
+      <div
+        style={{
+          ...posterFormulaStyle,
+          ...(hero ? heroPosterFormulaStyle : {}),
+          ...(compact ? thumbnailPosterFormulaStyle : {})
+        }}
+      >
+        {sample.content}
+      </div>
+      <p
+        style={{
+          ...posterCaptionStyle,
+          ...(hero ? heroPosterCaptionStyle : {}),
+          ...(compact ? thumbnailPosterCaptionStyle : {})
+        }}
+      >
+        {sample.posterCaption}
+      </p>
       <div style={posterFooterStyle}>
         <span style={posterBadgeStyle}>{'\u5c01\u9762\u9884\u89c8'}</span>
         <span style={posterFootnoteStyle}>{'\u6210\u7247\u9884\u671f\uff1a9:16 \u7ad6\u5c4f\u77ed\u89c6\u9891'}</span>
       </div>
     </div>
+  );
+}
+
+const renderSampleCard = (sample: FeaturedSample, onPreview: (slug: string) => void) => (
+  <article key={sample.taskName} style={cardStyle}>
+    <div style={cardHeaderStyle}>
+      <p style={cardEyebrowStyle}>{'\u6807\u51c6\u6837\u7247'}</p>
+      <button type="button" onClick={() => onPreview(sample.slug)} style={previewSwitchButtonStyle}>
+        {'\u8bbe\u4e3a\u5f53\u524d\u9884\u89c8'}
+      </button>
+    </div>
+    <h3 style={cardTitleStyle}>{sample.title}</h3>
+    <SamplePosterPreview sample={sample} variant="card" />
     <p style={cardDescriptionStyle}>{sample.description}</p>
     <div style={insightGridStyle}>
       <div style={insightItemStyle}>
@@ -156,7 +321,9 @@ const renderSampleCard = (sample: FeaturedSample) => (
       </div>
     </div>
     <p style={summaryLineStyle}>
-      {`适合 ${sample.gradeBand}，默认 ${sample.targetDurationSec} 秒，${sample.style === 'exam' ? '偏提分讲解' : '偏标准讲解'}。`}
+      {`\u9002\u5408 ${sample.gradeBand}\uff0c\u9ed8\u8ba4 ${sample.targetDurationSec} \u79d2\uff0c${
+        sample.style === 'exam' ? '\u504f\u63d0\u5206\u8bb2\u89e3' : '\u504f\u6807\u51c6\u8bb2\u89e3'
+      }\u3002`}
     </p>
     <div style={metaRowStyle}>
       <span style={metaChipStyle}>{`${sample.targetDurationSec} \u79d2`}</span>
@@ -270,6 +437,183 @@ const filterChipActiveStyle = {
   color: '#7C4A03'
 };
 
+const previewStageStyle = {
+  background: 'rgba(255,255,255,0.08)',
+  border: '1px solid rgba(255,255,255,0.14)',
+  borderRadius: 24,
+  display: 'grid',
+  gap: 18,
+  marginBottom: 22,
+  padding: 18
+};
+
+const previewStageCopyStyle = {
+  display: 'grid',
+  gap: 8
+};
+
+const stageEyebrowStyle = {
+  color: '#F5C542',
+  fontSize: 12,
+  fontWeight: 800,
+  letterSpacing: 1.4
+};
+
+const stageTitleStyle = {
+  fontFamily: 'Georgia, "Times New Roman", serif',
+  fontSize: 32,
+  lineHeight: 1.12,
+  margin: 0
+};
+
+const stageDescriptionStyle = {
+  color: 'rgba(255,247,214,0.86)',
+  lineHeight: 1.7,
+  margin: 0,
+  maxWidth: 720
+};
+
+const stagePanelStyle = {
+  alignItems: 'stretch',
+  display: 'grid',
+  gap: 18,
+  gridTemplateColumns: 'minmax(240px, 360px) minmax(0, 1fr)'
+};
+
+const stageInfoStyle = {
+  background: 'rgba(255,250,241,0.96)',
+  border: '1px solid rgba(255,255,255,0.14)',
+  borderRadius: 24,
+  color: '#102A43',
+  display: 'grid',
+  gap: 14,
+  padding: 20
+};
+
+const stageMetaTopStyle = {
+  alignItems: 'center',
+  display: 'flex',
+  gap: 12,
+  justifyContent: 'space-between'
+};
+
+const stageSampleLabelStyle = {
+  background: '#FFF4CC',
+  borderRadius: 999,
+  color: '#7C4A03',
+  display: 'inline-flex',
+  fontSize: 12,
+  fontWeight: 800,
+  padding: '6px 10px'
+};
+
+const stageDateStyle = {
+  color: '#6B7280',
+  fontSize: 13,
+  fontWeight: 700
+};
+
+const stageSampleTitleStyle = {
+  fontSize: 30,
+  lineHeight: 1.15,
+  margin: 0
+};
+
+const stageSampleDescriptionStyle = {
+  color: '#374151',
+  lineHeight: 1.7,
+  margin: 0
+};
+
+const stageInsightGridStyle = {
+  display: 'grid',
+  gap: 10,
+  gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))'
+};
+
+const stageInsightCardStyle = {
+  background: '#FFF7E0',
+  borderRadius: 16,
+  display: 'grid',
+  gap: 4,
+  padding: '12px 14px'
+};
+
+const stageInsightValueStyle = {
+  color: '#102A43',
+  fontSize: 16,
+  lineHeight: 1.4
+};
+
+const previewRailStyle = {
+  display: 'grid',
+  gap: 12
+};
+
+const previewRailHeaderStyle = {
+  alignItems: 'end',
+  display: 'flex',
+  flexWrap: 'wrap' as const,
+  gap: 10,
+  justifyContent: 'space-between'
+};
+
+const previewRailTitleStyle = {
+  color: '#FFF7D6',
+  fontSize: 15,
+  fontWeight: 800
+};
+
+const previewRailBodyStyle = {
+  color: 'rgba(255,247,214,0.82)',
+  fontSize: 13,
+  lineHeight: 1.5
+};
+
+const previewRailGridStyle = {
+  display: 'grid',
+  gap: 12,
+  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))'
+};
+
+const previewRailItemStyle = {
+  background: 'rgba(255,255,255,0.08)',
+  border: '1px solid rgba(255,255,255,0.14)',
+  borderRadius: 18,
+  color: '#FFF7D6',
+  cursor: 'pointer',
+  display: 'grid',
+  gap: 10,
+  padding: 12,
+  textAlign: 'left' as const
+};
+
+const previewRailItemActiveStyle = {
+  background: 'rgba(255,244,204,0.16)',
+  borderColor: '#FFF4CC',
+  boxShadow: '0 8px 20px rgba(16, 42, 67, 0.18)'
+};
+
+const previewRailPosterStyle = {
+  display: 'grid'
+};
+
+const previewRailCopyStyle = {
+  display: 'grid',
+  gap: 4
+};
+
+const previewRailItemTitleStyle = {
+  fontSize: 15,
+  lineHeight: 1.45
+};
+
+const previewRailItemMetaStyle = {
+  color: 'rgba(255,247,214,0.78)',
+  fontSize: 12,
+  lineHeight: 1.5
+};
+
 const gridStyle = {
   display: 'grid',
   gap: 16,
@@ -314,6 +658,19 @@ const cardStyle = {
   padding: 20
 };
 
+const cardHeaderStyle = {
+  alignItems: 'center',
+  display: 'flex',
+  gap: 10,
+  justifyContent: 'space-between'
+};
+
+const previewSwitchButtonStyle = {
+  ...createButtonStyle({tone: 'quiet'}),
+  fontSize: 12,
+  padding: '8px 12px'
+};
+
 const posterPreviewStyle = {
   aspectRatio: '9 / 16',
   background: 'linear-gradient(180deg, #14324A 0%, #245B45 100%)',
@@ -323,6 +680,17 @@ const posterPreviewStyle = {
   display: 'grid',
   gap: 14,
   padding: 18
+};
+
+const heroPosterPreviewStyle = {
+  minHeight: '100%'
+};
+
+const thumbnailPosterPreviewStyle = {
+  aspectRatio: '9 / 13',
+  borderRadius: 16,
+  gap: 8,
+  padding: 10
 };
 
 const posterTopRowStyle = {
@@ -358,11 +726,31 @@ const posterFormulaStyle = {
   padding: 16
 };
 
+const heroPosterFormulaStyle = {
+  fontSize: 30,
+  minHeight: 132
+};
+
+const thumbnailPosterFormulaStyle = {
+  borderRadius: 12,
+  fontSize: 15,
+  minHeight: 52,
+  padding: 10
+};
+
 const posterCaptionStyle = {
   fontSize: 22,
   fontWeight: 800,
   lineHeight: 1.35,
   margin: 0
+};
+
+const heroPosterCaptionStyle = {
+  fontSize: 28
+};
+
+const thumbnailPosterCaptionStyle = {
+  fontSize: 14
 };
 
 const posterFooterStyle = {
@@ -454,7 +842,7 @@ const metaChipStyle = {
 const actionLinkStyle = {
   ...createButtonStyle({tone: 'primary'}),
   background: '#102A43',
-  color: '#FFF7D6',
+  color: '#FFF7D6'
 };
 
 const actionRowStyle = {
@@ -465,7 +853,7 @@ const actionRowStyle = {
 
 const secondaryActionLinkStyle = {
   ...createButtonStyle({tone: 'secondary'}),
-  color: '#102A43',
+  color: '#102A43'
 };
 
 const emptyStateStyle = {

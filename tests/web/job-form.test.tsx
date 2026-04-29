@@ -12,17 +12,28 @@ describe('HomePage', () => {
     expect(html).toContain('data-home-layout="workspace"');
     expect(html).toContain('\u4e2d\u5c0f\u5b66\u6559\u57f9\u89c6\u9891\u5de5\u5382');
     expect(html).toContain('\u4ece\u9898\u76ee\u5230\u77ed\u89c6\u9891');
-    expect(html).toContain('\u751f\u6210\u5de5\u4f5c\u53f0');
+    expect(html).toContain('\u5de5\u4f5c\u533a\u5207\u6362');
+    expect(html).toContain('data-home-entry="create"');
+    expect(html).toContain('data-home-entry="samples"');
+    expect(html).toContain('data-home-entry="jobs"');
+    expect(html).toContain('data-home-panel="create"');
+    expect(html).toContain('data-home-illustration="create"');
+    expect(html).toContain('data-home-motion="panel-hero"');
     expect(html).toContain('\u9898\u76ee\u5185\u5bb9');
     expect(html).toContain('\u89e3\u65b9\u7a0b\uff1a2x + 3 = 11');
     expect(html).toContain('\u751f\u6210\u89c6\u9891');
   });
 
-  it('shows V1 supported scope and clickable example problems', async () => {
-    const html = renderToStaticMarkup(await HomePage());
+  it('shows V1 supported scope and clickable example problems in jobs panel', async () => {
+    const html = renderToStaticMarkup(
+      await HomePage({
+        searchParams: Promise.resolve({view: 'jobs'})
+      })
+    );
     const templates = getProblemTemplates();
     const examples = templates.flatMap((template) => template.examples);
 
+    expect(html).toContain('data-home-illustration="jobs"');
     expect(html).toContain('\u5f53\u524d V1 \u652f\u6301');
     expect(html).toContain('\u4e00\u952e\u586b\u5165\u793a\u4f8b');
 
@@ -37,9 +48,14 @@ describe('HomePage', () => {
     }
   });
 
-  it('shows a featured sample showcase with one-click preset links', async () => {
-    const html = renderToStaticMarkup(await HomePage());
+  it('shows a featured sample showcase with one-click preset links in samples panel', async () => {
+    const html = renderToStaticMarkup(
+      await HomePage({
+        searchParams: Promise.resolve({view: 'samples'})
+      })
+    );
 
+    expect(html).toContain('data-home-illustration="samples"');
     expect(html).toContain('\u7cbe\u9009\u6837\u7247');
     expect(html).toContain('\u4e3b\u63a8\u6837\u7247');
     expect(html).toContain('\u5168\u90e8\u6837\u7247');

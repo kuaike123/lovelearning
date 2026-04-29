@@ -28,7 +28,14 @@ describe('app router page props', () => {
     expect(markup).toContain('data-home-layout="workspace"');
     expect(markup).toContain('\u4e2d\u5c0f\u5b66\u6559\u57f9\u89c6\u9891\u5de5\u5382');
     expect(markup).toContain('\u4ece\u9898\u76ee\u5230\u77ed\u89c6\u9891');
-    expect(markup).toContain('\u751f\u6210\u5de5\u4f5c\u53f0');
-    expect(markup).toContain('\u8fd1\u671f\u8fd0\u8425\u9762\u677f');
+    expect(markup).toContain('data-home-entry="create"');
+    expect(markup).toContain('data-home-entry="samples"');
+    expect(markup).toContain('data-home-entry="jobs"');
+    expect(markup).toContain('data-home-panel="create"');
+    expect(markup).toContain('data-home-illustration="create"');
+    expect(markup).toContain('data-home-motion="panel-hero"');
+    expect(markup).toContain('\u65b0\u5efa\u89c6\u9891');
+    expect(markup).toContain('\u6d4f\u89c8\u6837\u7247');
+    expect(markup).toContain('\u67e5\u770b\u8fdb\u5ea6');
   });
 });

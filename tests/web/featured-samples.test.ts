@@ -1,4 +1,6 @@
 import {describe, expect, it} from 'vitest';
+import React from 'react';
+import {renderToStaticMarkup} from 'react-dom/server';
 
 import {
   buildFeaturedSampleGenerationHref,
@@ -9,6 +11,7 @@ import {
   sortFeaturedSamplesByRecommendation
 } from '../../apps/web/src/app/featured-samples';
 import {featuredSampleRecords} from '../../apps/web/src/app/featured-samples.data';
+import {FeaturedSampleShowcase} from '../../apps/web/src/app/FeaturedSampleShowcase';
 
 describe('featured sample filters', () => {
   it('validates the raw sample metadata and preserves stable slugs', () => {
@@ -75,5 +78,15 @@ describe('featured sample filters', () => {
     expect(quantitySample).not.toBeUndefined();
     expect(buildFeaturedSampleGenerationHref(quantitySample!)).toContain('voice=female_clear');
     expect(buildFeaturedSampleGenerationHref(quantitySample!)).toContain('speechRate=fast');
+  });
+
+  it('renders a prominent sample preview flow before the library cards', () => {
+    const html = renderToStaticMarkup(React.createElement(FeaturedSampleShowcase));
+
+    expect(html).toContain('data-featured-stage="linear-equation-basic"');
+    expect(html).toContain('data-featured-rail="sample-switcher"');
+    expect(html).toContain('当前预览样片');
+    expect(html).toContain('切换样片');
+    expect(html).toContain('封面预览流');
   });
 });
