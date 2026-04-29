@@ -3,6 +3,7 @@
 import React, {useEffect, useState} from 'react';
 
 import {deleteJob, listJobs, regenerateJob} from '../lib/api-client';
+import {createButtonStyle, createCardStyle, createEyebrowStyle, formControlStyle} from './ui-primitives';
 
 type RecentJob = {
   error?: string;
@@ -170,16 +171,14 @@ const copy = {
 };
 
 const sectionStyle = {
-  background: '#fffaf1',
-  border: '1px solid #eadfca',
+  ...createCardStyle(),
   borderRadius: 24,
   marginTop: 32,
   padding: 24
 };
 
 const eyebrowStyle = {
-  color: '#6f7d45',
-  fontSize: 13,
+  ...createEyebrowStyle(),
   fontWeight: 700,
   letterSpacing: 1.6,
   textTransform: 'uppercase' as const
@@ -199,7 +198,7 @@ const searchLabelStyle = {
 };
 
 const searchInputStyle = {
-  border: '1px solid #d7c8a9',
+  ...formControlStyle,
   borderRadius: 12,
   fontSize: 16,
   padding: '10px 12px'
@@ -211,11 +210,10 @@ const listStyle = {
 };
 
 const jobCardStyle = {
+  ...createCardStyle(),
   background: '#ffffff',
-  border: '1px solid #eadfca',
   borderRadius: 18,
   color: '#1f2937',
-  display: 'grid',
   gap: 10,
   padding: 16
 };
@@ -258,21 +256,17 @@ const actionRowStyle = {
 };
 
 const regenerateButtonStyle = {
+  ...createButtonStyle({tone: 'primary'}),
   background: '#1f5134',
-  border: 0,
-  borderRadius: 999,
-  color: '#ffffff',
-  cursor: 'pointer',
+  border: '1px solid #1f5134',
   justifySelf: 'start',
   padding: '8px 14px'
 };
 
 const deleteButtonStyle = {
+  ...createButtonStyle({tone: 'primary'}),
   background: '#7f1d1d',
-  border: 0,
-  borderRadius: 999,
-  color: '#ffffff',
-  cursor: 'pointer',
+  border: '1px solid #7f1d1d',
   justifySelf: 'start',
   padding: '8px 14px'
 };

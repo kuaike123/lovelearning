@@ -12,6 +12,7 @@ import {
   type ProblemCategoryFilter,
   type UseCaseFilter
 } from './featured-samples';
+import {createButtonStyle, createCardStyle, createPillStyle} from './ui-primitives';
 
 const categoryOptions: {label: string; value: ProblemCategoryFilter}[] = [
   {label: '\u5168\u90e8', value: 'all'},
@@ -304,11 +305,11 @@ const sectionDescriptionStyle = {
 };
 
 const cardStyle = {
+  ...createCardStyle(),
   background: 'rgba(255, 250, 241, 0.94)',
   border: '1px solid rgba(255,255,255,0.16)',
   borderRadius: 22,
   color: '#102A43',
-  display: 'grid',
   gap: 12,
   padding: 20
 };
@@ -446,22 +447,14 @@ const summaryLineStyle = {
 };
 
 const metaChipStyle = {
-  background: '#E7F0DA',
-  borderRadius: 999,
-  color: '#1F5134',
-  fontSize: 13,
-  fontWeight: 700,
-  padding: '6px 10px'
+  ...createPillStyle({tone: 'success'}),
+  fontSize: 13
 };
 
 const actionLinkStyle = {
+  ...createButtonStyle({tone: 'primary'}),
   background: '#102A43',
-  borderRadius: 999,
   color: '#FFF7D6',
-  display: 'inline-flex',
-  justifyContent: 'center',
-  padding: '10px 16px',
-  textDecoration: 'none'
 };
 
 const actionRowStyle = {
@@ -471,14 +464,8 @@ const actionRowStyle = {
 };
 
 const secondaryActionLinkStyle = {
-  background: '#FFFFFF',
-  border: '1px solid #d7c8a9',
-  borderRadius: 999,
+  ...createButtonStyle({tone: 'secondary'}),
   color: '#102A43',
-  display: 'inline-flex',
-  justifyContent: 'center',
-  padding: '10px 16px',
-  textDecoration: 'none'
 };
 
 const emptyStateStyle = {
