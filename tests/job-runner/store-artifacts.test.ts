@@ -21,7 +21,7 @@ describe('storeArtifacts', () => {
     }
   });
 
-  it('writes lesson JSON, subtitles, video, and cover files for a job', async () => {
+  it('writes lesson JSON, subtitles, video, cover files, and strategy metadata for a job', async () => {
     artifactRoot = await mkdtemp(join(tmpdir(), 'edu-video-artifacts-'));
     renderDir = await mkdtemp(join(tmpdir(), 'edu-video-render-'));
     const videoPath = join(renderDir, 'output.mp4');
@@ -36,7 +36,9 @@ describe('storeArtifacts', () => {
       publicBaseUrl: 'http://localhost:3001/artifacts',
       metadata: {
         problemText: '解方程：2x + 3 = 11',
-        taskName: '初一方程例题讲解'
+        taskName: '初一方程例题讲解',
+        narrationTone: '清晰讲题',
+        coverTone: '标准题解模板'
       },
       lessonPlan: {
         title: 'Equation lesson',
@@ -52,6 +54,7 @@ describe('storeArtifacts', () => {
         ]
       },
       subtitles: [{id: 's1', startMs: 0, endMs: 4000, text: 'Read the equation.'}],
+      audioUrls: ['http://localhost:3001/artifacts/jobs/job-1/audio/s1.wav'],
       renderArtifact: {videoPath, coverPath}
     });
 
@@ -64,7 +67,9 @@ describe('storeArtifacts', () => {
     expect(JSON.parse(lesson).title).toBe('Equation lesson');
     expect(JSON.parse(metadata)).toMatchObject({
       problemText: '解方程：2x + 3 = 11',
-      taskName: '初一方程例题讲解'
+      taskName: '初一方程例题讲解',
+      narrationTone: '清晰讲题',
+      coverTone: '标准题解模板'
     });
     expect(subtitles).toContain('00:00:00,000 --> 00:00:04,000');
     expect(video).toBe('video bytes');
@@ -72,6 +77,7 @@ describe('storeArtifacts', () => {
     expect(result).toEqual({
       videoUrl: 'http://localhost:3001/artifacts/jobs/job-1/output.mp4',
       coverUrl: 'http://localhost:3001/artifacts/jobs/job-1/cover.png',
+      audioUrls: ['http://localhost:3001/artifacts/jobs/job-1/audio/s1.wav'],
       lessonPlanUrl: 'http://localhost:3001/artifacts/jobs/job-1/lesson.json',
       subtitleUrl: 'http://localhost:3001/artifacts/jobs/job-1/subtitles.srt'
     });

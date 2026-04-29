@@ -69,3 +69,21 @@ export const getLessonPlan = async (lessonPlanUrl: string) => {
 
   return response.json();
 };
+
+export const previewTts = async (input: {
+  text: string;
+  voice?: 'female_warm' | 'female_clear' | 'male_calm';
+  speechRate?: 'slow' | 'normal' | 'fast';
+}) => {
+  const response = await fetch(`${apiBaseUrl}/tts/preview`, {
+    method: 'POST',
+    headers: {'content-type': 'application/json'},
+    body: JSON.stringify(input)
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to preview tts');
+  }
+
+  return response.json();
+};

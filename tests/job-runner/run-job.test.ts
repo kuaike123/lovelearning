@@ -65,6 +65,7 @@ describe('runJob', () => {
         storeArtifacts: vi.fn().mockResolvedValue({
           videoUrl: 'http://localhost:3001/artifacts/jobs/job-1/output.mp4',
           coverUrl: 'http://localhost:3001/artifacts/jobs/job-1/cover.png',
+          audioUrls: ['mock://audio/s1.mp3'],
           lessonPlanUrl: 'http://localhost:3001/artifacts/jobs/job-1/lesson.json',
           subtitleUrl: 'http://localhost:3001/artifacts/jobs/job-1/subtitles.srt'
         })
@@ -74,6 +75,93 @@ describe('runJob', () => {
     expect(result.status).toBe('completed');
     expect(result.videoUrl).toBe('http://localhost:3001/artifacts/jobs/job-1/output.mp4');
     expect(result.coverUrl).toBe('http://localhost:3001/artifacts/jobs/job-1/cover.png');
+    expect(result.audioUrls).toEqual(['mock://audio/s1.mp3']);
+  });
+
+  it('passes synthesized scene audio into the rendered video project', async () => {
+    const renderProject = vi.fn().mockResolvedValue({
+      videoPath: 'C:/tmp/job-1.mp4',
+      coverPath: 'C:/tmp/job-1.png'
+    });
+
+    await runJob(
+      {
+        subject: 'math',
+        sourceType: 'text',
+        content: 'Solve equation: 2x + 3 = 11'
+      },
+      {
+        parseProblem: vi.fn().mockResolvedValue({
+          subject: 'math',
+          grade: 'junior',
+          problemType: 'linear_equation_one_variable',
+          difficulty: 'easy',
+          originalText: 'Solve equation: 2x + 3 = 11',
+          normalizedExpression: '2x + 3 = 11',
+          isSupported: true,
+          knowledgePoints: ['linear equation']
+        }),
+        planLesson: vi.fn().mockResolvedValue({
+          title: 'Equation lesson',
+          learningGoal: 'Solve the equation',
+          steps: [
+            {
+              id: 's1',
+              stepType: 'show_problem',
+              teachingGoal: 'Show the problem',
+              narration: 'Read the equation.',
+              visualIntent: 'Show the original equation'
+            }
+          ]
+        }),
+        mapLessonToScenes: vi.fn().mockReturnValue({
+          compositionId: 'LessonVideo',
+          fps: 30,
+          width: 1080,
+          height: 1920,
+          theme: 'clean_classroom',
+          totalDurationSec: 8,
+          scenes: [
+            {
+              id: 's1',
+              sceneType: 'problem',
+              durationSec: 8,
+              subtitle: 'Read the equation.',
+              props: {}
+            }
+          ]
+        }),
+        synthesizeSceneAudio: vi.fn().mockResolvedValue({
+          audioPath: 'C:/tmp/job-1/audio/s1.wav',
+          audioUrl: 'file:///C:/tmp/job-1/audio/s1.wav',
+          durationSec: 9
+        }),
+        buildSubtitles: vi.fn().mockReturnValue([
+          {id: 's1', startMs: 0, endMs: 9000, text: 'Read the equation.'}
+        ]),
+        renderProject,
+        storeArtifacts: vi.fn().mockImplementation(async (artifacts) => ({
+          videoUrl: 'http://localhost:3001/artifacts/jobs/job-1/output.mp4',
+          coverUrl: 'http://localhost:3001/artifacts/jobs/job-1/cover.png',
+          audioUrls: artifacts.audioUrls,
+          lessonPlanUrl: 'http://localhost:3001/artifacts/jobs/job-1/lesson.json',
+          subtitleUrl: 'http://localhost:3001/artifacts/jobs/job-1/subtitles.srt'
+        }))
+      }
+    );
+
+    expect(renderProject).toHaveBeenCalledWith(
+      expect.objectContaining({
+        scenes: [
+          expect.objectContaining({
+            audioUrl: 'file:///C:/tmp/job-1/audio/s1.wav',
+            durationSec: 9
+          })
+        ],
+        totalDurationSec: 9
+      }),
+      expect.any(Object)
+    );
   });
 
   it('reports pipeline progress stages in order', async () => {

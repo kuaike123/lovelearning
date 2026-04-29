@@ -14,8 +14,13 @@ type StoreArtifactsInput = {
   metadata?: {
     problemText?: string;
     taskName?: string;
+    voice?: 'female_warm' | 'female_clear' | 'male_calm';
+    speechRate?: 'slow' | 'normal' | 'fast';
+    narrationTone?: string;
+    coverTone?: string;
   };
   publicBaseUrl?: string;
+  audioUrls?: string[];
   lessonPlan: unknown;
   subtitles: SubtitleCue[];
   renderArtifact?: {
@@ -48,6 +53,7 @@ export const storeArtifacts = async (artifacts: StoreArtifactsInput) => {
   return {
     ...(artifacts.renderArtifact?.videoPath ? {videoUrl: `${publicBaseUrl}/jobs/${jobId}/output.mp4`} : {}),
     ...(artifacts.renderArtifact?.coverPath ? {coverUrl: `${publicBaseUrl}/jobs/${jobId}/cover.png`} : {}),
+    ...(artifacts.audioUrls?.length ? {audioUrls: artifacts.audioUrls} : {}),
     lessonPlanUrl: `${publicBaseUrl}/jobs/${jobId}/lesson.json`,
     subtitleUrl: `${publicBaseUrl}/jobs/${jobId}/subtitles.srt`
   };

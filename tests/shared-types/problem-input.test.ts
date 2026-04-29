@@ -12,10 +12,12 @@ describe('problemInputSchema', () => {
       content: 'Solve equation: 2x + 3 = 11',
       targetDurationSec: 45,
       style: 'teacher',
-      voice: 'female_warm'
+      voice: 'female_warm',
+      speechRate: 'slow'
     });
 
     expect(parsed.content).toContain('2x + 3 = 11');
+    expect(parsed.speechRate).toBe('slow');
     expect(parsed.taskName).toBe('初一方程例题讲解');
   });
 });

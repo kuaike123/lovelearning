@@ -52,6 +52,8 @@ const contentTypeFor = (filePath: string) => {
       return 'video/mp4';
     case '.png':
       return 'image/png';
+    case '.wav':
+      return 'audio/wav';
     default:
       return 'application/octet-stream';
   }

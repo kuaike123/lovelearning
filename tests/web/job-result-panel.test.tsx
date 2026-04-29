@@ -11,11 +11,38 @@ import {
 } from '../../apps/web/src/app/jobs/[id]/JobResultPanel';
 
 describe('JobResultPage', () => {
-  it('uses a Chinese page title', () => {
-    const html = renderToStaticMarkup(<JobResultPage params={{id: 'job-1'}} />);
+  it('uses a Chinese page title', async () => {
+    const html = renderToStaticMarkup(await JobResultPage({params: Promise.resolve({id: 'job-1'})}));
 
     expect(html).toContain('\u751f\u6210\u7ed3\u679c');
     expect(html).not.toContain('Generation Result');
+  });
+});
+
+describe('JobResultPanel product copy', () => {
+  it('renders a productized overview section for the current task', () => {
+    const html = renderToStaticMarkup(
+      <JobStatusSummary
+        job={{
+          status: 'running',
+          stage: 'render',
+          progress: 42,
+          taskName: '\u521d\u4e00\u65b9\u7a0b\u6807\u51c6\u8bb2\u89e3',
+          narrationTone: '\u9f13\u52b1\u542f\u53d1',
+          coverTone: '\u50cf\u8001\u5e08\u5728\u8eab\u8fb9\u5e26\u7740\u5b66',
+          voice: 'female_warm',
+          speechRate: 'slow'
+        }}
+      />
+    );
+
+    expect(html).toContain('\u4efb\u52a1\u6982\u89c8');
+    expect(html).toContain('\u5f53\u524d\u751f\u6210\u9636\u6bb5');
+    expect(html).toContain('\u9884\u8ba1\u7ed3\u679c');
+    expect(html).toContain('\u6e29\u67d4\u5973\u58f0');
+    expect(html).toContain('\u6162\u901f');
+    expect(html).toContain('\u9f13\u52b1\u542f\u53d1');
+    expect(html).toContain('\u50cf\u8001\u5e08\u5728\u8eab\u8fb9\u5e26\u7740\u5b66');
   });
 });
 
@@ -40,6 +67,7 @@ describe('JobAssetList', () => {
           status: 'completed',
           videoUrl: 'http://localhost:3001/artifacts/jobs/job-1/output.mp4',
           coverUrl: 'http://localhost:3001/artifacts/jobs/job-1/cover.png',
+          audioUrls: ['http://localhost:3001/artifacts/jobs/job-1/audio/s1.wav'],
           subtitleUrl: 'http://localhost:3001/artifacts/jobs/job-1/subtitles.srt',
           lessonPlanUrl: 'http://localhost:3001/artifacts/jobs/job-1/lesson.json'
         }}
@@ -47,7 +75,12 @@ describe('JobAssetList', () => {
     );
 
     expect(html).toContain('http://localhost:3001/artifacts/jobs/job-1/output.mp4');
+    expect(html).toContain('http://localhost:3001/artifacts/jobs/job-1/audio/s1.wav');
     expect(html).toContain('http://localhost:3001/artifacts/jobs/job-1/subtitles.srt');
+    expect(html).toContain('\u4ea4\u4ed8\u6e05\u5355');
+    expect(html).toContain('\u53ef\u76f4\u63a5\u7528\u4e8e');
+    expect(html).toContain('\u6210\u7247\u5b9a\u4f4d');
+    expect(html).toContain('\u7ad6\u5c4f\u8bb2\u89e3\u89c6\u9891');
   });
 
   it('renders a playable preview and cover image for a completed job', () => {

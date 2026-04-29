@@ -12,6 +12,10 @@ type RecoveredJob = {
   createdAt: string;
   problemText: string;
   taskName: string;
+  voice?: 'female_warm' | 'female_clear' | 'male_calm';
+  speechRate?: 'slow' | 'normal' | 'fast';
+  narrationTone?: string;
+  coverTone?: string;
   videoUrl: string;
   coverUrl: string;
   subtitleUrl: string;
@@ -47,6 +51,10 @@ export const recoverJobFromArtifacts = (jobId: string): RecoveredJob | null => {
       createdAt,
       problemText,
       taskName,
+      voice: metadata.voice,
+      speechRate: metadata.speechRate,
+      narrationTone: metadata.narrationTone,
+      coverTone: metadata.coverTone,
       videoUrl: `${publicBaseUrl}/jobs/${jobId}/output.mp4`,
       coverUrl: `${publicBaseUrl}/jobs/${jobId}/cover.png`,
       subtitleUrl: `${publicBaseUrl}/jobs/${jobId}/subtitles.srt`,
@@ -64,15 +72,19 @@ export const listRecoveredJobsFromArtifacts = (limit = 20) => {
     return [];
   }
 
-  return readdirSync(jobsRoot, {withFileTypes: true})
+  const normalizedLimit = Math.max(limit, 1);
+  const recentCandidates = readdirSync(jobsRoot, {withFileTypes: true})
     .filter((entry) => entry.isDirectory())
     .map((entry) => readArtifactDirectorySummary(jobsRoot, entry.name))
     .filter((entry): entry is {name: string; modifiedAt: number} => entry !== null)
     .sort((left, right) => right.modifiedAt - left.modifiedAt)
-    .slice(0, Math.max(limit, 1))
+    .slice(0, normalizedLimit * 3);
+
+  return recentCandidates
     .map((entry) => recoverJobFromArtifacts(entry.name))
     .filter((job): job is RecoveredJob => job !== null)
-    .sort((left, right) => right.createdAt.localeCompare(left.createdAt));
+    .sort((left, right) => right.createdAt.localeCompare(left.createdAt))
+    .slice(0, normalizedLimit);
 };
 
 export const removeJobArtifacts = (jobId: string) => {
@@ -98,7 +110,16 @@ const readArtifactDirectorySummary = (jobsRoot: string, name: string) => {
   }
 };
 
-const readMetadata = (metadataPath: string): {problemText?: string; taskName?: string} => {
+const readMetadata = (
+  metadataPath: string
+): {
+  problemText?: string;
+  taskName?: string;
+  voice?: 'female_warm' | 'female_clear' | 'male_calm';
+  speechRate?: 'slow' | 'normal' | 'fast';
+  narrationTone?: string;
+  coverTone?: string;
+} => {
   if (!existsSync(metadataPath)) {
     return {};
   }
@@ -106,16 +127,44 @@ const readMetadata = (metadataPath: string): {problemText?: string; taskName?: s
   try {
     const parsed = JSON.parse(readFileSync(metadataPath, 'utf8')) as {
       problemText?: unknown;
+      speechRate?: unknown;
       taskName?: unknown;
+      voice?: unknown;
+      narrationTone?: unknown;
+      coverTone?: unknown;
     };
 
     return {
       problemText: typeof parsed.problemText === 'string' ? parsed.problemText : undefined,
-      taskName: typeof parsed.taskName === 'string' ? parsed.taskName : undefined
+      taskName: typeof parsed.taskName === 'string' ? parsed.taskName : undefined,
+      voice: readVoice(parsed.voice),
+      speechRate: readSpeechRate(parsed.speechRate),
+      narrationTone: readNonEmptyString(parsed.narrationTone),
+      coverTone: readNonEmptyString(parsed.coverTone)
     };
   } catch {
     return {};
   }
+};
+
+const readVoice = (value: unknown) => {
+  if (value === 'female_warm' || value === 'female_clear' || value === 'male_calm') {
+    return value;
+  }
+
+  return undefined;
+};
+
+const readSpeechRate = (value: unknown) => {
+  if (value === 'slow' || value === 'normal' || value === 'fast') {
+    return value;
+  }
+
+  return undefined;
+};
+
+const readNonEmptyString = (value: unknown) => {
+  return typeof value === 'string' && value.trim() ? value : undefined;
 };
 
 const readLesson = (lessonPath: string): {title?: string} => {

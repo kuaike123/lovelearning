@@ -8,7 +8,8 @@ export const problemInputSchema = z.object({
   content: z.string().min(1),
   targetDurationSec: z.number().int().min(30).max(60).optional(),
   style: z.enum(['teacher', 'kids', 'exam']).optional(),
-  voice: z.enum(['female_warm', 'female_clear', 'male_calm']).optional()
+  voice: z.enum(['female_warm', 'female_clear', 'male_calm']).optional(),
+  speechRate: z.enum(['slow', 'normal', 'fast']).optional()
 });
 
 export type ProblemInput = z.infer<typeof problemInputSchema>;

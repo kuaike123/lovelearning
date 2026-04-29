@@ -10,6 +10,7 @@ import {MistakeWarningScene} from '../../packages/renderer/src/scenes/MistakeWar
 import {ProblemScene} from '../../packages/renderer/src/scenes/ProblemScene';
 import {SceneProgress} from '../../packages/renderer/src/components/SceneProgress';
 import {getSceneRenderer} from '../../packages/renderer/src/lib/scene-renderer-registry';
+import {SceneLayoutRenderer} from '../../packages/renderer/src/components/SceneLayoutRenderer';
 import {ShortVideoShell} from '../../packages/renderer/src/components/ShortVideoShell';
 import {SummaryScene} from '../../packages/renderer/src/scenes/SummaryScene';
 import {TitleScene} from '../../packages/renderer/src/scenes/TitleScene';
@@ -79,6 +80,97 @@ describe('getSceneVisuals', () => {
     expect(getSceneRenderer('summary').label).toBe('\u603b\u7ed3\u6536\u675f');
   });
 
+  it('renders title card scenes with a learning goal hero layout', () => {
+    const html = renderToStaticMarkup(
+      React.createElement(SceneLayoutRenderer, {
+        sceneType: 'title',
+        visuals: {
+          heading: '\u4e00\u5143\u4e00\u6b21\u65b9\u7a0b',
+          detail: '\u638c\u63e1\u79fb\u9879\u548c\u5316\u7b80',
+          formulas: ['\u4e00\u5143\u4e00\u6b21\u65b9\u7a0b'],
+          layout: 'title_card',
+          layoutLabel: '\u5c01\u9762\u7247\u5934',
+          narration: '\u4eca\u5929\u6765\u5b66\u4e00\u5143\u4e00\u6b21\u65b9\u7a0b'
+        }
+      })
+    );
+
+    expect(html).toContain('\u5b66\u4e60\u76ee\u6807');
+    expect(html).toContain('\u638c\u63e1\u79fb\u9879\u548c\u5316\u7b80');
+    expect(html).toContain('\u4e00\u5143\u4e00\u6b21\u65b9\u7a0b');
+  });
+
+  it('renders summary scenes with a dedicated answer block', () => {
+    const html = renderToStaticMarkup(
+      React.createElement(SceneLayoutRenderer, {
+        sceneType: 'summary',
+        visuals: {
+          heading: '\u5199\u51fa\u6700\u7ec8\u7b54\u6848',
+          detail: '\u56de\u987e\u89e3\u9898\u5957\u8def',
+          formulas: ['2x = 8', 'x = 4'],
+          answer: 'x = 4',
+          layout: 'summary',
+          layoutLabel: '\u603b\u7ed3\u6536\u675f',
+          narration: '\u6240\u4ee5\u6700\u7ec8\u7b54\u6848\u662f x \u7b49\u4e8e 4'
+        }
+      })
+    );
+
+    expect(html).toContain('\u6700\u7ec8\u7b54\u6848');
+    expect(html).toContain('x = 4');
+    expect(html).toContain('\u89e3\u9898\u5957\u8def');
+    expect(html).toContain('\u5e26\u8d70\u4e00\u53e5');
+  });
+
+  it('renders problem scenes with a dedicated keyword block', () => {
+    const html = renderToStaticMarkup(
+      React.createElement(SceneLayoutRenderer, {
+        sceneType: 'problem',
+        visuals: {
+          heading: '\u8bfb\u51fa\u6570\u91cf\u5173\u7cfb',
+          detail: '\u5148\u627e\u5230\u548c\u4e0e\u500d\u6570\u8fd9\u4e24\u4e2a\u6761\u4ef6',
+          formulas: ['\u548c = 12', '\u500d\u6570 = 2'],
+          highlights: ['\u548c = 12', '\u500d\u6570 = 2'],
+          layout: 'problem_card',
+          layoutLabel: '\u9898\u76ee\u5361\u7247',
+          narration: '\u5148\u5728\u9898\u76ee\u91cc\u627e\u5230\u548c\u500d\u6570'
+        }
+      })
+    );
+
+    expect(html).toContain('\u9898\u76ee\u62c6\u89e3');
+    expect(html).toContain('\u672c\u9898\u5173\u952e\u8bcd');
+    expect(html).toContain('\u548c = 12');
+    expect(html).toContain('\u500d\u6570 = 2');
+  });
+
+  it('renders comparison scenes with wrong-vs-right teaching guidance', () => {
+    const html = renderToStaticMarkup(
+      React.createElement(SceneLayoutRenderer, {
+        sceneType: 'warning',
+        visuals: {
+          heading: '\u6613\u9519\u63d0\u9192',
+          detail: '\u8fd9\u4e00\u6b65\u6700\u5bb9\u6613\u51fa\u9519',
+          formulas: ['\u53ea\u79fb\u4e00\u8fb9', '\u4e24\u8fb9\u540c\u65f6\u64cd\u4f5c'],
+          highlights: ['\u7b49\u5f0f\u4e24\u8fb9'],
+          layout: 'comparison',
+          layoutLabel: '\u5bf9\u6bd4\u8bb2\u89e3',
+          mistake: {
+            wrong: '\u53ea\u79fb\u4e00\u8fb9',
+            correct: '\u4e24\u8fb9\u540c\u65f6\u51cf 3',
+            tip: '\u8bb0\u4f4f\u7b49\u5f0f\u4e24\u8fb9\u8981\u505a\u540c\u4e00\u4e2a\u53d8\u5316'
+          },
+          narration: '\u8fd9\u4e00\u6b65\u4e00\u5b9a\u8981\u8bb0\u5f97\u4e24\u8fb9\u540c\u65f6\u53d8\u5316'
+        }
+      })
+    );
+
+    expect(html).toContain('\u5e38\u89c1\u9519\u6cd5');
+    expect(html).toContain('\u6b63\u786e\u505a\u6cd5');
+    expect(html).toContain('\u8001\u5e08\u63d0\u9192');
+    expect(html).toContain('\u4e24\u8fb9\u540c\u65f6\u51cf 3');
+  });
+
   it('uses Chinese fallback copy in standalone scenes', () => {
     const html = renderToStaticMarkup(
       React.createElement(
@@ -111,12 +203,14 @@ describe('getSceneVisuals', () => {
     const html = renderToStaticMarkup(
       React.createElement(FormulaBoard, {
         formulas: ['x + 2x = 12', 'x = 4', '2x = 8'],
+        highlights: ['x = 4'],
         sceneType: 'summary'
       })
     );
 
     expect(html).toContain('\u516c\u5f0f\u677f\u4e66');
     expect(html).toContain('\u6700\u7ec8\u7b54\u6848');
+    expect(html).toContain('\u5173\u952e\u5f0f');
     expect(html).toContain('x + 2x = 12');
     expect(html).toContain('2x = 8');
   });
@@ -136,6 +230,8 @@ describe('getSceneVisuals', () => {
     );
 
     expect(html).toContain('\u77e5\u8bc6\u70b9\u901f\u8bb2');
+    expect(html).toContain('\u4e2d\u5b66\u6570\u5b66');
+    expect(html).toContain('\u9010\u6b65\u62c6\u89e3');
     expect(html).toContain('1/6');
     expect(html).toContain('\u6570\u91cf\u5173\u7cfb\u5e94\u7528\u9898');
   });

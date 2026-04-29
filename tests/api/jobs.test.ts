@@ -43,6 +43,10 @@ describe('jobs api', () => {
     expect(response.body.status).toBe('queued');
     expect(response.body.stage).toBe('queued');
     expect(response.body.taskName).toBe('初一方程例题讲解');
+    expect(response.body.voice).toBe('female_warm');
+    expect(response.body.speechRate).toBe('normal');
+    expect(response.body.narrationTone).toBe('清晰讲题');
+    expect(response.body.coverTone).toBe('标准题解模板');
     expect(response.body.jobId).toEqual(expect.any(String));
   }, 30000);
 
@@ -58,6 +62,10 @@ describe('jobs api', () => {
     expect(response.status).toBe(200);
     expect(response.body.jobId).toBe(created.body.jobId);
     expect(['queued', 'running', 'completed']).toContain(response.body.status);
+    expect(response.body.voice).toEqual(expect.any(String));
+    expect(response.body.speechRate).toEqual(expect.any(String));
+    expect(response.body.narrationTone).toEqual(expect.any(String));
+    expect(response.body.coverTone).toEqual(expect.any(String));
   }, 30000);
 
   it('lists recently created jobs over HTTP', async () => {
@@ -128,22 +136,20 @@ describe('jobs api', () => {
     const created = await request(app.getHttpServer()).post('/jobs').send({
       subject: 'math',
       sourceType: 'text',
-      content:
-        '\u5df2\u77e5\u4e24\u6570\u548c\u4e3a12\uff0c\u5176\u4e2d\u4e00\u4e2a\u6570\u662f\u53e6\u4e00\u4e2a\u6570\u76842\u500d\uff0c\u6c42\u8fd9\u4e24\u4e2a\u6570\u3002'
+      content: '已知两数和为12，其中一个数是另一个数的2倍，求这两个数。'
     });
 
-    let response = await request(app.getHttpServer()).get(`/jobs/${created.body.jobId}`).send({});
-
-    for (let attempt = 0; attempt < 10 && response.body.status !== 'completed'; attempt++) {
-      await new Promise((resolve) => setTimeout(resolve, 20));
-      response = await request(app.getHttpServer()).get(`/jobs/${created.body.jobId}`).send({});
-    }
+    const response = await waitForCompletedJob(app, created.body.jobId);
 
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({
       jobId: created.body.jobId,
       status: 'completed',
       stage: 'done',
+      voice: 'male_calm',
+      speechRate: 'fast',
+      narrationTone: '关系梳理',
+      coverTone: '已知条件拆开讲',
       lessonPlanUrl: `http://localhost:3001/artifacts/jobs/${created.body.jobId}/lesson.json`
     });
 
@@ -152,7 +158,7 @@ describe('jobs api', () => {
     );
     const lessonText = JSON.stringify(lesson);
 
-    expect(lesson.title).toContain('\u6570\u91cf\u5173\u7cfb\u5e94\u7528\u9898');
+    expect(lesson.title).toContain('数量关系应用题');
     expect(lessonText).toContain('x + 2x = 12');
     expect(lessonText).toContain('2x = 8');
   }, 30000);
@@ -164,12 +170,7 @@ describe('jobs api', () => {
       content: 'Solve equation: 2x + 3 = 11'
     });
 
-    let response = await request(app.getHttpServer()).get(`/jobs/${created.body.jobId}`).send({});
-
-    for (let attempt = 0; attempt < 10 && response.body.status !== 'completed'; attempt++) {
-      await new Promise((resolve) => setTimeout(resolve, 20));
-      response = await request(app.getHttpServer()).get(`/jobs/${created.body.jobId}`).send({});
-    }
+    const response = await waitForCompletedJob(app, created.body.jobId);
 
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({
@@ -179,7 +180,9 @@ describe('jobs api', () => {
       videoUrl: `http://localhost:3001/artifacts/jobs/${created.body.jobId}/output.mp4`,
       coverUrl: `http://localhost:3001/artifacts/jobs/${created.body.jobId}/cover.png`,
       subtitleUrl: `http://localhost:3001/artifacts/jobs/${created.body.jobId}/subtitles.srt`,
-      lessonPlanUrl: `http://localhost:3001/artifacts/jobs/${created.body.jobId}/lesson.json`
+      lessonPlanUrl: `http://localhost:3001/artifacts/jobs/${created.body.jobId}/lesson.json`,
+      narrationTone: '清晰讲题',
+      coverTone: '标准题解模板'
     });
 
     const lesson = JSON.parse(
@@ -191,3 +194,14 @@ describe('jobs api', () => {
     expect(lessonText).toContain('x = 4');
   }, 30000);
 });
+
+const waitForCompletedJob = async (app: INestApplication, jobId: string) => {
+  let response = await request(app.getHttpServer()).get(`/jobs/${jobId}`).send({});
+
+  for (let attempt = 0; attempt < 50 && response.body.status !== 'completed'; attempt++) {
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    response = await request(app.getHttpServer()).get(`/jobs/${jobId}`).send({});
+  }
+
+  return response;
+};

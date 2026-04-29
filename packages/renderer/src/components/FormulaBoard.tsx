@@ -2,11 +2,13 @@ import React from 'react';
 
 type FormulaBoardProps = {
   formulas: string[];
+  highlights?: string[];
   sceneType: string;
 };
 
-export const FormulaBoard: React.FC<FormulaBoardProps> = ({formulas, sceneType}) => {
+export const FormulaBoard: React.FC<FormulaBoardProps> = ({formulas, highlights, sceneType}) => {
   const safeFormulas = formulas.length > 0 ? formulas : [''];
+  const activeHighlights = highlights ?? [];
 
   return (
     <section style={boardStyle} aria-label={'\u516c\u5f0f\u677f\u4e66'}>
@@ -16,9 +18,12 @@ export const FormulaBoard: React.FC<FormulaBoardProps> = ({formulas, sceneType})
       </div>
       <div style={formulaListStyle}>
         {safeFormulas.map((formula, index) => (
-          <div key={`${formula}-${index}`} style={formulaCardStyle(index, sceneType)}>
+          <div key={`${formula}-${index}`} style={formulaCardStyle(index, sceneType, activeHighlights.includes(formula))}>
             <span style={stepBadgeStyle}>{String(index + 1).padStart(2, '0')}</span>
-            <span style={formulaTextStyle(formula)}>{formula}</span>
+            <div style={formulaContentStyle}>
+              {activeHighlights.includes(formula) ? <strong style={highlightLabelStyle}>{'\u5173\u952e\u5f0f'}</strong> : null}
+              <span style={formulaTextStyle(formula)}>{formula}</span>
+            </div>
           </div>
         ))}
       </div>
@@ -52,13 +57,20 @@ const formulaListStyle = {
   gap: 14
 };
 
-const formulaCardStyle = (index: number, sceneType: string) => ({
+const formulaCardStyle = (index: number, sceneType: string, isHighlighted: boolean) => ({
   alignItems: 'center',
   background:
     sceneType === 'summary' && index === 0
       ? 'linear-gradient(90deg, rgba(245,197,66,0.22), rgba(255,255,255,0.08))'
+      : isHighlighted
+        ? 'linear-gradient(90deg, rgba(82,183,136,0.28), rgba(255,255,255,0.08))'
       : 'rgba(255, 255, 255, 0.08)',
-  border: index === 0 ? '2px solid rgba(245, 197, 66, 0.72)' : '2px solid rgba(255, 255, 255, 0.12)',
+  border:
+    index === 0
+      ? '2px solid rgba(245, 197, 66, 0.72)'
+      : isHighlighted
+        ? '2px solid rgba(82, 183, 136, 0.72)'
+        : '2px solid rgba(255, 255, 255, 0.12)',
   borderRadius: 24,
   display: 'grid',
   gap: 16,
@@ -77,6 +89,18 @@ const stepBadgeStyle = {
   height: 52,
   justifyContent: 'center',
   width: 52
+};
+
+const formulaContentStyle = {
+  display: 'grid',
+  gap: 8
+};
+
+const highlightLabelStyle = {
+  color: '#86EFAC',
+  fontSize: 20,
+  fontWeight: 900,
+  letterSpacing: 2
 };
 
 const formulaTextStyle = (formula: string) => ({

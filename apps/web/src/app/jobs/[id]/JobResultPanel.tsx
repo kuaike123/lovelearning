@@ -11,8 +11,13 @@ type Job = {
   progress?: number;
   error?: string;
   taskName?: string;
+  voice?: 'female_warm' | 'female_clear' | 'male_calm';
+  speechRate?: 'slow' | 'normal' | 'fast';
+  narrationTone?: string;
+  coverTone?: string;
   videoUrl?: string;
   coverUrl?: string;
+  audioUrls?: string[];
   subtitleUrl?: string;
   lessonPlanUrl?: string;
 };
@@ -34,8 +39,12 @@ const copy = {
   actionsHome: '\u8fd4\u56de\u9996\u9875',
   actionsRegenerate: '\u91cd\u65b0\u751f\u6210',
   assetCover: '\u5c01\u9762',
+  assetDeliveryList: '\u4ea4\u4ed8\u6e05\u5355',
   assetDownloadTitle: '\u4e0b\u8f7d\u6587\u4ef6',
+  assetAudio: '\u914d\u97f3\u97f3\u9891',
   assetJson: '\u8bb2\u89e3 JSON',
+  assetPositioningTitle: '\u6210\u7247\u5b9a\u4f4d',
+  assetUsageTitle: '\u53ef\u76f4\u63a5\u7528\u4e8e',
   assetSubtitle: '\u5b57\u5e55',
   assetVideo: '\u89c6\u9891',
   coverAlt: '\u751f\u6210\u7684\u8bb2\u89e3\u89c6\u9891\u5c01\u9762',
@@ -51,6 +60,12 @@ const copy = {
   loadingProgress: '\u751f\u6210\u8fdb\u5ea6',
   mainEyebrow: '\u89c6\u9891\u751f\u6210\u4efb\u52a1',
   mainTitle: '\u6570\u5b66\u8bb2\u89e3\u89c6\u9891\u9884\u89c8',
+  overviewEyebrow: '\u4efb\u52a1\u6982\u89c8',
+  overviewOutcome: '\u9884\u8ba1\u7ed3\u679c',
+  overviewVoice: '\u914d\u97f3\u8bbe\u7f6e',
+  overviewTone: '\u8bb2\u89e3\u7b56\u7565',
+  overviewStage: '\u5f53\u524d\u751f\u6210\u9636\u6bb5',
+  overviewTask: '\u5f53\u524d\u4efb\u52a1',
   stagePrefix: '\u9636\u6bb5\uff1a',
   statusPrefix: '\u72b6\u6001\uff1a',
   progressPrefix: '\u8fdb\u5ea6\uff1a',
@@ -168,11 +183,52 @@ export function JobResultActions({
   );
 }
 
-export function JobStatusSummary({job}: {job: Pick<Job, 'error' | 'progress' | 'status' | 'stage' | 'taskName'>}) {
+export function JobStatusSummary({
+  job
+}: {
+  job: Pick<
+    Job,
+    'coverTone' | 'error' | 'narrationTone' | 'progress' | 'speechRate' | 'status' | 'stage' | 'taskName' | 'voice'
+  >;
+}) {
   const progress = typeof job.progress === 'number' ? Math.max(0, Math.min(100, Math.round(job.progress))) : null;
+  const outcome = describeOutcome(job.status, progress);
+  const stageLabel = job.stage ? formatJobStage(job.stage) : formatJobStatus(job.status);
+  const taskLabel = job.taskName ?? copy.unnamedTask;
 
   return (
     <>
+      <section style={overviewCardStyle}>
+        <p style={eyebrowStyle}>{copy.overviewEyebrow}</p>
+        <div style={overviewGridStyle}>
+          <div style={overviewItemStyle}>
+            <span style={overviewLabelStyle}>{copy.overviewTask}</span>
+            <strong style={overviewValueStyle}>{taskLabel}</strong>
+          </div>
+          <div style={overviewItemStyle}>
+            <span style={overviewLabelStyle}>{copy.overviewStage}</span>
+            <strong style={overviewValueStyle}>{stageLabel}</strong>
+          </div>
+          <div style={overviewItemStyle}>
+            <span style={overviewLabelStyle}>{copy.overviewOutcome}</span>
+            <strong style={overviewValueStyle}>{outcome}</strong>
+          </div>
+          <div style={overviewItemStyle}>
+            <span style={overviewLabelStyle}>{copy.overviewVoice}</span>
+            <strong style={overviewValueStyle}>
+              {formatVoice(job.voice)} / {formatSpeechRate(job.speechRate)}
+            </strong>
+          </div>
+          <div style={overviewItemStyle}>
+            <span style={overviewLabelStyle}>{copy.overviewTone}</span>
+            <strong style={overviewValueStyle}>
+              {job.narrationTone ?? '\u6e05\u6670\u8bb2\u9898'}
+              {' / '}
+              {job.coverTone ?? '\u6807\u51c6\u9898\u89e3\u6a21\u677f'}
+            </strong>
+          </div>
+        </div>
+      </section>
       <div style={statusGridStyle}>
         {job.taskName ? (
           <p>
@@ -236,10 +292,40 @@ export function JobAssetList({job}: {job: Job}) {
       </div>
       <div style={linkCardStyle}>
         <p style={eyebrowStyle}>{copy.assetDownloadTitle}</p>
+        <div style={deliveryBlockStyle}>
+          <p style={deliveryTitleStyle}>{copy.assetDeliveryList}</p>
+          <div style={deliveryChipListStyle}>
+            <span style={deliveryChipStyle}>{'\u7ad6\u5c4f\u8bb2\u89e3\u89c6\u9891'}</span>
+            <span style={deliveryChipStyle}>{'\u914d\u97f3\u97f3\u8f68'}</span>
+            <span style={deliveryChipStyle}>{'\u4e2d\u6587\u5b57\u5e55\u6587\u4ef6'}</span>
+            <span style={deliveryChipStyle}>{'\u8bb2\u89e3\u811a\u672c JSON'}</span>
+            <span style={deliveryChipStyle}>{'\u5c01\u9762\u9884\u89c8\u56fe'}</span>
+          </div>
+        </div>
         {job.videoUrl ? <a href={job.videoUrl}>{copy.assetVideo}</a> : null}
         {job.coverUrl ? <a href={job.coverUrl}>{copy.assetCover}</a> : null}
+        {job.audioUrls?.map((audioUrl, index) => (
+          <a href={audioUrl} key={audioUrl}>
+            {copy.assetAudio}
+            {job.audioUrls && job.audioUrls.length > 1 ? ` ${index + 1}` : ''}
+          </a>
+        ))}
         {job.subtitleUrl ? <a href={job.subtitleUrl}>{copy.assetSubtitle}</a> : null}
         {job.lessonPlanUrl ? <a href={job.lessonPlanUrl}>{copy.assetJson}</a> : null}
+        <div style={usageBlockStyle}>
+          <p style={deliveryTitleStyle}>{copy.assetPositioningTitle}</p>
+          <p style={positioningTextStyle}>
+            {'当前结果默认按 9:16 竖屏教培短视频组织，可直接作为招生展示、错题讲解和家长沟通素材。'}
+          </p>
+        </div>
+        <div style={usageBlockStyle}>
+          <p style={deliveryTitleStyle}>{copy.assetUsageTitle}</p>
+          <ul style={usageListStyle}>
+            <li>{'\u62db\u751f\u77ed\u89c6\u9891\u53d1\u5e03'}</li>
+            <li>{'\u9519\u9898\u8bb2\u89e3\u56de\u4f20'}</li>
+            <li>{'\u5bb6\u957f\u793a\u8303\u4e0e\u73ed\u8bfe\u9884\u4e60'}</li>
+          </ul>
+        </div>
       </div>
     </div>
   );
@@ -327,6 +413,46 @@ const formatJobStage = (stage: string) => {
   return labels[stage] ?? stage;
 };
 
+const formatVoice = (voice: Job['voice']) => {
+  const labels: Record<NonNullable<Job['voice']>, string> = {
+    female_clear: '\u6e05\u6670\u5973\u58f0',
+    female_warm: '\u6e29\u67d4\u5973\u58f0',
+    male_calm: '\u6c89\u7a33\u7537\u58f0'
+  };
+
+  return voice ? labels[voice] : '\u6e29\u67d4\u5973\u58f0';
+};
+
+const formatSpeechRate = (speechRate: Job['speechRate']) => {
+  const labels: Record<NonNullable<Job['speechRate']>, string> = {
+    fast: '\u5feb\u901f',
+    normal: '\u6b63\u5e38',
+    slow: '\u6162\u901f'
+  };
+
+  return speechRate ? labels[speechRate] : '\u6b63\u5e38';
+};
+
+const describeOutcome = (status: string, progress: number | null) => {
+  if (status === 'completed') {
+    return '\u89c6\u9891\u3001\u5b57\u5e55\u548c\u5c01\u9762\u5df2\u53ef\u4e0b\u8f7d';
+  }
+
+  if (status === 'failed') {
+    return '\u672c\u6b21\u751f\u6210\u672a\u6210\u529f\uff0c\u53ef\u91cd\u65b0\u53d1\u8d77\u4efb\u52a1';
+  }
+
+  if (progress !== null && progress >= 85) {
+    return '\u5373\u5c06\u8f93\u51fa\u6210\u7247\uff0c\u8bf7\u7a0d\u5019';
+  }
+
+  if (progress !== null && progress >= 45) {
+    return '\u6b63\u5728\u7ec4\u88c5\u914d\u97f3\u3001\u52a8\u753b\u548c\u5b57\u5e55';
+  }
+
+  return '\u6b63\u5728\u51c6\u5907\u8bb2\u89e3\u811a\u672c\u4e0e\u89c6\u9891\u6750\u6599';
+};
+
 const formatJobError = (error: string | undefined) => {
   if (!error) return copy.errorDefault;
 
@@ -405,6 +531,39 @@ const statusGridStyle = {
   flexWrap: 'wrap' as const
 };
 
+const overviewCardStyle = {
+  background: 'linear-gradient(135deg, #fffaf1 0%, #f6efdd 100%)',
+  border: '1px solid #eadfca',
+  borderRadius: 20,
+  display: 'grid',
+  gap: 16,
+  margin: '20px 0 18px',
+  padding: 20
+};
+
+const overviewGridStyle = {
+  display: 'grid',
+  gap: 14,
+  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))'
+};
+
+const overviewItemStyle = {
+  display: 'grid',
+  gap: 6
+};
+
+const overviewLabelStyle = {
+  color: '#6b7280',
+  fontSize: 13,
+  fontWeight: 700
+};
+
+const overviewValueStyle = {
+  color: '#1f2937',
+  fontSize: 18,
+  lineHeight: 1.4
+};
+
 const progressTrackStyle = {
   background: '#eadfca',
   borderRadius: 999,
@@ -445,6 +604,55 @@ const linkCardStyle = {
   display: 'grid',
   gap: 12,
   padding: 20
+};
+
+const deliveryBlockStyle = {
+  display: 'grid',
+  gap: 10
+};
+
+const deliveryTitleStyle = {
+  color: '#1f2937',
+  fontSize: 14,
+  fontWeight: 800,
+  margin: 0
+};
+
+const deliveryChipListStyle = {
+  display: 'flex',
+  flexWrap: 'wrap' as const,
+  gap: 8
+};
+
+const deliveryChipStyle = {
+  background: '#f1ead9',
+  borderRadius: 999,
+  color: '#374151',
+  display: 'inline-flex',
+  fontSize: 12,
+  fontWeight: 700,
+  padding: '6px 10px'
+};
+
+const usageBlockStyle = {
+  borderTop: '1px solid #eadfca',
+  display: 'grid',
+  gap: 8,
+  marginTop: 4,
+  paddingTop: 12
+};
+
+const usageListStyle = {
+  color: '#374151',
+  lineHeight: 1.6,
+  margin: 0,
+  paddingLeft: 18
+};
+
+const positioningTextStyle = {
+  color: '#374151',
+  lineHeight: 1.7,
+  margin: 0
 };
 
 const lessonPanelStyle = {

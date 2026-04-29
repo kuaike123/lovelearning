@@ -31,11 +31,15 @@ export const runJob = async (input: ProblemInput, deps: any) => {
       return {...scene, audioUrl: audio.audioUrl, durationSec: audio.durationSec};
     })
   );
+  const totalDurationSec = scenes.reduce((total: number, scene: {durationSec: number}) => total + scene.durationSec, 0);
+  const audioUrls = scenes
+    .map((scene: {audioUrl?: string}) => scene.audioUrl)
+    .filter((audioUrl: string | undefined): audioUrl is string => Boolean(audioUrl));
 
   await reportProgress('subtitles');
   const subtitles = deps.buildSubtitles(scenes);
   await reportProgress('render');
-  const renderArtifact = await deps.renderProject({...project, scenes}, {
+  const renderArtifact = await deps.renderProject({...project, scenes, totalDurationSec}, {
     onProgress: (renderProgress: {
       encodedFrames?: number;
       progress?: number;
@@ -51,7 +55,7 @@ export const runJob = async (input: ProblemInput, deps: any) => {
     }
   });
   await reportProgress('store');
-  const stored = await deps.storeArtifacts({lessonPlan, subtitles, renderArtifact});
+  const stored = await deps.storeArtifacts({audioUrls, lessonPlan, subtitles, renderArtifact});
   await reportProgress('done', 'completed');
 
   return {
@@ -59,6 +63,7 @@ export const runJob = async (input: ProblemInput, deps: any) => {
     stage: 'done',
     videoUrl: stored.videoUrl ?? renderArtifact.videoUrl,
     coverUrl: stored.coverUrl ?? renderArtifact.coverUrl,
+    audioUrls: stored.audioUrls ?? audioUrls,
     subtitleUrl: stored.subtitleUrl,
     lessonPlanUrl: stored.lessonPlanUrl
   };

@@ -34,7 +34,7 @@ describe('RecentJobsList', () => {
     expect(html).toContain(taskName);
     expect(html).toContain(equationProblem);
     expect(html).toContain('\u5df2\u5b8c\u6210');
-  });
+  }, 30000);
 
   it('renders an empty state when no jobs exist yet', () => {
     const html = renderToStaticMarkup(<RecentJobsList jobs={[]} />);

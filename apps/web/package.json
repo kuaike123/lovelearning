@@ -2,6 +2,7 @@
   "name": "web",
   "private": true,
   "scripts": {
+    "build": "next build",
     "dev": "next dev",
     "test": "vitest run ../../tests/web"
   },

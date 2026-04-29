@@ -3,10 +3,18 @@ import type {VideoScene} from '../../../shared-types/src';
 import {getSceneRenderer} from './scene-renderer-registry';
 
 export type SceneVisuals = {
+  answer?: string;
   detail?: string;
   formulas: string[];
   heading: string;
+  highlights?: string[];
+  layout: 'title_card' | 'problem_card' | 'formula_focus' | 'comparison' | 'summary' | 'diagram';
   layoutLabel?: string;
+  mistake?: {
+    correct: string;
+    tip: string;
+    wrong: string;
+  };
   motionPreset?: string;
   narration: string;
 };
@@ -18,10 +26,14 @@ export const getSceneVisuals = (scene: VideoScene): SceneVisuals => {
     const formulas = visual.formulaBlocks?.filter((item) => item.trim().length > 0) ?? [];
 
     return {
+      answer: visual.answer,
       detail: visual.detail,
       formulas: formulas.length > 0 ? formulas : [visual.primaryText ?? scene.subtitle],
       heading: visual.primaryText ?? scene.subtitle,
+      highlights: visual.highlights,
+      layout: visual.layout,
       layoutLabel: renderer.label,
+      mistake: visual.mistake,
       motionPreset: visual.motionPreset,
       narration: scene.subtitle
     };
@@ -42,6 +54,7 @@ export const getSceneVisuals = (scene: VideoScene): SceneVisuals => {
     detail,
     formulas: formulas.length > 0 ? formulas : [scene.subtitle],
     heading,
+    layout: 'formula_focus',
     narration: scene.subtitle
   };
 };

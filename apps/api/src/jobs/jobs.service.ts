@@ -1,5 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import {randomUUID} from 'node:crypto';
+import {join} from 'node:path';
 
 import {mapLessonToScenes} from '../../../../packages/lesson-engine/src/map-lesson-to-scenes';
 import {parseProblem} from '../../../../packages/lesson-engine/src/parse-problem';
@@ -7,7 +8,7 @@ import {planLessonForProblem} from '../../../../packages/lesson-engine/src/plan-
 import {runJob} from '../../../../packages/job-runner/src/run-job';
 import {renderProject} from '../../../../packages/job-runner/src/render-project';
 import {storeArtifacts} from '../../../../packages/job-runner/src/store-artifacts';
-import type {ProblemInput} from '../../../../packages/shared-types/src';
+import {recommendVoicePreset, type ProblemInput} from '../../../../packages/shared-types/src';
 import {buildSubtitles} from '../../../../packages/tts-service/src/build-subtitles';
 import {synthesizeSceneAudio} from '../../../../packages/tts-service/src/synthesize-scene-audio';
 import {getArtifactRoot} from '../artifacts/artifact-root';
@@ -21,6 +22,7 @@ export class JobsService {
 
   create(input: unknown) {
     const parsedInput = CreateJobDto.parse(input);
+    const recommendation = buildRecommendation(parsedInput);
 
     const job = {
       jobId: randomUUID(),
@@ -28,7 +30,11 @@ export class JobsService {
       stage: 'queued',
       createdAt: new Date().toISOString(),
       taskName: buildTaskName(parsedInput),
-      problemText: parsedInput.content
+      problemText: parsedInput.content,
+      voice: parsedInput.voice ?? recommendation.voice,
+      speechRate: parsedInput.speechRate ?? recommendation.speechRate,
+      narrationTone: recommendation.narrationTone,
+      coverTone: recommendation.coverTone
     };
 
     const saved = this.jobsRepository.save(job);
@@ -87,6 +93,7 @@ export class JobsService {
 
   private async completeJob(jobId: string, input: ProblemInput) {
     try {
+      const recommendation = buildRecommendation(input);
       const result = await runJob(input, {
         onProgress: (progress: {
           encodedFrames?: number;
@@ -101,7 +108,13 @@ export class JobsService {
         parseProblem,
         planLesson: planLessonForProblem,
         mapLessonToScenes,
-        synthesizeSceneAudio,
+        synthesizeSceneAudio: (scene: Parameters<typeof synthesizeSceneAudio>[0]) =>
+          synthesizeSceneAudio(scene, {
+            outputDir: join(getArtifactRoot(), 'jobs', jobId, 'audio'),
+            publicBaseUrl: `http://localhost:3001/artifacts/jobs/${jobId}/audio`,
+            voice: input.voice,
+            speechRate: input.speechRate
+          }),
         buildSubtitles,
         renderProject,
         storeArtifacts: (artifacts: Parameters<typeof storeArtifacts>[0]) =>
@@ -111,7 +124,11 @@ export class JobsService {
             artifactRoot: getArtifactRoot(),
             metadata: {
               problemText: input.content,
-              taskName: buildTaskName(input)
+              taskName: buildTaskName(input),
+              voice: input.voice ?? recommendation.voice,
+              speechRate: input.speechRate ?? recommendation.speechRate,
+              narrationTone: recommendation.narrationTone,
+              coverTone: recommendation.coverTone
             },
             publicBaseUrl: 'http://localhost:3001/artifacts'
           })
@@ -137,3 +154,19 @@ const buildTaskName = (input: ProblemInput) => {
 };
 
 const readString = (value: unknown) => (typeof value === 'string' && value.trim() ? value : undefined);
+
+const buildRecommendation = (input: ProblemInput) => {
+  return recommendVoicePreset({
+    content: input.content,
+    style: input.style ?? 'teacher',
+    targetDurationSec: normalizeDuration(input.targetDurationSec)
+  });
+};
+
+const normalizeDuration = (duration: number | undefined): 30 | 45 | 60 => {
+  if (duration === 30 || duration === 45 || duration === 60) {
+    return duration;
+  }
+
+  return 45;
+};

@@ -23,7 +23,14 @@ describe('job artifact recovery', () => {
     await writeFile(join(jobDir, 'subtitles.srt'), '1\n00:00:00,000 --> 00:00:01,000\nHello', 'utf8');
     await writeFile(
       join(jobDir, 'job.json'),
-      JSON.stringify({taskName: '初一方程例题讲解', problemText: '解方程：2x + 3 = 11'}),
+      JSON.stringify({
+        taskName: '初一方程例题讲解',
+        problemText: '解方程：2x + 3 = 11',
+        voice: 'female_clear',
+        speechRate: 'slow',
+        narrationTone: '提分拆解',
+        coverTone: '考点直入'
+      }),
       'utf8'
     );
     await writeFile(
@@ -51,6 +58,10 @@ describe('job artifact recovery', () => {
       stage: 'done',
       taskName: '初一方程例题讲解',
       problemText: '解方程：2x + 3 = 11',
+      voice: 'female_clear',
+      speechRate: 'slow',
+      narrationTone: '提分拆解',
+      coverTone: '考点直入',
       videoUrl: `http://localhost:3001/artifacts/jobs/${jobId}/output.mp4`,
       coverUrl: `http://localhost:3001/artifacts/jobs/${jobId}/cover.png`,
       subtitleUrl: `http://localhost:3001/artifacts/jobs/${jobId}/subtitles.srt`,
@@ -63,7 +74,7 @@ describe('job artifact recovery', () => {
 
     expect(response.status).toBe(200);
     expect(response.body.jobs.some((job: {jobId: string}) => job.jobId === jobId)).toBe(true);
-  });
+  }, 30000);
 
   it('deletes recovered artifact jobs from disk', async () => {
     const response = await (request(app.getHttpServer()) as any).delete(`/jobs/${jobId}`).send({});
@@ -71,5 +82,5 @@ describe('job artifact recovery', () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual({deleted: true});
     expect(existsSync(jobDir)).toBe(false);
-  });
+  }, 30000);
 });

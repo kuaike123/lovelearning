@@ -24,6 +24,10 @@ export const ShortVideoShell: React.FC<ShortVideoShellProps> = ({
           <div>
             <p style={eyebrowStyle}>{'\u77e5\u8bc6\u70b9\u901f\u8bb2'}</p>
             <h1 style={titleStyle}>{title}</h1>
+            <div style={metaRowStyle}>
+              <span style={metaChipStyle('subject')}>{'\u4e2d\u5b66\u6570\u5b66'}</span>
+              <span style={metaChipStyle('format')}>{sceneType === 'title' ? '\u9010\u6b65\u62c6\u89e3' : '\u6559\u5b66\u77ed\u89c6\u9891'}</span>
+            </div>
           </div>
           <div style={counterStyle}>
             {sceneNumber}/{totalScenes}
@@ -93,6 +97,24 @@ const counterStyle = {
   fontWeight: 900,
   padding: '12px 20px'
 };
+
+const metaRowStyle = {
+  display: 'flex',
+  flexWrap: 'wrap' as const,
+  gap: 12,
+  marginTop: 18
+};
+
+const metaChipStyle = (variant: 'format' | 'subject') => ({
+  background: variant === 'subject' ? 'rgba(16, 42, 67, 0.08)' : 'rgba(82, 183, 136, 0.16)',
+  border: variant === 'subject' ? '1px solid rgba(16, 42, 67, 0.12)' : '1px solid rgba(82, 183, 136, 0.24)',
+  borderRadius: 999,
+  color: variant === 'subject' ? '#102A43' : '#1F5134',
+  fontSize: 20,
+  fontWeight: 800,
+  letterSpacing: 1,
+  padding: '8px 14px'
+});
 
 const brandStyle = {
   bottom: 34,

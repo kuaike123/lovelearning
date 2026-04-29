@@ -1,6 +1,14 @@
 import {afterEach, describe, expect, it, vi} from 'vitest';
 
-import {createJob, deleteJob, getJob, getLessonPlan, listJobs, regenerateJob} from '../../apps/web/src/lib/api-client';
+import {
+  createJob,
+  deleteJob,
+  getJob,
+  getLessonPlan,
+  listJobs,
+  previewTts,
+  regenerateJob
+} from '../../apps/web/src/lib/api-client';
 
 describe('api client', () => {
   afterEach(() => {
@@ -47,7 +55,8 @@ describe('api client', () => {
       content: 'Solve equation: 2x + 3 = 11',
       targetDurationSec: 45,
       style: 'teacher',
-      voice: 'female_warm'
+      voice: 'female_warm',
+      speechRate: 'slow'
     });
 
     expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/jobs', {
@@ -61,7 +70,8 @@ describe('api client', () => {
         content: 'Solve equation: 2x + 3 = 11',
         targetDurationSec: 45,
         style: 'teacher',
-        voice: 'female_warm'
+        voice: 'female_warm',
+        speechRate: 'slow'
       })
     });
   });
@@ -133,5 +143,36 @@ describe('api client', () => {
 
     expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/artifacts/jobs/job-1/lesson.json');
     expect(result).toEqual({title: 'Solve 2x + 3 = 11', steps: []});
+  });
+
+  it('requests a TTS preview clip with the current voice settings', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        audioUrl: 'http://localhost:3001/artifacts/previews/preview-1.wav',
+        durationSec: 4
+      })
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await previewTts({
+      text: '我们先来看这道方程题。',
+      voice: 'female_warm',
+      speechRate: 'slow'
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith('http://localhost:3001/tts/preview', {
+      method: 'POST',
+      headers: {'content-type': 'application/json'},
+      body: JSON.stringify({
+        text: '我们先来看这道方程题。',
+        voice: 'female_warm',
+        speechRate: 'slow'
+      })
+    });
+    expect(result).toEqual({
+      audioUrl: 'http://localhost:3001/artifacts/previews/preview-1.wav',
+      durationSec: 4
+    });
   });
 });

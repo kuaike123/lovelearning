@@ -1,0 +1,43 @@
+export const featuredSampleRecords = [
+  {
+    primaryUseCase: 'recruitment',
+    problemCategory: 'equation',
+    conversionScenario: '首次体验转化',
+    content: '解方程：2x + 3 = 11',
+    description: '适合展示一元一次方程的标准讲解节奏，强调移项、化简和验算。',
+    gradeBand: '初一-初二',
+    highlights: ['移项过程清晰', '答案高亮收束', '适合 45 秒标准演示'],
+    isFeatured: true,
+    posterCaption: '方程题也能拍成一条清楚的短视频',
+    posterKicker: '初一热门题型',
+    publishedAt: '2026-04-20',
+    recommendationScore: 96,
+    slug: 'linear-equation-basic',
+    speechRate: 'slow',
+    style: 'teacher',
+    targetDurationSec: 45,
+    taskName: '初一方程标准讲解',
+    title: '初一方程标准讲解',
+    useCases: ['招生短视频', '家长沟通演示', '课前预习'],
+    voice: 'female_warm'
+  },
+  {
+    primaryUseCase: 'homework',
+    problemCategory: 'word_problem',
+    conversionScenario: '错题巩固与追单',
+    content: '已知两数和为12，其中一个数是另一个数的2倍，求这两个数。',
+    description: '适合展示数量关系应用题的设未知数和列方程流程。',
+    gradeBand: '初二-初三',
+    highlights: ['设未知数步骤突出', '数量关系可视化', '提分风格更适合考试场景'],
+    isFeatured: false,
+    posterCaption: '应用题可以直接输出为提分向解题视频',
+    publishedAt: '2026-04-18',
+    recommendationScore: 88,
+    slug: 'quantity-relation-word-problem',
+    style: 'exam',
+    targetDurationSec: 60,
+    taskName: '数量关系应用题提分版',
+    title: '数量关系应用题提分版',
+    useCases: ['班课例题讲解', '错题回看', '练习题视频化']
+  }
+] as const;

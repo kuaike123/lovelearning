@@ -1,10 +1,11 @@
 import React from 'react';
-import {AbsoluteFill, interpolate, Sequence, useCurrentFrame} from 'remotion';
+import {AbsoluteFill, Audio, interpolate, Sequence, useCurrentFrame} from 'remotion';
 
 import type {VideoProject} from '../../../shared-types/src';
 
 import {buildTimeline} from '../lib/build-timeline';
-import {FormulaBoard} from '../components/FormulaBoard';
+import {SceneLayoutRenderer} from '../components/SceneLayoutRenderer';
+import {getMotionProfile} from '../lib/scene-motion';
 import {getSceneVisuals} from '../lib/scene-visuals';
 import {SceneProgress} from '../components/SceneProgress';
 import {ShortVideoShell} from '../components/ShortVideoShell';
@@ -22,6 +23,7 @@ export const LessonVideo: React.FC<{project: VideoProject}> = ({project}) => {
     >
       {timeline.map((entry, index) => (
         <Sequence key={entry.id} from={entry.from} durationInFrames={entry.durationInFrames}>
+          {project.scenes[index]?.audioUrl ? <Audio src={project.scenes[index].audioUrl} /> : null}
           <SceneFrame
             durationInFrames={entry.durationInFrames}
             scene={project.scenes[index]}
@@ -47,7 +49,7 @@ const SceneFrame: React.FC<{
   const visuals = getSceneVisuals(scene);
   const sceneProgress = durationInFrames > 0 ? frame / durationInFrames : 0;
   const easedIn = interpolate(frame, [0, 14], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
-  const lift = interpolate(easedIn, [0, 1], [34, 0]);
+  const motion = getMotionProfile(visuals.motionPreset as Parameters<typeof getMotionProfile>[0], sceneProgress);
   const formulaRevealCount = Math.max(
     1,
     Math.min(visuals.formulas.length, Math.ceil(interpolate(sceneProgress, [0.18, 0.62], [1, visuals.formulas.length], {
@@ -63,13 +65,18 @@ const SceneFrame: React.FC<{
           style={{
             display: 'grid',
             gap: 30,
-            opacity: easedIn,
-            transform: `translateY(${lift}px)`
+            opacity: Math.min(1, easedIn * motion.opacity),
+            transform: `translate3d(${motion.translateX}px, ${motion.translateY}px, 0) scale(${motion.scale})`
           }}
         >
           <SceneTypePill sceneType={scene.sceneType} layoutLabel={visuals.layoutLabel} />
-          <FormulaBoard formulas={visuals.formulas.slice(0, formulaRevealCount)} sceneType={scene.sceneType} />
-          {visuals.detail ? <TeachingNote text={visuals.detail} /> : null}
+          <SceneLayoutRenderer
+            sceneType={scene.sceneType}
+            visuals={{
+              ...visuals,
+              formulas: visuals.formulas.slice(0, formulaRevealCount)
+            }}
+          />
           <NarrationCard narration={visuals.narration} />
           <SceneProgress progress={sceneNumber / totalScenes} />
         </div>
@@ -83,15 +90,6 @@ const SceneTypePill: React.FC<{layoutLabel?: string; sceneType: string}> = ({lay
     <div style={pillStyle}>
       <span>{formatSceneType(sceneType)}</span>
       <strong>{layoutLabel ?? '\u8ddf\u7740\u8001\u5e08\u4e00\u6b65\u4e00\u6b65\u6765'}</strong>
-    </div>
-  );
-};
-
-const TeachingNote: React.FC<{text: string}> = ({text}) => {
-  return (
-    <div style={noteStyle}>
-      <strong>{'\u753b\u9762\u91cd\u70b9'}</strong>
-      <span>{text}</span>
     </div>
   );
 };
@@ -129,18 +127,6 @@ const pillStyle = {
   gap: 16,
   justifyContent: 'space-between',
   padding: '14px 20px'
-};
-
-const noteStyle = {
-  background: '#FFF7D6',
-  border: '2px solid rgba(245, 197, 66, 0.55)',
-  borderRadius: 24,
-  color: '#374151',
-  display: 'grid',
-  fontSize: 28,
-  gap: 10,
-  lineHeight: 1.45,
-  padding: 24
 };
 
 const narrationStyle = {
