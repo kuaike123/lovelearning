@@ -12,6 +12,7 @@ import {recommendVoicePreset, type ProblemInput} from '../../../../packages/shar
 import {buildSubtitles} from '../../../../packages/tts-service/src/build-subtitles';
 import {synthesizeSceneAudio} from '../../../../packages/tts-service/src/synthesize-scene-audio';
 import {getArtifactRoot} from '../artifacts/artifact-root';
+import {getPublicArtifactBaseUrl} from '../runtime-config';
 import {CreateJobDto} from './dto/create-job.dto';
 import {listRecoveredJobsFromArtifacts, recoverJobFromArtifacts, removeJobArtifacts} from './job-artifacts';
 import {JobsRepository} from './jobs.repository';
@@ -121,7 +122,7 @@ export class JobsService {
         synthesizeSceneAudio: (scene: Parameters<typeof synthesizeSceneAudio>[0]) =>
           synthesizeSceneAudio(scene, {
             outputDir: join(getArtifactRoot(), 'jobs', jobId, 'audio'),
-            publicBaseUrl: `http://localhost:3001/artifacts/jobs/${jobId}/audio`,
+            publicBaseUrl: getPublicArtifactBaseUrl('jobs', jobId, 'audio'),
             voice: input.voice,
             speechRate: input.speechRate
           }),
@@ -140,7 +141,7 @@ export class JobsService {
               narrationTone: recommendation.narrationTone,
               coverTone: recommendation.coverTone
             },
-            publicBaseUrl: 'http://localhost:3001/artifacts'
+            publicBaseUrl: getPublicArtifactBaseUrl()
           })
       });
 

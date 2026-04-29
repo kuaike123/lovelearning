@@ -54,6 +54,8 @@ export function SubmitJobForm({
   );
   const [status, setStatus] = useState<'idle' | 'submitting' | 'failed'>('idle');
   const [previewStatus, setPreviewStatus] = useState<'idle' | 'loading' | 'failed'>('idle');
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [previewError, setPreviewError] = useState<string | null>(null);
   const [previews, setPreviews] = useState<VoicePreview[]>([]);
 
   const recommendation = recommendVoicePreset({content, style, targetDurationSec});
@@ -66,6 +68,7 @@ export function SubmitJobForm({
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setStatus('submitting');
+    setSubmitError(null);
 
     try {
       const trimmedTaskName = taskName.trim();
@@ -82,7 +85,8 @@ export function SubmitJobForm({
       });
 
       window.location.assign(`/jobs/${job.jobId}`);
-    } catch {
+    } catch (error) {
+      setSubmitError(formatRequestError(error, 'submit'));
       setStatus('failed');
     }
   };
@@ -92,11 +96,13 @@ export function SubmitJobForm({
 
     if (!trimmedContent) {
       setPreviews([]);
+      setPreviewError('\u8bf7\u5148\u8f93\u5165\u9898\u76ee\u5185\u5bb9\uff0c\u518d\u751f\u6210\u8bd5\u542c\u3002');
       setPreviewStatus('failed');
       return;
     }
 
     setPreviewStatus('loading');
+    setPreviewError(null);
 
     try {
       const nextPreviews = await Promise.all(
@@ -121,8 +127,9 @@ export function SubmitJobForm({
 
       setPreviews(nextPreviews);
       setPreviewStatus('idle');
-    } catch {
+    } catch (error) {
       setPreviews([]);
+      setPreviewError(formatRequestError(error, 'preview'));
       setPreviewStatus('failed');
     }
   };
@@ -344,8 +351,8 @@ export function SubmitJobForm({
         </div>
       </section>
 
-      {status === 'failed' ? <p role="alert">创建任务失败，请稍后重试。</p> : null}
-      {previewStatus === 'failed' ? <p role="alert">试听生成失败，请检查题目内容后重试。</p> : null}
+      {status === 'failed' && submitError ? <p role="alert">{submitError}</p> : null}
+      {previewStatus === 'failed' && previewError ? <p role="alert">{previewError}</p> : null}
     </form>
   );
 }
@@ -702,4 +709,21 @@ const formatSpeechRate = (speechRate: SpeechRate) => {
   };
 
   return labels[speechRate];
+};
+
+const formatRequestError = (error: unknown, action: 'submit' | 'preview') => {
+  const fallback =
+    action === 'submit'
+      ? '\u89c6\u9891\u751f\u6210\u5931\u8d25\uff0c\u8bf7\u7a0d\u540e\u91cd\u8bd5\u3002'
+      : '\u97f3\u8272\u8bd5\u542c\u751f\u6210\u5931\u8d25\uff0c\u8bf7\u7a0d\u540e\u91cd\u8bd5\u3002';
+
+  if (!(error instanceof Error)) {
+    return fallback;
+  }
+
+  if (error.message === 'API_UNREACHABLE') {
+    return '\u540e\u7aef\u670d\u52a1\u672a\u8fde\u63a5\uff0c\u8bf7\u5148\u542f\u52a8 API \uff08\u9ed8\u8ba4\u7aef\u53e3 3001\uff09\u540e\u518d\u91cd\u8bd5\u3002';
+  }
+
+  return error.message.trim() || fallback;
 };

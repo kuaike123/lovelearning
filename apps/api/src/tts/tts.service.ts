@@ -5,6 +5,7 @@ import {join} from 'node:path';
 import {recommendVoicePreset} from '../../../../packages/shared-types/src';
 import {synthesizeSceneAudio} from '../../../../packages/tts-service/src/synthesize-scene-audio';
 import {getArtifactRoot} from '../artifacts/artifact-root';
+import {getPublicArtifactBaseUrl} from '../runtime-config';
 import {PreviewTtsDto} from './dto/preview-tts.dto';
 
 @Injectable()
@@ -25,7 +26,7 @@ export class TtsService {
       },
       {
         outputDir: join(getArtifactRoot(), 'previews'),
-        publicBaseUrl: 'http://localhost:3001/artifacts/previews',
+        publicBaseUrl: getPublicArtifactBaseUrl('previews'),
         voice: parsedInput.voice ?? recommendation.voice,
         speechRate: parsedInput.speechRate ?? recommendation.speechRate
       }

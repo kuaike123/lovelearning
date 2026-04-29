@@ -7,6 +7,7 @@ import {extname, resolve, sep} from 'node:path';
 
 import {AppModule} from './app.module';
 import {getArtifactRoot} from './artifacts/artifact-root';
+import {getApiPort} from './runtime-config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -37,7 +38,7 @@ async function bootstrap() {
       next();
     }
   });
-  await app.listen(3001);
+  await app.listen(Number(getApiPort()));
 }
 
 void bootstrap();

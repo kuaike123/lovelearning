@@ -2,8 +2,7 @@ import {existsSync, readdirSync, readFileSync, rmSync, statSync} from 'node:fs';
 import {join, resolve, sep} from 'node:path';
 
 import {getArtifactRoot} from '../artifacts/artifact-root';
-
-const publicBaseUrl = 'http://localhost:3001/artifacts';
+import {getPublicArtifactBaseUrl} from '../runtime-config';
 
 type RecoveredJob = {
   jobId: string;
@@ -55,10 +54,10 @@ export const recoverJobFromArtifacts = (jobId: string): RecoveredJob | null => {
       speechRate: metadata.speechRate,
       narrationTone: metadata.narrationTone,
       coverTone: metadata.coverTone,
-      videoUrl: `${publicBaseUrl}/jobs/${jobId}/output.mp4`,
-      coverUrl: `${publicBaseUrl}/jobs/${jobId}/cover.png`,
-      subtitleUrl: `${publicBaseUrl}/jobs/${jobId}/subtitles.srt`,
-      lessonPlanUrl: `${publicBaseUrl}/jobs/${jobId}/lesson.json`
+      videoUrl: getPublicArtifactBaseUrl('jobs', jobId, 'output.mp4'),
+      coverUrl: getPublicArtifactBaseUrl('jobs', jobId, 'cover.png'),
+      subtitleUrl: getPublicArtifactBaseUrl('jobs', jobId, 'subtitles.srt'),
+      lessonPlanUrl: getPublicArtifactBaseUrl('jobs', jobId, 'lesson.json')
     };
   } catch {
     return null;

@@ -3,6 +3,7 @@ import {afterEach, describe, expect, it, vi} from 'vitest';
 import {
   createJob,
   deleteJob,
+  getApiBaseUrl,
   getJob,
   getLessonPlan,
   listJobs,
@@ -13,6 +14,24 @@ import {
 describe('api client', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
+  });
+
+  it('prefers NEXT_PUBLIC_API_BASE_URL when provided', () => {
+    vi.stubEnv('NEXT_PUBLIC_API_BASE_URL', 'https://api.example.com/');
+
+    expect(getApiBaseUrl()).toBe('https://api.example.com');
+  });
+
+  it('derives the local API origin from browser location when running on localhost', () => {
+    vi.stubGlobal('window', {
+      location: {
+        hostname: '127.0.0.1',
+        protocol: 'http:'
+      }
+    });
+
+    expect(getApiBaseUrl()).toBe('http://127.0.0.1:3001');
   });
 
   it('creates a job through the API', async () => {
@@ -174,5 +193,17 @@ describe('api client', () => {
       audioUrl: 'http://localhost:3001/artifacts/previews/preview-1.wav',
       durationSec: 4
     });
+  });
+
+  it('surfaces a clear error when the API service is unreachable', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('fetch failed')));
+
+    await expect(
+      previewTts({
+        text: 'Solve equation: 2x + 3 = 11',
+        voice: 'female_warm',
+        speechRate: 'slow'
+      })
+    ).rejects.toThrow('API_UNREACHABLE');
   });
 });
