@@ -8,6 +8,10 @@ type ButtonOptions = {
   tone?: 'primary' | 'secondary' | 'quiet';
 };
 
+type PillOptions = {
+  tone?: 'default' | 'accent' | 'success';
+};
+
 export const uiColors = {
   border: '#eadfca',
   borderStrong: '#d7c8a9',
@@ -44,6 +48,33 @@ export const workspaceGridStyle: CSSProperties = {
 export const sectionIntroStyle: CSSProperties = {
   display: 'grid',
   gap: 8
+};
+
+export const formFieldLabelStyle: CSSProperties = {
+  color: uiColors.ink,
+  fontSize: 14,
+  fontWeight: 700
+};
+
+export const formControlStyle: CSSProperties = {
+  background: '#ffffff',
+  border: `1px solid ${uiColors.borderStrong}`,
+  borderRadius: 14,
+  color: uiColors.ink,
+  fontSize: 15,
+  padding: '12px 14px'
+};
+
+export const textareaControlStyle: CSSProperties = {
+  ...formControlStyle,
+  minHeight: 128,
+  resize: 'vertical'
+};
+
+export const optionGridStyle: CSSProperties = {
+  display: 'grid',
+  gap: 12,
+  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))'
 };
 
 export const createCardStyle = ({tone = 'default'}: CardOptions = {}): CSSProperties => {
@@ -120,3 +151,35 @@ export const createEyebrowStyle = (): CSSProperties => ({
   letterSpacing: 1.4,
   margin: 0
 });
+
+export const createPillStyle = ({tone = 'default'}: PillOptions = {}): CSSProperties => {
+  const base: CSSProperties = {
+    alignItems: 'center',
+    background: uiColors.surfaceSoft,
+    borderRadius: 999,
+    color: '#374151',
+    display: 'inline-flex',
+    fontSize: 12,
+    fontWeight: 700,
+    gap: 6,
+    padding: '6px 10px'
+  };
+
+  if (tone === 'accent') {
+    return {
+      ...base,
+      background: '#FFF4CC',
+      color: '#7C4A03'
+    };
+  }
+
+  if (tone === 'success') {
+    return {
+      ...base,
+      background: '#E7F0DA',
+      color: '#1F5134'
+    };
+  }
+
+  return base;
+};
