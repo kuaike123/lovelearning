@@ -1,11 +1,21 @@
 import React from 'react';
 
+import type {PresenterTeachingCue} from '../lib/presenter-cues';
+
 export type PresenterState = 'idle_teach' | 'welcome_wave' | 'point_explain' | 'warning_alert' | 'summary_cheer';
+export type PresenterSpeechActivity = 'resting' | 'speaking';
+export type PresenterSpeechWindow = {
+  end: number;
+  start: number;
+};
 
 type PresenterMascotProps = {
   sceneProgress?: number;
   sceneType: string;
+  speechActivity?: PresenterSpeechActivity;
+  speechWindows?: PresenterSpeechWindow[];
   state?: PresenterState;
+  teachingCue?: PresenterTeachingCue;
 };
 
 const sceneStateMap: Record<string, PresenterState> = {
@@ -44,6 +54,15 @@ const stateCopy: Record<PresenterState, {badge: string; label: string; rotation:
   }
 };
 
+const teachingCueCopy: Record<PresenterTeachingCue, string> = {
+  diagram_pointer: '\u6307\u5411\u56fe\u5f62\u5173\u952e\u70b9',
+  formula_pointer: '\u6307\u5411\u516c\u5f0f\u677f\u4e66',
+  none: '\u966a\u4f34\u8bb2\u89e3',
+  reading_guide: '\u5e26\u7740\u5708\u51fa\u9898\u5e72',
+  summary_reward: '\u9f13\u52b1\u5b8c\u6210\u5b66\u4e60',
+  warning_flash: '\u9ad8\u4eae\u6613\u9519\u70b9'
+};
+
 export const getPresenterStateForScene = (sceneType: string): PresenterState => {
   return sceneStateMap[sceneType] ?? 'idle_teach';
 };
@@ -54,14 +73,32 @@ const clampProgress = (progress: number | undefined) => {
   return Math.max(0, Math.min(1, progress));
 };
 
-export const PresenterMascot: React.FC<PresenterMascotProps> = ({sceneProgress, sceneType, state}) => {
+export const isProgressInsideSpeechWindow = (progress: number, speechWindows?: PresenterSpeechWindow[]) => {
+  if (!speechWindows?.length) return true;
+
+  return speechWindows.some((window) => progress >= window.start && progress <= window.end);
+};
+
+export const PresenterMascot: React.FC<PresenterMascotProps> = ({
+  sceneProgress,
+  sceneType,
+  speechActivity = 'resting',
+  speechWindows,
+  state,
+  teachingCue = 'none'
+}) => {
   const presenterState = state ?? getPresenterStateForScene(sceneType);
   const copy = stateCopy[presenterState];
+  const cueLabel = teachingCueCopy[teachingCue];
   const progress = clampProgress(sceneProgress);
   const phase = progress * Math.PI * 2;
   const floatY = Math.sin(phase * 2) * 5;
   const blinkScale = progress > 0.18 && progress < 0.24 ? 0.16 : progress > 0.68 && progress < 0.74 ? 0.16 : 1;
-  const mouthOpen = progress > 0.08 && progress < 0.88 && Math.sin(phase * 5) > 0;
+  const isSpeaking = speechActivity === 'speaking' && isProgressInsideSpeechWindow(progress, speechWindows);
+  const speechState = speechActivity === 'resting' ? 'resting' : isSpeaking ? 'speaking' : 'paused';
+  const mouthSync = speechState === 'speaking' ? 'tts' : speechState === 'paused' ? 'pause' : 'idle';
+  const speechLabel = speechState === 'speaking' ? '\u0054\u0054\u0053\u53e3\u64ad\u540c\u6b65' : speechState === 'paused' ? '\u53e3\u64ad\u505c\u987f' : '\u9759\u97f3\u966a\u4f34';
+  const mouthOpen = isSpeaking && progress > 0.08 && progress < 0.92 && Math.sin(phase * 7) > -0.2;
   const leftArmMotion = Math.sin(phase) * 7;
   const rightArmMotion = Math.cos(phase) * 7;
   const isWarning = presenterState === 'warning_alert';
@@ -73,16 +110,25 @@ export const PresenterMascot: React.FC<PresenterMascotProps> = ({sceneProgress, 
 
   return (
     <aside
-      aria-label={`${copy.label} ${copy.badge} \u773c\u955c \u7728\u773c \u53e3\u578b\u540c\u6b65`}
+      aria-label={`${copy.label} ${copy.badge} ${cueLabel} \u773c\u955c \u7728\u773c ${speechLabel}`}
+      data-mouth-sync={mouthSync}
       data-presenter-motion="active"
       data-presenter-progress={progress.toFixed(2)}
+      data-presenter-speech={speechState}
       data-presenter-state={presenterState}
+      data-teaching-cue={teachingCue}
       style={presenterWrapStyle}
     >
       <div style={speechBubbleStyle(isWarning)}>
         <span style={speechBadgeStyle}>{copy.badge}</span>
         <strong style={speechNameStyle}>{copy.label}</strong>
       </div>
+      {teachingCue !== 'none' ? (
+        <div style={cueCalloutStyle(teachingCue)}>
+          <span style={cueDotStyle(teachingCue)} />
+          <strong>{cueLabel}</strong>
+        </div>
+      ) : null}
       <svg
         aria-hidden="true"
         height="238"
@@ -142,7 +188,7 @@ export const PresenterMascot: React.FC<PresenterMascotProps> = ({sceneProgress, 
         {isWelcoming ? <path d="M30 110c-10-11-13-24-7-36" fill="none" stroke="#F5C542" strokeLinecap="round" strokeWidth="6" /> : null}
         {isCheering ? <path d="M175 61l8 8 12-17" fill="none" stroke="#52B788" strokeLinecap="round" strokeWidth="7" /> : null}
       </svg>
-      <span style={hiddenDescriptorStyle}>{'\u773c\u955c \u7728\u773c \u53e3\u578b\u540c\u6b65'}</span>
+      <span style={hiddenDescriptorStyle}>{`${cueLabel} \u773c\u955c \u7728\u773c ${speechLabel}`}</span>
     </aside>
   );
 };
@@ -184,6 +230,36 @@ const speechNameStyle = {
   fontSize: 22,
   fontWeight: 900
 };
+
+const cueCalloutStyle = (teachingCue: PresenterTeachingCue) => ({
+  alignItems: 'center',
+  background: teachingCue === 'warning_flash' ? '#FFF1D7' : 'rgba(255, 255, 255, 0.92)',
+  border: `2px solid ${teachingCue === 'warning_flash' ? '#F5C542' : 'rgba(31, 81, 52, 0.18)'}`,
+  borderRadius: 999,
+  boxShadow: '0 12px 28px rgba(16, 42, 67, 0.14)',
+  color: teachingCue === 'warning_flash' ? '#9A3412' : '#1F5134',
+  display: 'flex',
+  fontSize: 17,
+  fontWeight: 900,
+  gap: 8,
+  marginBottom: 6,
+  padding: '8px 13px'
+});
+
+const cueDotStyle = (teachingCue: PresenterTeachingCue) => ({
+  background:
+    teachingCue === 'warning_flash'
+      ? '#F97316'
+      : teachingCue === 'summary_reward'
+        ? '#52B788'
+        : teachingCue === 'diagram_pointer'
+          ? '#3B82F6'
+          : '#F5C542',
+  borderRadius: '50%',
+  boxShadow: '0 0 0 6px rgba(245, 197, 66, 0.18)',
+  height: 12,
+  width: 12
+});
 
 const mascotSvgStyle = (rotation: number, floatY: number) => ({
   filter: 'drop-shadow(0 20px 28px rgba(16, 42, 67, 0.22))',

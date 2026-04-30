@@ -317,7 +317,52 @@ describe('getSceneVisuals', () => {
     expect(html).toContain('data-presenter-motion="active"');
     expect(html).toContain('data-presenter-progress="0.50"');
     expect(html).toContain('\u7728\u773c');
-    expect(html).toContain('\u53e3\u578b\u540c\u6b65');
+    expect(html).toContain('\u9759\u97f3\u966a\u4f34');
+  });
+
+  it('marks presenter mouth motion as TTS-synced only while narration audio is active', () => {
+    const html = renderToStaticMarkup(
+      React.createElement(PresenterMascot, {
+        sceneProgress: 0.25,
+        sceneType: 'step',
+        speechActivity: 'speaking'
+      } as React.ComponentProps<typeof PresenterMascot>)
+    );
+
+    expect(html).toContain('data-presenter-speech="speaking"');
+    expect(html).toContain('data-mouth-sync="tts"');
+    expect(html).toContain('\u0054\u0054\u0053\u53e3\u64ad\u540c\u6b65');
+  });
+
+  it('pauses presenter mouth motion between narration speech windows', () => {
+    const html = renderToStaticMarkup(
+      React.createElement(PresenterMascot, {
+        sceneProgress: 0.12,
+        sceneType: 'step',
+        speechActivity: 'speaking',
+        speechWindows: [
+          {start: 0.22, end: 0.42},
+          {start: 0.52, end: 0.82}
+        ]
+      } as React.ComponentProps<typeof PresenterMascot>)
+    );
+
+    expect(html).toContain('data-presenter-speech="paused"');
+    expect(html).toContain('data-mouth-sync="pause"');
+    expect(html).toContain('\u53e3\u64ad\u505c\u987f');
+  });
+
+  it('renders presenter teaching cues for formula emphasis', () => {
+    const html = renderToStaticMarkup(
+      React.createElement(PresenterMascot, {
+        sceneProgress: 0.46,
+        sceneType: 'step',
+        teachingCue: 'formula_pointer'
+      } as React.ComponentProps<typeof PresenterMascot>)
+    );
+
+    expect(html).toContain('data-teaching-cue="formula_pointer"');
+    expect(html).toContain('\u6307\u5411\u516c\u5f0f\u677f\u4e66');
   });
 
   it('renders eased scene progress as a teaching rhythm bar', () => {
