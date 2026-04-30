@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 
 import {
   buildFeaturedSampleGenerationHref,
@@ -12,6 +12,7 @@ import {
   type ProblemCategoryFilter,
   type UseCaseFilter
 } from './featured-samples';
+import {FeaturedSamplePoster} from './FeaturedSamplePoster';
 import {createButtonStyle, createCardStyle, createPillStyle} from './ui-primitives';
 
 const categoryOptions: {label: string; value: ProblemCategoryFilter}[] = [
@@ -30,6 +31,7 @@ const useCaseOptions: {label: string; value: UseCaseFilter}[] = [
 export function FeaturedSampleShowcase() {
   const [problemCategory, setProblemCategory] = useState<ProblemCategoryFilter>('all');
   const [useCase, setUseCase] = useState<UseCaseFilter>('all');
+  const thumbnailRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   const visibleSamples = useMemo(
     () =>
@@ -52,12 +54,38 @@ export function FeaturedSampleShowcase() {
     }
   }, [activeSampleSlug, visibleSamples]);
 
+  useEffect(() => {
+    if (!activeSampleSlug) {
+      return;
+    }
+
+    thumbnailRefs.current[activeSampleSlug]?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'center'
+    });
+  }, [activeSampleSlug]);
+
   const activeSample =
     visibleSamples.find((sample) => sample.slug === activeSampleSlug) ?? visibleSamples[0] ?? null;
+  const activeSampleIndex = activeSample
+    ? visibleSamples.findIndex((sample) => sample.slug === activeSample.slug)
+    : -1;
+  const activeSamplePage =
+    activeSampleIndex >= 0 ? `${activeSampleIndex + 1} / ${visibleSamples.length}` : `0 / ${visibleSamples.length}`;
   const resultSummary =
     visibleSamples.length > 0
       ? `\u5f53\u524d\u5171 ${visibleSamples.length} \u4e2a\u6837\u7247`
       : '\u6ca1\u6709\u627e\u5230\u5339\u914d\u7684\u6837\u7247';
+
+  const jumpToRelativeSample = (direction: -1 | 1) => {
+    if (visibleSamples.length === 0 || activeSampleIndex < 0) {
+      return;
+    }
+
+    const nextIndex = (activeSampleIndex + direction + visibleSamples.length) % visibleSamples.length;
+    setActiveSampleSlug(visibleSamples[nextIndex].slug);
+  };
 
   return (
     <section id="featured-samples" style={sectionStyle}>
@@ -125,7 +153,7 @@ export function FeaturedSampleShowcase() {
           </div>
 
           <div style={stagePanelStyle}>
-            <SamplePosterPreview sample={activeSample} variant="hero" />
+            <FeaturedSamplePoster sample={activeSample} variant="hero" />
             <div style={stageInfoStyle}>
               <div style={stageMetaTopStyle}>
                 <span style={stageSampleLabelStyle}>{'\u4e3b\u89c6\u89c9\u6837\u7247'}</span>
@@ -169,18 +197,71 @@ export function FeaturedSampleShowcase() {
 
           <div data-featured-rail="sample-switcher" style={previewRailStyle}>
             <div style={previewRailHeaderStyle}>
-              <span style={previewRailTitleStyle}>{'\u5207\u6362\u6837\u7247'}</span>
-              <span style={previewRailBodyStyle}>
-                {'\u5148\u770b\u5c01\u9762\uff0c\u518d\u5f80\u4e0b\u6d4f\u89c8\u5b8c\u6574\u6837\u7247\u5e93\u3002'}
-              </span>
+              <div style={previewRailHeadingStyle}>
+                <span style={previewRailTitleStyle}>{'\u5207\u6362\u6837\u7247'}</span>
+                <span style={previewRailBodyStyle}>
+                  {'\u5148\u770b\u5c01\u9762\uff0c\u518d\u5f80\u4e0b\u6d4f\u89c8\u5b8c\u6574\u6837\u7247\u5e93\u3002'}
+                </span>
+              </div>
+              <div style={previewRailNavStyle}>
+                <span data-featured-page={activeSamplePage} style={previewRailPagePillStyle}>
+                  {activeSamplePage}
+                </span>
+                <button
+                  type="button"
+                  data-featured-nav="previous"
+                  onClick={() => jumpToRelativeSample(-1)}
+                  disabled={visibleSamples.length <= 1}
+                  style={{
+                    ...previewRailNavButtonStyle,
+                    ...(visibleSamples.length <= 1 ? previewRailNavButtonDisabledStyle : {})
+                  }}
+                >
+                  {'\u4e0a\u4e00\u5f20'}
+                </button>
+                <button
+                  type="button"
+                  data-featured-nav="next"
+                  onClick={() => jumpToRelativeSample(1)}
+                  disabled={visibleSamples.length <= 1}
+                  style={{
+                    ...previewRailNavButtonStyle,
+                    ...(visibleSamples.length <= 1 ? previewRailNavButtonDisabledStyle : {})
+                  }}
+                >
+                  {'\u4e0b\u4e00\u5f20'}
+                </button>
+              </div>
             </div>
-            <div style={previewRailGridStyle}>
+            <div style={previewRailDotsStyle}>
+              {visibleSamples.map((sample, index) => {
+                const selected = sample.slug === activeSample.slug;
+
+                return (
+                  <button
+                    key={sample.slug}
+                    type="button"
+                    data-featured-dot={selected ? 'active' : 'idle'}
+                    aria-label={`\u7b2c ${index + 1} \u4e2a\u6837\u7247`}
+                    onClick={() => setActiveSampleSlug(sample.slug)}
+                    style={{
+                      ...previewRailDotStyle,
+                      ...(selected ? previewRailDotActiveStyle : {})
+                    }}
+                  />
+                );
+              })}
+            </div>
+            <div style={previewRailTrackStyle}>
               {visibleSamples.map((sample) => {
                 const selected = sample.slug === activeSample.slug;
 
                 return (
                   <button
                     key={sample.slug}
+                    ref={(node) => {
+                      thumbnailRefs.current[sample.slug] = node;
+                    }}
                     type="button"
                     onClick={() => setActiveSampleSlug(sample.slug)}
                     style={{
@@ -189,9 +270,12 @@ export function FeaturedSampleShowcase() {
                     }}
                   >
                     <div style={previewRailPosterStyle}>
-                      <SamplePosterPreview sample={sample} variant="thumbnail" />
+                      <FeaturedSamplePoster sample={sample} variant="thumbnail" />
                     </div>
                     <div style={previewRailCopyStyle}>
+                      {selected ? (
+                        <span style={previewRailCurrentBadgeStyle}>{'\u5f53\u524d\u6837\u7247'}</span>
+                      ) : null}
                       <strong style={previewRailItemTitleStyle}>{sample.title}</strong>
                       <span style={previewRailItemMetaStyle}>
                         {sample.problemCategory === 'equation'
@@ -247,54 +331,6 @@ export function FeaturedSampleShowcase() {
   );
 }
 
-function SamplePosterPreview({
-  sample,
-  variant
-}: {
-  sample: FeaturedSample;
-  variant: 'hero' | 'card' | 'thumbnail';
-}) {
-  const compact = variant === 'thumbnail';
-  const hero = variant === 'hero';
-
-  return (
-    <div
-      style={{
-        ...posterPreviewStyle,
-        ...(hero ? heroPosterPreviewStyle : {}),
-        ...(compact ? thumbnailPosterPreviewStyle : {})
-      }}
-    >
-      <div style={posterTopRowStyle}>
-        <span style={posterKickerStyle}>{sample.posterKicker}</span>
-        <span style={posterBrandStyle}>{'Love Learning'}</span>
-      </div>
-      <div
-        style={{
-          ...posterFormulaStyle,
-          ...(hero ? heroPosterFormulaStyle : {}),
-          ...(compact ? thumbnailPosterFormulaStyle : {})
-        }}
-      >
-        {sample.content}
-      </div>
-      <p
-        style={{
-          ...posterCaptionStyle,
-          ...(hero ? heroPosterCaptionStyle : {}),
-          ...(compact ? thumbnailPosterCaptionStyle : {})
-        }}
-      >
-        {sample.posterCaption}
-      </p>
-      <div style={posterFooterStyle}>
-        <span style={posterBadgeStyle}>{'\u5c01\u9762\u9884\u89c8'}</span>
-        <span style={posterFootnoteStyle}>{'\u6210\u7247\u9884\u671f\uff1a9:16 \u7ad6\u5c4f\u77ed\u89c6\u9891'}</span>
-      </div>
-    </div>
-  );
-}
-
 const renderSampleCard = (sample: FeaturedSample, onPreview: (slug: string) => void) => (
   <article key={sample.taskName} style={cardStyle}>
     <div style={cardHeaderStyle}>
@@ -304,7 +340,7 @@ const renderSampleCard = (sample: FeaturedSample, onPreview: (slug: string) => v
       </button>
     </div>
     <h3 style={cardTitleStyle}>{sample.title}</h3>
-    <SamplePosterPreview sample={sample} variant="card" />
+    <FeaturedSamplePoster sample={sample} variant="card" />
     <p style={cardDescriptionStyle}>{sample.description}</p>
     <div style={insightGridStyle}>
       <div style={insightItemStyle}>
@@ -558,6 +594,11 @@ const previewRailHeaderStyle = {
   justifyContent: 'space-between'
 };
 
+const previewRailHeadingStyle = {
+  display: 'grid',
+  gap: 4
+};
+
 const previewRailTitleStyle = {
   color: '#FFF7D6',
   fontSize: 15,
@@ -570,10 +611,69 @@ const previewRailBodyStyle = {
   lineHeight: 1.5
 };
 
-const previewRailGridStyle = {
-  display: 'grid',
+const previewRailNavStyle = {
+  alignItems: 'center',
+  display: 'flex',
+  flexWrap: 'wrap' as const,
   gap: 12,
-  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))'
+  justifyContent: 'flex-end'
+};
+
+const previewRailPagePillStyle = {
+  background: 'rgba(255,255,255,0.12)',
+  border: '1px solid rgba(255,255,255,0.18)',
+  borderRadius: 999,
+  color: '#FFF7D6',
+  display: 'inline-flex',
+  fontSize: 12,
+  fontWeight: 800,
+  padding: '7px 11px'
+};
+
+const previewRailNavButtonStyle = {
+  ...createButtonStyle({tone: 'quiet'}),
+  background: 'rgba(255,255,255,0.14)',
+  border: '1px solid rgba(255,255,255,0.18)',
+  color: '#FFF7D6',
+  padding: '8px 12px'
+};
+
+const previewRailNavButtonDisabledStyle = {
+  cursor: 'not-allowed',
+  opacity: 0.5
+};
+
+const previewRailTrackStyle = {
+  display: 'flex',
+  gap: 12,
+  overflowX: 'auto' as const,
+  paddingBottom: 4,
+  scrollSnapType: 'x proximity' as const
+};
+
+const previewRailDotsStyle = {
+  alignItems: 'center',
+  display: 'flex',
+  gap: 8,
+  justifyContent: 'center'
+};
+
+const previewRailDotStyle = {
+  background: 'rgba(255,255,255,0.28)',
+  border: 'none',
+  borderRadius: 999,
+  cursor: 'pointer',
+  display: 'inline-flex',
+  height: 8,
+  padding: 0,
+  transition: 'all 160ms ease',
+  width: 8
+};
+
+const previewRailDotActiveStyle = {
+  background: '#FFF4CC',
+  boxShadow: '0 0 0 4px rgba(255,244,204,0.18)',
+  width: 20
 };
 
 const previewRailItemStyle = {
@@ -583,8 +683,10 @@ const previewRailItemStyle = {
   color: '#FFF7D6',
   cursor: 'pointer',
   display: 'grid',
+  flex: '0 0 220px',
   gap: 10,
   padding: 12,
+  scrollSnapAlign: 'start' as const,
   textAlign: 'left' as const
 };
 
@@ -601,6 +703,18 @@ const previewRailPosterStyle = {
 const previewRailCopyStyle = {
   display: 'grid',
   gap: 4
+};
+
+const previewRailCurrentBadgeStyle = {
+  background: 'rgba(255,244,204,0.16)',
+  border: '1px solid rgba(255,244,204,0.4)',
+  borderRadius: 999,
+  color: '#FFF4CC',
+  display: 'inline-flex',
+  fontSize: 11,
+  fontWeight: 800,
+  padding: '5px 8px',
+  width: 'fit-content'
 };
 
 const previewRailItemTitleStyle = {
@@ -669,111 +783,6 @@ const previewSwitchButtonStyle = {
   ...createButtonStyle({tone: 'quiet'}),
   fontSize: 12,
   padding: '8px 12px'
-};
-
-const posterPreviewStyle = {
-  aspectRatio: '9 / 16',
-  background: 'linear-gradient(180deg, #14324A 0%, #245B45 100%)',
-  borderRadius: 22,
-  boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.12)',
-  color: '#FFF7D6',
-  display: 'grid',
-  gap: 14,
-  padding: 18
-};
-
-const heroPosterPreviewStyle = {
-  minHeight: '100%'
-};
-
-const thumbnailPosterPreviewStyle = {
-  aspectRatio: '9 / 13',
-  borderRadius: 16,
-  gap: 8,
-  padding: 10
-};
-
-const posterTopRowStyle = {
-  alignItems: 'center',
-  display: 'flex',
-  justifyContent: 'space-between'
-};
-
-const posterKickerStyle = {
-  background: 'rgba(245,197,66,0.18)',
-  borderRadius: 999,
-  color: '#F5C542',
-  fontSize: 12,
-  fontWeight: 800,
-  padding: '6px 10px'
-};
-
-const posterBrandStyle = {
-  color: 'rgba(255,247,214,0.8)',
-  fontSize: 12,
-  fontWeight: 700,
-  letterSpacing: 1
-};
-
-const posterFormulaStyle = {
-  background: 'rgba(255,255,255,0.08)',
-  border: '1px solid rgba(255,255,255,0.16)',
-  borderRadius: 18,
-  fontFamily: 'Georgia, "Times New Roman", serif',
-  fontSize: 24,
-  lineHeight: 1.35,
-  minHeight: 96,
-  padding: 16
-};
-
-const heroPosterFormulaStyle = {
-  fontSize: 30,
-  minHeight: 132
-};
-
-const thumbnailPosterFormulaStyle = {
-  borderRadius: 12,
-  fontSize: 15,
-  minHeight: 52,
-  padding: 10
-};
-
-const posterCaptionStyle = {
-  fontSize: 22,
-  fontWeight: 800,
-  lineHeight: 1.35,
-  margin: 0
-};
-
-const heroPosterCaptionStyle = {
-  fontSize: 28
-};
-
-const thumbnailPosterCaptionStyle = {
-  fontSize: 14
-};
-
-const posterFooterStyle = {
-  alignSelf: 'end',
-  display: 'grid',
-  gap: 8
-};
-
-const posterBadgeStyle = {
-  background: '#FFF4CC',
-  borderRadius: 999,
-  color: '#7C4A03',
-  display: 'inline-flex',
-  fontSize: 12,
-  fontWeight: 800,
-  padding: '6px 10px',
-  width: 'fit-content'
-};
-
-const posterFootnoteStyle = {
-  color: 'rgba(255,247,214,0.84)',
-  fontSize: 12,
-  lineHeight: 1.5
 };
 
 const cardEyebrowStyle = {

@@ -9,6 +9,8 @@ type RecentJob = {
   error?: string;
   jobId: string;
   status: string;
+  stage?: string;
+  progress?: number;
   createdAt?: string;
   problemText?: string;
   taskName?: string;
@@ -90,39 +92,107 @@ export function RecentJobsList({
     return <p>{copy.empty}</p>;
   }
 
+  const insights = summarizeRecentJobs(jobs);
+
   return (
     <div style={listStyle}>
-      {jobs.map((job) => (
-        <article key={job.jobId} style={jobCardStyle}>
-          <a href={`/jobs/${job.jobId}`} style={jobLinkStyle}>
-            <span style={problemStyle}>{job.taskName ?? job.problemText ?? copy.untitled}</span>
-            {job.taskName && job.problemText ? <span style={descriptionStyle}>{job.problemText}</span> : null}
-            <span style={metaStyle}>
-              {formatJobStatus(job.status)}
-              {job.createdAt ? ` · ${new Date(job.createdAt).toLocaleString()}` : ''}
-            </span>
-          </a>
-          {job.status === 'failed' && job.error ? (
-            <p style={errorStyle}>
-              {copy.failedReason}{job.error}
-            </p>
-          ) : null}
-          {onDelete || onRegenerate ? (
-            <div style={actionRowStyle}>
-              {onRegenerate ? (
-                <button type="button" onClick={() => void onRegenerate(job.jobId)} style={regenerateButtonStyle}>
-                  {copy.regenerateJob}
-                </button>
-              ) : null}
-              {onDelete ? (
-                <button type="button" onClick={() => void onDelete(job.jobId)} style={deleteButtonStyle}>
-                  {copy.deleteJob}
-                </button>
-              ) : null}
-            </div>
-          ) : null}
-        </article>
-      ))}
+      <section style={overviewPanelStyle}>
+        <div style={overviewHeaderStyle}>
+          <div>
+            <p style={overviewEyebrowStyle}>{copy.overviewEyebrow}</p>
+            <h3 style={overviewTitleStyle}>{copy.overviewTitle}</h3>
+          </div>
+          <span style={overviewHintStyle}>{copy.overviewHint}</span>
+        </div>
+        <div style={overviewGridStyle}>
+          <article style={overviewCardStyle}>
+            <span style={overviewLabelStyle}>{copy.overviewTotal}</span>
+            <strong style={overviewValueStyle}>{insights.total}</strong>
+          </article>
+          <article style={overviewCardStyle}>
+            <span style={overviewLabelStyle}>{copy.overviewRunning}</span>
+            <strong style={overviewValueStyle}>{insights.inFlight}</strong>
+          </article>
+          <article style={overviewCardStyle}>
+            <span style={overviewLabelStyle}>{copy.overviewCompleted}</span>
+            <strong style={overviewValueStyle}>{insights.completed}</strong>
+          </article>
+          <article style={overviewCardStyle}>
+            <span style={overviewLabelStyle}>{copy.overviewFailed}</span>
+            <strong style={overviewValueStyle}>{insights.failed}</strong>
+          </article>
+        </div>
+      </section>
+
+      {insights.failed > 0 ? (
+        <section style={attentionCardStyle}>
+          <div style={attentionHeaderStyle}>
+            <strong style={attentionTitleStyle}>{copy.needsAttentionTitle}</strong>
+            <span style={attentionCountStyle}>{`${insights.failed}${copy.needsAttentionCountSuffix}`}</span>
+          </div>
+          <p style={attentionBodyStyle}>{copy.needsAttentionBody}</p>
+        </section>
+      ) : null}
+
+      {jobs.map((job) => {
+        const progress = typeof job.progress === 'number' ? clampProgress(job.progress) : null;
+
+        return (
+          <article key={job.jobId} style={jobCardStyle}>
+            <a href={`/jobs/${job.jobId}`} style={jobLinkStyle}>
+              <div style={cardTopRowStyle}>
+                <span style={problemStyle}>{job.taskName ?? job.problemText ?? copy.untitled}</span>
+                <span style={getStatusBadgeStyle(job.status)}>{formatJobStatus(job.status)}</span>
+              </div>
+              {job.taskName && job.problemText ? <span style={descriptionStyle}>{job.problemText}</span> : null}
+              <span style={metaStyle}>
+                {job.createdAt ? `${copy.createdAtPrefix}${new Date(job.createdAt).toLocaleString()}` : formatJobStatus(job.status)}
+              </span>
+            </a>
+
+            {job.status !== 'failed' && (job.stage || progress !== null) ? (
+              <div style={timelineCardStyle}>
+                {job.stage ? (
+                  <p style={timelineTextStyle}>
+                    {copy.currentStagePrefix}
+                    {formatJobStage(job.stage)}
+                  </p>
+                ) : null}
+                {progress !== null ? (
+                  <>
+                    <div aria-label={copy.progressBarLabel} style={progressTrackStyle}>
+                      <div style={{...progressFillStyle, width: `${progress}%`}} />
+                    </div>
+                    <p style={progressTextStyle}>{`${copy.progressTextPrefix} ${progress}%`}</p>
+                  </>
+                ) : null}
+              </div>
+            ) : null}
+
+            {job.status === 'failed' && job.error ? (
+              <p style={errorStyle}>
+                {copy.failedReason}
+                {job.error}
+              </p>
+            ) : null}
+
+            {onDelete || onRegenerate ? (
+              <div style={actionRowStyle}>
+                {onRegenerate ? (
+                  <button type="button" onClick={() => void onRegenerate(job.jobId)} style={regenerateButtonStyle}>
+                    {copy.regenerateJob}
+                  </button>
+                ) : null}
+                {onDelete ? (
+                  <button type="button" onClick={() => void onDelete(job.jobId)} style={deleteButtonStyle}>
+                    {copy.deleteJob}
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
+          </article>
+        );
+      })}
     </div>
   );
 }
@@ -139,6 +209,30 @@ export const filterRecentJobs = (jobs: RecentJob[], query: string) => {
   });
 };
 
+const summarizeRecentJobs = (jobs: RecentJob[]) => {
+  return jobs.reduce(
+    (summary, job) => {
+      summary.total += 1;
+
+      if (job.status === 'completed') {
+        summary.completed += 1;
+      } else if (job.status === 'failed') {
+        summary.failed += 1;
+      } else {
+        summary.inFlight += 1;
+      }
+
+      return summary;
+    },
+    {
+      completed: 0,
+      failed: 0,
+      inFlight: 0,
+      total: 0
+    }
+  );
+};
+
 const formatJobStatus = (status: string) => {
   const labels: Record<string, string> = {
     completed: copy.completed,
@@ -151,23 +245,75 @@ const formatJobStatus = (status: string) => {
   return labels[status] ?? status;
 };
 
+const formatJobStage = (stage: string) => {
+  const labels: Record<string, string> = {
+    audio: copy.stageAudio,
+    done: copy.stageDone,
+    job_runner: copy.stageJobRunner,
+    loading: copy.loadingStatus,
+    map: copy.stageMap,
+    parse: copy.stageParse,
+    plan: copy.stagePlan,
+    queued: copy.queued,
+    render: copy.stageRender,
+    store: copy.stageStore,
+    subtitles: copy.stageSubtitles
+  };
+
+  return labels[stage] ?? stage;
+};
+
+const clampProgress = (progress: number) => Math.max(0, Math.min(100, Math.round(progress)));
+
+const getStatusBadgeStyle = (status: string) => ({
+  ...statusBadgeStyle,
+  ...(status === 'completed'
+    ? statusBadgeCompletedStyle
+    : status === 'failed'
+      ? statusBadgeFailedStyle
+      : statusBadgeInFlightStyle)
+});
+
 const copy = {
-  completed: '\u5df2\u5b8c\u6210',
-  deleteJob: '\u5220\u9664\u4efb\u52a1',
-  empty: '\u8fd8\u6ca1\u6709\u751f\u6210\u8bb0\u5f55\u3002\u63d0\u4ea4\u4e00\u9053\u9898\u540e\uff0c\u53ef\u4ee5\u5728\u8fd9\u91cc\u67e5\u770b\u7ed3\u679c\u3002',
-  failed: '\u5931\u8d25',
-  failedReason: '\u5931\u8d25\u539f\u56e0\uff1a',
-  historyEyebrow: '\u751f\u6210\u8bb0\u5f55',
-  loadFailed: '\u6700\u8fd1\u4efb\u52a1\u52a0\u8f7d\u5931\u8d25',
-  loading: '\u6b63\u5728\u52a0\u8f7d\u6700\u8fd1\u4efb\u52a1...',
-  loadingStatus: '\u52a0\u8f7d\u4e2d',
-  queued: '\u6392\u961f\u4e2d',
-  recentJobs: '\u6700\u8fd1\u4efb\u52a1',
-  regenerateJob: '\u91cd\u65b0\u751f\u6210',
-  running: '\u751f\u6210\u4e2d',
-  searchLabel: '\u641c\u7d22\u4efb\u52a1',
-  searchPlaceholder: '\u8f93\u5165\u4efb\u52a1\u540d\u79f0\u6216\u9898\u76ee\u5173\u952e\u8bcd',
-  untitled: '\u672a\u547d\u540d\u6570\u5b66\u9898'
+  completed: '已完成',
+  createdAtPrefix: '创建时间：',
+  currentStagePrefix: '当前阶段：',
+  deleteJob: '删除任务',
+  empty: '还没有生成记录。提交一道题后，可以在这里查看结果。',
+  failed: '失败',
+  failedReason: '失败原因：',
+  historyEyebrow: '生成记录',
+  loadFailed: '最近任务加载失败',
+  loading: '正在加载最近任务...',
+  loadingStatus: '加载中',
+  needsAttentionBody: '请优先检查失败任务，可以直接重新生成或删除无效记录。',
+  needsAttentionCountSuffix: '个待处理',
+  needsAttentionTitle: '需要处理',
+  overviewCompleted: '已完成',
+  overviewEyebrow: '任务总览',
+  overviewFailed: '待处理',
+  overviewHint: '先看状态，再继续回看或处理',
+  overviewRunning: '正在生成',
+  overviewTitle: '本批任务看板',
+  overviewTotal: '全部任务',
+  progressBarLabel: '生成进度',
+  progressTextPrefix: '进度',
+  queued: '排队中',
+  recentJobs: '最近任务',
+  regenerateJob: '重新生成',
+  running: '生成中',
+  searchLabel: '搜索任务',
+  searchPlaceholder: '输入任务名称或题目关键词',
+  stageAudio: '生成配音',
+  stageDone: '完成',
+  stageJobRunner: '执行任务',
+  stageMap: '生成分镜',
+  stageParse: '解析题目',
+  stagePlan: '规划讲解',
+  stageRender: '渲染视频',
+  stageStore: '保存成片',
+  stageSubtitles: '生成字幕',
+  untitled: '未命名数学题'
 };
 
 const sectionStyle = {
@@ -209,6 +355,107 @@ const listStyle = {
   gap: 12
 };
 
+const overviewPanelStyle = {
+  background: 'linear-gradient(135deg, #fffaf1 0%, #f6efdd 100%)',
+  border: '1px solid #eadfca',
+  borderRadius: 20,
+  display: 'grid',
+  gap: 14,
+  padding: 18
+};
+
+const overviewHeaderStyle = {
+  alignItems: 'end',
+  display: 'flex',
+  flexWrap: 'wrap' as const,
+  gap: 10,
+  justifyContent: 'space-between'
+};
+
+const overviewEyebrowStyle = {
+  color: '#6f7d45',
+  fontSize: 12,
+  fontWeight: 800,
+  letterSpacing: 1.2,
+  margin: 0
+};
+
+const overviewTitleStyle = {
+  fontSize: 24,
+  lineHeight: 1.2,
+  margin: '6px 0 0'
+};
+
+const overviewHintStyle = {
+  color: '#6b7280',
+  fontSize: 13,
+  fontWeight: 700
+};
+
+const overviewGridStyle = {
+  display: 'grid',
+  gap: 10,
+  gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))'
+};
+
+const overviewCardStyle = {
+  background: '#ffffff',
+  border: '1px solid #eadfca',
+  borderRadius: 16,
+  display: 'grid',
+  gap: 6,
+  padding: '12px 14px'
+};
+
+const overviewLabelStyle = {
+  color: '#7c4a03',
+  fontSize: 12,
+  fontWeight: 700
+};
+
+const overviewValueStyle = {
+  color: '#102A43',
+  fontSize: 24,
+  lineHeight: 1.2
+};
+
+const attentionCardStyle = {
+  background: '#fff1f2',
+  border: '1px solid #fecdd3',
+  borderRadius: 18,
+  display: 'grid',
+  gap: 8,
+  padding: 16
+};
+
+const attentionHeaderStyle = {
+  alignItems: 'center',
+  display: 'flex',
+  gap: 10,
+  justifyContent: 'space-between'
+};
+
+const attentionTitleStyle = {
+  color: '#9f1239',
+  fontSize: 16,
+  fontWeight: 800
+};
+
+const attentionCountStyle = {
+  background: '#ffe4e6',
+  borderRadius: 999,
+  color: '#9f1239',
+  fontSize: 12,
+  fontWeight: 800,
+  padding: '6px 10px'
+};
+
+const attentionBodyStyle = {
+  color: '#881337',
+  lineHeight: 1.6,
+  margin: 0
+};
+
 const jobCardStyle = {
   ...createCardStyle(),
   background: '#ffffff',
@@ -216,6 +463,13 @@ const jobCardStyle = {
   color: '#1f2937',
   gap: 10,
   padding: 16
+};
+
+const cardTopRowStyle = {
+  alignItems: 'start',
+  display: 'flex',
+  gap: 10,
+  justifyContent: 'space-between'
 };
 
 const jobLinkStyle = {
@@ -238,6 +492,65 @@ const descriptionStyle = {
 const metaStyle = {
   color: '#6b7280',
   fontSize: 14
+};
+
+const statusBadgeStyle = {
+  borderRadius: 999,
+  display: 'inline-flex',
+  flexShrink: 0,
+  fontSize: 12,
+  fontWeight: 800,
+  padding: '6px 10px'
+};
+
+const statusBadgeCompletedStyle = {
+  background: '#e7f0da',
+  color: '#1f5134'
+};
+
+const statusBadgeFailedStyle = {
+  background: '#ffe4e6',
+  color: '#9f1239'
+};
+
+const statusBadgeInFlightStyle = {
+  background: '#fff4cc',
+  color: '#7c4a03'
+};
+
+const timelineCardStyle = {
+  background: '#f8fafc',
+  border: '1px solid #e5e7eb',
+  borderRadius: 14,
+  display: 'grid',
+  gap: 8,
+  padding: '12px 14px'
+};
+
+const timelineTextStyle = {
+  color: '#374151',
+  fontSize: 14,
+  fontWeight: 700,
+  margin: 0
+};
+
+const progressTrackStyle = {
+  background: '#e5e7eb',
+  borderRadius: 999,
+  height: 10,
+  overflow: 'hidden'
+};
+
+const progressFillStyle = {
+  background: 'linear-gradient(90deg, #1f5134 0%, #6f7d45 100%)',
+  height: '100%'
+};
+
+const progressTextStyle = {
+  color: '#6b7280',
+  fontSize: 13,
+  fontWeight: 700,
+  margin: 0
 };
 
 const errorStyle = {

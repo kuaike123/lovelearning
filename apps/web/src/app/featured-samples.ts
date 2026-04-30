@@ -68,6 +68,67 @@ export const getFeaturedSampleBySlug = (slug: string) => {
   return featuredSamples.find((sample) => sample.slug === slug) ?? null;
 };
 
+export const getFeaturedSampleNeighbors = (slug: string) => {
+  const currentIndex = featuredSamples.findIndex((sample) => sample.slug === slug);
+
+  if (currentIndex === -1 || featuredSamples.length === 0) {
+    return {
+      previous: null,
+      next: null
+    };
+  }
+
+  const previousIndex = (currentIndex - 1 + featuredSamples.length) % featuredSamples.length;
+  const nextIndex = (currentIndex + 1) % featuredSamples.length;
+
+  return {
+    previous: featuredSamples[previousIndex],
+    next: featuredSamples[nextIndex]
+  };
+};
+
+export const getFeaturedSamplePosition = (slug: string) => {
+  const currentIndex = featuredSamples.findIndex((sample) => sample.slug === slug);
+
+  if (currentIndex === -1 || featuredSamples.length === 0) {
+    return {
+      current: null,
+      index: -1,
+      pageLabel: `0 / ${featuredSamples.length}`,
+      total: featuredSamples.length
+    };
+  }
+
+  return {
+    current: featuredSamples[currentIndex],
+    index: currentIndex,
+    pageLabel: `${currentIndex + 1} / ${featuredSamples.length}`,
+    total: featuredSamples.length
+  };
+};
+
+export const getRelatedFeaturedSamples = (slug: string, limit = 2) => {
+  const current = getFeaturedSampleBySlug(slug);
+
+  if (!current) {
+    return [];
+  }
+
+  return featuredSamples
+    .filter((sample) => sample.slug !== slug)
+    .sort((left, right) => {
+      const leftScore =
+        Number(left.problemCategory === current.problemCategory) * 2 +
+        Number(left.primaryUseCase === current.primaryUseCase);
+      const rightScore =
+        Number(right.problemCategory === current.problemCategory) * 2 +
+        Number(right.primaryUseCase === current.primaryUseCase);
+
+      return rightScore - leftScore || right.recommendationScore - left.recommendationScore;
+    })
+    .slice(0, limit);
+};
+
 export const buildFeaturedSampleGenerationHref = (sample: FeaturedSample) => {
   const recommendation = recommendVoicePreset({
     content: sample.content,

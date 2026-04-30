@@ -116,6 +116,10 @@ describe('JobStatusSummary', () => {
     expect(html).toContain('\u9636\u6bb5\uff1a\u6e32\u67d3\u89c6\u9891');
     expect(html).toContain('\u8fdb\u5ea6\uff1a42%');
     expect(html).toContain('aria-valuenow="42"');
+    expect(html).toContain('data-stage-timeline="job-progress"');
+    expect(html).toContain('\u751f\u6210\u8def\u5f84');
+    expect(html).toContain('\u5f53\u524d\u8282\u70b9');
+    expect(html).toContain('data-stage-state="current"');
   });
 });
 
@@ -135,6 +139,8 @@ describe('JobResultPanel copy helpers', () => {
     expect(html).toContain('\u4efb\u52a1\u540d\u79f0\uff1a\u521d\u4e00\u65b9\u7a0b\u4f8b\u9898\u8bb2\u89e3');
     expect(html).toContain('\u5f53\u524d\u7248\u672c\u4ec5\u652f\u6301\u4e00\u5143\u4e00\u6b21\u65b9\u7a0b\u89e3\u6790');
     expect(html).not.toContain('Unsupported input');
+    expect(html).toContain('\u5904\u7406\u5efa\u8bae');
+    expect(html).toContain('\u5148\u68c0\u67e5\u9898\u76ee\u8f93\u5165\u662f\u5426\u4e3a\u5f53\u524d\u7248\u672c\u652f\u6301\u7684\u9898\u578b');
   });
 });
 

@@ -7,6 +7,9 @@ import {
   featuredSampleArraySchema,
   featuredSamples,
   filterFeaturedSamples,
+  getFeaturedSampleNeighbors,
+  getFeaturedSamplePosition,
+  getRelatedFeaturedSamples,
   splitFeaturedSamples,
   sortFeaturedSamplesByRecommendation
 } from '../../apps/web/src/app/featured-samples';
@@ -80,13 +83,54 @@ describe('featured sample filters', () => {
     expect(buildFeaturedSampleGenerationHref(quantitySample!)).toContain('speechRate=fast');
   });
 
+  it('derives previous and next neighbors for sample detail navigation', () => {
+    expect(getFeaturedSampleNeighbors('linear-equation-basic')).toEqual({
+      previous: featuredSamples[1],
+      next: featuredSamples[1]
+    });
+    expect(getFeaturedSampleNeighbors('quantity-relation-word-problem')).toEqual({
+      previous: featuredSamples[0],
+      next: featuredSamples[0]
+    });
+  });
+
+  it('derives stable page position metadata for sample detail pagination', () => {
+    expect(getFeaturedSamplePosition('linear-equation-basic')).toEqual({
+      current: featuredSamples[0],
+      index: 0,
+      pageLabel: '1 / 2',
+      total: 2
+    });
+    expect(getFeaturedSamplePosition('quantity-relation-word-problem')).toEqual({
+      current: featuredSamples[1],
+      index: 1,
+      pageLabel: '2 / 2',
+      total: 2
+    });
+  });
+
+  it('returns related samples excluding the current slug', () => {
+    expect(getRelatedFeaturedSamples('linear-equation-basic').map((sample) => sample.slug)).toEqual([
+      'quantity-relation-word-problem'
+    ]);
+  });
+
   it('renders a prominent sample preview flow before the library cards', () => {
     const html = renderToStaticMarkup(React.createElement(FeaturedSampleShowcase));
 
     expect(html).toContain('data-featured-stage="linear-equation-basic"');
     expect(html).toContain('data-featured-rail="sample-switcher"');
-    expect(html).toContain('当前预览样片');
-    expect(html).toContain('切换样片');
-    expect(html).toContain('封面预览流');
+    expect(html).toContain('data-featured-nav="previous"');
+    expect(html).toContain('data-featured-nav="next"');
+    expect(html).toContain('data-featured-page="1 / 2"');
+    expect(html).toContain('data-featured-dot="active"');
+    expect(html).toContain('data-poster-cta="hero"');
+    expect(html).toContain('\u5f53\u524d\u9884\u89c8\u6837\u7247');
+    expect(html).toContain('\u5f53\u524d\u6837\u7247');
+    expect(html).toContain('\u5207\u6362\u6837\u7247');
+    expect(html).toContain('\u5c01\u9762\u9884\u89c8\u6d41');
+    expect(html).toContain('\u65b9\u7a0b\u8bb2\u89e3');
+    expect(html).toContain('\u8bb2\u5e08\u53e3\u64ad\u5356\u70b9');
+    expect(html).toContain('\u7acb\u5373\u751f\u6210\u540c\u6b3e');
   });
 });
