@@ -1,13 +1,14 @@
 import React from 'react';
 
 import {PresenterMascot, type PresenterSpeechActivity, type PresenterSpeechWindow} from './PresenterMascot';
-import type {PresenterTeachingCue} from '../lib/presenter-cues';
+import type {PresenterTeachingCue, PresenterTeachingTarget} from '../lib/presenter-cues';
 
 type ShortVideoShellProps = {
   children?: React.ReactNode;
   presenterSpeechActivity?: PresenterSpeechActivity;
   presenterSpeechWindows?: PresenterSpeechWindow[];
   presenterTeachingCue?: PresenterTeachingCue;
+  presenterTeachingTarget?: PresenterTeachingTarget;
   sceneProgress?: number;
   sceneNumber: number;
   sceneType: string;
@@ -20,6 +21,7 @@ export const ShortVideoShell: React.FC<ShortVideoShellProps> = ({
   presenterSpeechActivity,
   presenterSpeechWindows,
   presenterTeachingCue,
+  presenterTeachingTarget,
   sceneProgress,
   sceneNumber,
   sceneType,
@@ -53,6 +55,7 @@ export const ShortVideoShell: React.FC<ShortVideoShellProps> = ({
         speechActivity={presenterSpeechActivity}
         speechWindows={presenterSpeechWindows}
         teachingCue={presenterTeachingCue}
+        teachingTarget={presenterTeachingTarget}
       />
       <div style={brandStyle}>{'Love Learning'}</div>
     </div>

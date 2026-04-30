@@ -4,7 +4,7 @@ import {AbsoluteFill, Audio, interpolate, Sequence, useCurrentFrame} from 'remot
 import type {VideoProject} from '../../../shared-types/src';
 
 import {buildTimeline} from '../lib/build-timeline';
-import {getPresenterCueForScene} from '../lib/presenter-cues';
+import {getPresenterCueForScene, getPresenterTargetForCue} from '../lib/presenter-cues';
 import {buildPresenterSpeechWindows} from '../lib/presenter-speech';
 import {SceneLayoutRenderer} from '../components/SceneLayoutRenderer';
 import {getMotionProfile} from '../lib/scene-motion';
@@ -53,6 +53,7 @@ const SceneFrame: React.FC<{
   const sceneProgress = durationInFrames > 0 ? frame / durationInFrames : 0;
   const presenterSpeechWindows = scene.audioUrl ? buildPresenterSpeechWindows(visuals.narration) : undefined;
   const presenterTeachingCue = getPresenterCueForScene({layout: visuals.layout, sceneType: scene.sceneType});
+  const presenterTeachingTarget = getPresenterTargetForCue(presenterTeachingCue);
   const easedIn = interpolate(frame, [0, 14], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
   const motion = getMotionProfile(visuals.motionPreset as Parameters<typeof getMotionProfile>[0], sceneProgress);
   const formulaRevealCount = Math.max(
@@ -69,6 +70,7 @@ const SceneFrame: React.FC<{
         presenterSpeechActivity={scene.audioUrl ? 'speaking' : 'resting'}
         presenterSpeechWindows={presenterSpeechWindows}
         presenterTeachingCue={presenterTeachingCue}
+        presenterTeachingTarget={presenterTeachingTarget}
         sceneProgress={sceneProgress}
         sceneType={scene.sceneType}
         sceneNumber={sceneNumber}

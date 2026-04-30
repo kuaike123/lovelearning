@@ -357,12 +357,15 @@ describe('getSceneVisuals', () => {
       React.createElement(PresenterMascot, {
         sceneProgress: 0.46,
         sceneType: 'step',
-        teachingCue: 'formula_pointer'
+        teachingCue: 'formula_pointer',
+        teachingTarget: 'formula_board'
       } as React.ComponentProps<typeof PresenterMascot>)
     );
 
     expect(html).toContain('data-teaching-cue="formula_pointer"');
+    expect(html).toContain('data-teaching-target="formula_board"');
     expect(html).toContain('\u6307\u5411\u516c\u5f0f\u677f\u4e66');
+    expect(html).toContain('\u7bad\u5934\u6307\u5411\u516c\u5f0f\u677f\u4e66\u533a');
   });
 
   it('renders eased scene progress as a teaching rhythm bar', () => {

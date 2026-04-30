@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type {PresenterTeachingCue} from '../lib/presenter-cues';
+import {getPresenterTargetForCue, type PresenterTeachingCue, type PresenterTeachingTarget} from '../lib/presenter-cues';
 
 export type PresenterState = 'idle_teach' | 'welcome_wave' | 'point_explain' | 'warning_alert' | 'summary_cheer';
 export type PresenterSpeechActivity = 'resting' | 'speaking';
@@ -16,6 +16,7 @@ type PresenterMascotProps = {
   speechWindows?: PresenterSpeechWindow[];
   state?: PresenterState;
   teachingCue?: PresenterTeachingCue;
+  teachingTarget?: PresenterTeachingTarget;
 };
 
 const sceneStateMap: Record<string, PresenterState> = {
@@ -63,6 +64,15 @@ const teachingCueCopy: Record<PresenterTeachingCue, string> = {
   warning_flash: '\u9ad8\u4eae\u6613\u9519\u70b9'
 };
 
+const teachingTargetCopy: Record<PresenterTeachingTarget, string> = {
+  comparison_card: '\u7bad\u5934\u6307\u5411\u6613\u9519\u5bf9\u6bd4\u533a',
+  diagram_area: '\u7bad\u5934\u6307\u5411\u56fe\u5f62\u533a',
+  formula_board: '\u7bad\u5934\u6307\u5411\u516c\u5f0f\u677f\u4e66\u533a',
+  none: '\u65e0\u6307\u5411\u533a\u57df',
+  problem_keywords: '\u7bad\u5934\u6307\u5411\u9898\u5e72\u5173\u952e\u8bcd\u533a',
+  summary_answer: '\u7bad\u5934\u6307\u5411\u7b54\u6848\u603b\u7ed3\u533a'
+};
+
 export const getPresenterStateForScene = (sceneType: string): PresenterState => {
   return sceneStateMap[sceneType] ?? 'idle_teach';
 };
@@ -85,11 +95,14 @@ export const PresenterMascot: React.FC<PresenterMascotProps> = ({
   speechActivity = 'resting',
   speechWindows,
   state,
-  teachingCue = 'none'
+  teachingCue = 'none',
+  teachingTarget
 }) => {
   const presenterState = state ?? getPresenterStateForScene(sceneType);
   const copy = stateCopy[presenterState];
   const cueLabel = teachingCueCopy[teachingCue];
+  const target = teachingTarget ?? getPresenterTargetForCue(teachingCue);
+  const targetLabel = teachingTargetCopy[target];
   const progress = clampProgress(sceneProgress);
   const phase = progress * Math.PI * 2;
   const floatY = Math.sin(phase * 2) * 5;
@@ -110,13 +123,14 @@ export const PresenterMascot: React.FC<PresenterMascotProps> = ({
 
   return (
     <aside
-      aria-label={`${copy.label} ${copy.badge} ${cueLabel} \u773c\u955c \u7728\u773c ${speechLabel}`}
+      aria-label={`${copy.label} ${copy.badge} ${cueLabel} ${targetLabel} \u773c\u955c \u7728\u773c ${speechLabel}`}
       data-mouth-sync={mouthSync}
       data-presenter-motion="active"
       data-presenter-progress={progress.toFixed(2)}
       data-presenter-speech={speechState}
       data-presenter-state={presenterState}
       data-teaching-cue={teachingCue}
+      data-teaching-target={target}
       style={presenterWrapStyle}
     >
       <div style={speechBubbleStyle(isWarning)}>
@@ -127,6 +141,12 @@ export const PresenterMascot: React.FC<PresenterMascotProps> = ({
         <div style={cueCalloutStyle(teachingCue)}>
           <span style={cueDotStyle(teachingCue)} />
           <strong>{cueLabel}</strong>
+        </div>
+      ) : null}
+      {target !== 'none' ? (
+        <div aria-hidden="true" data-target-pointer={target} style={targetPointerStyle(target)}>
+          <span style={targetLineStyle(target)} />
+          <span style={targetArrowHeadStyle(target)} />
         </div>
       ) : null}
       <svg
@@ -188,7 +208,7 @@ export const PresenterMascot: React.FC<PresenterMascotProps> = ({
         {isWelcoming ? <path d="M30 110c-10-11-13-24-7-36" fill="none" stroke="#F5C542" strokeLinecap="round" strokeWidth="6" /> : null}
         {isCheering ? <path d="M175 61l8 8 12-17" fill="none" stroke="#52B788" strokeLinecap="round" strokeWidth="7" /> : null}
       </svg>
-      <span style={hiddenDescriptorStyle}>{`${cueLabel} \u773c\u955c \u7728\u773c ${speechLabel}`}</span>
+      <span style={hiddenDescriptorStyle}>{`${cueLabel} ${targetLabel} \u773c\u955c \u7728\u773c ${speechLabel}`}</span>
     </aside>
   );
 };
@@ -259,6 +279,49 @@ const cueDotStyle = (teachingCue: PresenterTeachingCue) => ({
   boxShadow: '0 0 0 6px rgba(245, 197, 66, 0.18)',
   height: 12,
   width: 12
+});
+
+const targetPointerTop: Record<PresenterTeachingTarget, number> = {
+  comparison_card: 94,
+  diagram_area: 118,
+  formula_board: 132,
+  none: 0,
+  problem_keywords: 104,
+  summary_answer: 150
+};
+
+const targetPointerColor = (target: PresenterTeachingTarget) => {
+  if (target === 'comparison_card') return '#F97316';
+  if (target === 'summary_answer') return '#52B788';
+  if (target === 'diagram_area') return '#3B82F6';
+  if (target === 'problem_keywords') return '#1F5134';
+
+  return '#F5C542';
+};
+
+const targetPointerStyle = (target: PresenterTeachingTarget) => ({
+  alignItems: 'center',
+  display: 'flex',
+  left: -216,
+  position: 'absolute' as const,
+  top: targetPointerTop[target],
+  width: 216
+});
+
+const targetLineStyle = (target: PresenterTeachingTarget) => ({
+  background: `linear-gradient(90deg, rgba(255,255,255,0), ${targetPointerColor(target)})`,
+  borderRadius: 999,
+  boxShadow: `0 0 18px ${targetPointerColor(target)}55`,
+  height: 5,
+  width: 188
+});
+
+const targetArrowHeadStyle = (target: PresenterTeachingTarget) => ({
+  borderBottom: '9px solid transparent',
+  borderLeft: `15px solid ${targetPointerColor(target)}`,
+  borderTop: '9px solid transparent',
+  height: 0,
+  width: 0
 });
 
 const mascotSvgStyle = (rotation: number, floatY: number) => ({
