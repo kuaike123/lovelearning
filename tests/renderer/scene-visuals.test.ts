@@ -5,6 +5,7 @@ import {renderToStaticMarkup} from 'react-dom/server';
 import {EquationTransformScene} from '../../packages/renderer/src/scenes/EquationTransformScene';
 import {FormulaBoard} from '../../packages/renderer/src/components/FormulaBoard';
 import {formatSceneType} from '../../packages/renderer/src/compositions/LessonVideo';
+import {getPresenterStateForScene, PresenterMascot} from '../../packages/renderer/src/components/PresenterMascot';
 import {getSceneVisuals} from '../../packages/renderer/src/lib/scene-visuals';
 import {MistakeWarningScene} from '../../packages/renderer/src/scenes/MistakeWarningScene';
 import {ProblemScene} from '../../packages/renderer/src/scenes/ProblemScene';
@@ -12,6 +13,7 @@ import {SceneProgress} from '../../packages/renderer/src/components/SceneProgres
 import {getSceneRenderer} from '../../packages/renderer/src/lib/scene-renderer-registry';
 import {SceneLayoutRenderer} from '../../packages/renderer/src/components/SceneLayoutRenderer';
 import {ShortVideoShell} from '../../packages/renderer/src/components/ShortVideoShell';
+import {Subtitle} from '../../packages/renderer/src/components/Subtitle';
 import {SummaryScene} from '../../packages/renderer/src/scenes/SummaryScene';
 import {TitleScene} from '../../packages/renderer/src/scenes/TitleScene';
 
@@ -101,6 +103,8 @@ describe('getSceneVisuals', () => {
     expect(html).toContain('\u8003\u70b9\u76f4\u5165');
     expect(html).toContain('\u638c\u63e1\u79fb\u9879\u548c\u5316\u7b80');
     expect(html).toContain('\u4e00\u5143\u4e00\u6b21\u65b9\u7a0b');
+    expect(html).toContain('\u4eca\u65e5\u8bb2\u5e08\u63d0\u8981');
+    expect(html).toContain('\u8001\u5e08\u53e3\u64ad\u5356\u70b9');
   });
 
   it('renders quantity-relation title cards with condition-style cover blocks', () => {
@@ -149,6 +153,8 @@ describe('getSceneVisuals', () => {
     expect(html).toContain('\u89e3\u9898\u5957\u8def');
     expect(html).toContain('\u5e26\u8d70\u4e00\u53e5');
     expect(html).toContain('\u63d0\u5206\u62c6\u89e3\uff1a\u5148\u6293\u5173\u952e\u5173\u7cfb\uff0c\u518d\u5199\u51fa\u6700\u7ec8\u7ed3\u8bba\u3002');
+    expect(html).toContain('\u4e3e\u4e00\u53cd\u4e09');
+    expect(html).toContain('\u540c\u7c7b\u9898\u4e5f\u80fd\u4e00\u952e\u751f\u6210\u8bb2\u89e3');
   });
 
   it('renders problem scenes with a dedicated keyword block', () => {
@@ -169,6 +175,8 @@ describe('getSceneVisuals', () => {
 
     expect(html).toContain('\u9898\u76ee\u62c6\u89e3');
     expect(html).toContain('\u672c\u9898\u5173\u952e\u8bcd');
+    expect(html).toContain('\u8001\u5e08\u63d0\u793a');
+    expect(html).toContain('\u5148\u5708\u51fa\u5df2\u77e5\u6761\u4ef6');
     expect(html).toContain('\u548c = 12');
     expect(html).toContain('\u500d\u6570 = 2');
   });
@@ -197,6 +205,7 @@ describe('getSceneVisuals', () => {
     expect(html).toContain('\u5e38\u89c1\u9519\u6cd5');
     expect(html).toContain('\u6b63\u786e\u505a\u6cd5');
     expect(html).toContain('\u8001\u5e08\u63d0\u9192');
+    expect(html).toContain('\u8fd9\u4e00\u6b65\u6700\u5bb9\u6613\u5931\u5206');
     expect(html).toContain('\u4e24\u8fb9\u540c\u65f6\u51cf 3');
   });
 
@@ -228,18 +237,28 @@ describe('getSceneVisuals', () => {
     expect(formatSceneType('summary')).toBe('\u603b\u7ed3');
   });
 
+  it('maps each teaching scene type to a reusable presenter action state', () => {
+    expect(getPresenterStateForScene('title')).toBe('welcome_wave');
+    expect(getPresenterStateForScene('problem')).toBe('idle_teach');
+    expect(getPresenterStateForScene('step')).toBe('point_explain');
+    expect(getPresenterStateForScene('warning')).toBe('warning_alert');
+    expect(getPresenterStateForScene('summary')).toBe('summary_cheer');
+    expect(getPresenterStateForScene('future_subject_scene')).toBe('idle_teach');
+  });
+
   it('renders formula board with primary and answer emphasis', () => {
     const html = renderToStaticMarkup(
       React.createElement(FormulaBoard, {
         formulas: ['x + 2x = 12', 'x = 4', '2x = 8'],
         highlights: ['x = 4'],
-        sceneType: 'summary'
+        sceneType: 'step'
       })
     );
 
     expect(html).toContain('\u516c\u5f0f\u677f\u4e66');
-    expect(html).toContain('\u6700\u7ec8\u7b54\u6848');
+    expect(html).toContain('\u539f\u5f0f');
     expect(html).toContain('\u5173\u952e\u5f0f');
+    expect(html).toContain('\u5173\u952e\u53d8\u5f62');
     expect(html).toContain('x + 2x = 12');
     expect(html).toContain('2x = 8');
   });
@@ -263,6 +282,42 @@ describe('getSceneVisuals', () => {
     expect(html).toContain('\u9010\u6b65\u62c6\u89e3');
     expect(html).toContain('1/6');
     expect(html).toContain('\u6570\u91cf\u5173\u7cfb\u5e94\u7528\u9898');
+    expect(html).toContain('Love Learning');
+    expect(html).toContain('\u8bb2\u5e08\u77ed\u89c6\u9891\u6a21\u677f');
+  });
+
+  it('renders a fixed red panda teacher presenter with scene-aware action copy', () => {
+    const html = renderToStaticMarkup(
+      React.createElement(
+        ShortVideoShell,
+        {
+          sceneType: 'warning',
+          sceneNumber: 4,
+          title: '\u6613\u9519\u63d0\u9192',
+          totalScenes: 6
+        },
+        React.createElement('p', null, 'content')
+      )
+    );
+
+    expect(html).toContain('data-presenter-state="warning_alert"');
+    expect(html).toContain('\u5c0f\u718a\u732b\u8001\u5e08');
+    expect(html).toContain('\u773c\u955c');
+    expect(html).toContain('\u6613\u9519\u63d0\u9192');
+  });
+
+  it('renders presenter micro-motion from reusable scene progress', () => {
+    const html = renderToStaticMarkup(
+      React.createElement(PresenterMascot, {
+        sceneProgress: 0.5,
+        sceneType: 'step'
+      } as React.ComponentProps<typeof PresenterMascot>)
+    );
+
+    expect(html).toContain('data-presenter-motion="active"');
+    expect(html).toContain('data-presenter-progress="0.50"');
+    expect(html).toContain('\u7728\u773c');
+    expect(html).toContain('\u53e3\u578b\u540c\u6b65');
   });
 
   it('renders eased scene progress as a teaching rhythm bar', () => {
@@ -270,5 +325,18 @@ describe('getSceneVisuals', () => {
 
     expect(html).toContain('aria-label="\u89c6\u9891\u8bb2\u89e3\u8fdb\u5ea6"');
     expect(html).toContain('42%');
+    expect(html).toContain('\u63a8\u8fdb\u53d8\u5f62');
+  });
+
+  it('renders subtitle cards with a teaching-style caption chrome', () => {
+    const html = renderToStaticMarkup(
+      React.createElement(Subtitle, {
+        text: '\u5148\u8ba9\u7b49\u5f0f\u4e24\u8fb9\u540c\u65f6\u51cf\u53bb 3\u3002'
+      })
+    );
+
+    expect(html).toContain('\u8bb2\u5e08\u53e3\u64ad');
+    expect(html).toContain('\u5148\u8ba9\u7b49\u5f0f\u4e24\u8fb9\u540c\u65f6\u51cf\u53bb 3\u3002');
+    expect(html).toContain('\u5b57\u5e55\u8ddf\u8bfb');
   });
 });

@@ -14,9 +14,13 @@ describe('SubmitJobForm', () => {
     expect(html).toContain('data-form-section="problem-input"');
     expect(html).toContain('data-form-section="generation-settings"');
     expect(html).toContain('data-form-section="voice-preview"');
+    expect(html).toContain('data-form-section="workspace-overview"');
+    expect(html).toContain('data-form-section="preflight-check"');
     expect(html).toContain('\u9898\u76ee\u8f93\u5165');
     expect(html).toContain('\u751f\u6210\u8bbe\u7f6e');
     expect(html).toContain('\u8bd5\u542c\u4e0e\u914d\u97f3\u9009\u62e9');
+    expect(html).toContain('\u521b\u4f5c\u603b\u89c8');
+    expect(html).toContain('\u751f\u6210\u524d\u68c0\u67e5');
     expect(html).toContain('\u4efb\u52a1\u540d\u79f0');
     expect(html).toContain('\u751f\u6210\u89c6\u9891');
     expect(html).toContain('\u5bf9\u6bd4\u4e09\u79cd\u97f3\u8272');
@@ -45,6 +49,8 @@ describe('SubmitJobForm', () => {
     expect(html).toContain('\u4e00\u952e\u91c7\u7528\u63a8\u8350\u97f3\u8272');
     expect(html).toContain('\u63a8\u8350\u8bed\u901f');
     expect(html).toContain('\u8bb2\u89e3\u8bed\u6c14');
+    expect(html).toContain('\u53ef\u76f4\u63a5\u4ea4\u4ed8');
+    expect(html).toContain('\u9ed8\u8ba4\u4ea7\u51fa');
   });
 
   it('accepts prefilled sample metadata for a fixed showcase flow', () => {

@@ -9,6 +9,7 @@ import {getMotionProfile} from '../lib/scene-motion';
 import {getSceneVisuals} from '../lib/scene-visuals';
 import {SceneProgress} from '../components/SceneProgress';
 import {ShortVideoShell} from '../components/ShortVideoShell';
+import {Subtitle} from '../components/Subtitle';
 
 export const LessonVideo: React.FC<{project: VideoProject}> = ({project}) => {
   const timeline = buildTimeline(project.scenes, project.fps);
@@ -60,7 +61,13 @@ const SceneFrame: React.FC<{
 
   return (
     <AbsoluteFill>
-      <ShortVideoShell sceneType={scene.sceneType} sceneNumber={sceneNumber} totalScenes={totalScenes} title={visuals.heading}>
+      <ShortVideoShell
+        sceneProgress={sceneProgress}
+        sceneType={scene.sceneType}
+        sceneNumber={sceneNumber}
+        totalScenes={totalScenes}
+        title={visuals.heading}
+      >
         <div
           style={{
             display: 'grid',
@@ -77,7 +84,7 @@ const SceneFrame: React.FC<{
               formulas: visuals.formulas.slice(0, formulaRevealCount)
             }}
           />
-          <NarrationCard narration={visuals.narration} />
+          <Subtitle text={visuals.narration} />
           <SceneProgress progress={sceneNumber / totalScenes} />
         </div>
       </ShortVideoShell>
@@ -91,15 +98,6 @@ const SceneTypePill: React.FC<{layoutLabel?: string; sceneType: string}> = ({lay
       <span>{formatSceneType(sceneType)}</span>
       <strong>{layoutLabel ?? '\u8ddf\u7740\u8001\u5e08\u4e00\u6b65\u4e00\u6b65\u6765'}</strong>
     </div>
-  );
-};
-
-const NarrationCard: React.FC<{narration: string}> = ({narration}) => {
-  return (
-    <p style={narrationStyle}>
-      <span style={quoteStyle}>{'\u8bb2'}</span>
-      {narration}
-    </p>
   );
 };
 
@@ -127,32 +125,4 @@ const pillStyle = {
   gap: 16,
   justifyContent: 'space-between',
   padding: '14px 20px'
-};
-
-const narrationStyle = {
-  alignItems: 'flex-start',
-  background: '#FFFFFF',
-  border: '2px solid rgba(16, 42, 67, 0.1)',
-  borderRadius: 28,
-  color: '#1F2937',
-  display: 'flex',
-  fontSize: 30,
-  gap: 18,
-  lineHeight: 1.46,
-  margin: 0,
-  padding: 26
-};
-
-const quoteStyle = {
-  alignItems: 'center',
-  background: '#52B788',
-  borderRadius: '50%',
-  color: '#ffffff',
-  display: 'inline-flex',
-  flex: '0 0 auto',
-  fontSize: 24,
-  fontWeight: 900,
-  height: 44,
-  justifyContent: 'center',
-  width: 44
 };

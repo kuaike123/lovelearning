@@ -1,7 +1,10 @@
 import React from 'react';
 
+import {PresenterMascot} from './PresenterMascot';
+
 type ShortVideoShellProps = {
   children?: React.ReactNode;
+  sceneProgress?: number;
   sceneNumber: number;
   sceneType: string;
   title: string;
@@ -10,6 +13,7 @@ type ShortVideoShellProps = {
 
 export const ShortVideoShell: React.FC<ShortVideoShellProps> = ({
   children,
+  sceneProgress,
   sceneNumber,
   sceneType,
   title,
@@ -27,6 +31,7 @@ export const ShortVideoShell: React.FC<ShortVideoShellProps> = ({
             <div style={metaRowStyle}>
               <span style={metaChipStyle('subject')}>{'\u4e2d\u5b66\u6570\u5b66'}</span>
               <span style={metaChipStyle('format')}>{sceneType === 'title' ? '\u9010\u6b65\u62c6\u89e3' : '\u6559\u5b66\u77ed\u89c6\u9891'}</span>
+              <span style={metaChipStyle('brand')}>{'\u8bb2\u5e08\u77ed\u89c6\u9891\u6a21\u677f'}</span>
             </div>
           </div>
           <div style={counterStyle}>
@@ -35,7 +40,8 @@ export const ShortVideoShell: React.FC<ShortVideoShellProps> = ({
         </header>
         {children}
       </main>
-      <div style={brandStyle}>{'EduMotion V1'}</div>
+      <PresenterMascot sceneProgress={sceneProgress} sceneType={sceneType} />
+      <div style={brandStyle}>{'Love Learning'}</div>
     </div>
   );
 };
@@ -105,11 +111,21 @@ const metaRowStyle = {
   marginTop: 18
 };
 
-const metaChipStyle = (variant: 'format' | 'subject') => ({
-  background: variant === 'subject' ? 'rgba(16, 42, 67, 0.08)' : 'rgba(82, 183, 136, 0.16)',
-  border: variant === 'subject' ? '1px solid rgba(16, 42, 67, 0.12)' : '1px solid rgba(82, 183, 136, 0.24)',
+const metaChipStyle = (variant: 'brand' | 'format' | 'subject') => ({
+  background:
+    variant === 'subject'
+      ? 'rgba(16, 42, 67, 0.08)'
+      : variant === 'brand'
+        ? 'rgba(245, 197, 66, 0.16)'
+        : 'rgba(82, 183, 136, 0.16)',
+  border:
+    variant === 'subject'
+      ? '1px solid rgba(16, 42, 67, 0.12)'
+      : variant === 'brand'
+        ? '1px solid rgba(245, 197, 66, 0.32)'
+        : '1px solid rgba(82, 183, 136, 0.24)',
   borderRadius: 999,
-  color: variant === 'subject' ? '#102A43' : '#1F5134',
+  color: variant === 'subject' ? '#102A43' : variant === 'brand' ? '#9A6700' : '#1F5134',
   fontSize: 20,
   fontWeight: 800,
   letterSpacing: 1,

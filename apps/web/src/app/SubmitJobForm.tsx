@@ -1,6 +1,6 @@
 'use client';
 
-import React, {FormEvent, useState} from 'react';
+import React, {FormEvent, useMemo, useState} from 'react';
 
 import {createJob, previewTts} from '../lib/api-client';
 import {recommendVoicePreset} from './voice-recommendation';
@@ -49,9 +49,7 @@ export function SubmitJobForm({
   const [targetDurationSec, setTargetDurationSec] = useState<30 | 45 | 60>(initialTargetDurationSec);
   const [style, setStyle] = useState<'teacher' | 'kids' | 'exam'>(initialStyle);
   const [voice, setVoice] = useState<VoiceOption>(initialVoice ?? initialRecommendation.voice);
-  const [speechRate, setSpeechRate] = useState<SpeechRate>(
-    initialSpeechRate ?? initialRecommendation.speechRate
-  );
+  const [speechRate, setSpeechRate] = useState<SpeechRate>(initialSpeechRate ?? initialRecommendation.speechRate);
   const [status, setStatus] = useState<'idle' | 'submitting' | 'failed'>('idle');
   const [previewStatus, setPreviewStatus] = useState<'idle' | 'loading' | 'failed'>('idle');
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -59,6 +57,25 @@ export function SubmitJobForm({
   const [previews, setPreviews] = useState<VoicePreview[]>([]);
 
   const recommendation = recommendVoicePreset({content, style, targetDurationSec});
+  const trimmedContent = content.trim();
+  const trimmedTaskName = taskName.trim();
+  const workspaceChecks = useMemo(
+    () => [
+      {
+        done: trimmedContent.length > 0,
+        label: '已输入题目内容'
+      },
+      {
+        done: trimmedTaskName.length > 0,
+        label: '已填写任务名称'
+      },
+      {
+        done: voice === recommendation.voice && speechRate === recommendation.speechRate,
+        label: '已确认推荐配音策略'
+      }
+    ],
+    [recommendation.speechRate, recommendation.voice, speechRate, trimmedContent.length, trimmedTaskName.length, voice]
+  );
 
   const applyRecommendation = () => {
     setVoice(recommendation.voice);
@@ -71,7 +88,6 @@ export function SubmitJobForm({
     setSubmitError(null);
 
     try {
-      const trimmedTaskName = taskName.trim();
       const job = await createJob({
         subject: 'math',
         grade,
@@ -92,11 +108,9 @@ export function SubmitJobForm({
   };
 
   const handlePreview = async () => {
-    const trimmedContent = content.trim();
-
     if (!trimmedContent) {
       setPreviews([]);
-      setPreviewError('\u8bf7\u5148\u8f93\u5165\u9898\u76ee\u5185\u5bb9\uff0c\u518d\u751f\u6210\u8bd5\u542c\u3002');
+      setPreviewError('请先输入题目内容，再生成试听。');
       setPreviewStatus('failed');
       return;
     }
@@ -143,6 +157,33 @@ export function SubmitJobForm({
           输入题目后，系统会自动生成讲解步骤、字幕、配音和动画视频。固定样片会自动带入推荐时长、风格和任务名称。
         </p>
       </div>
+
+      <section data-form-section="workspace-overview" style={overviewSectionStyle}>
+        <SectionHeader
+          eyebrow="创作总览"
+          title="先确认这次创作的交付方向"
+          description="在真正生成前，先快速确认题目、包装方式和默认产出，避免把所有操作堆在一块。"
+        />
+        <div style={overviewGridStyle}>
+          <article style={overviewCardStyle}>
+            <span style={overviewLabelStyle}>本次任务</span>
+            <strong style={overviewValueStyle}>{trimmedTaskName || '未命名数学题'}</strong>
+            <p style={overviewBodyStyle}>
+              {trimmedContent ? `${trimmedContent.slice(0, 26)}${trimmedContent.length > 26 ? '…' : ''}` : '等待输入题目内容'}
+            </p>
+          </article>
+          <article style={overviewCardStyle}>
+            <span style={overviewLabelStyle}>默认产出</span>
+            <strong style={overviewValueStyle}>45 秒竖屏讲解视频</strong>
+            <p style={overviewBodyStyle}>可直接交付为视频、字幕、配音和讲解 JSON。</p>
+          </article>
+          <article style={overviewCardStyle}>
+            <span style={overviewLabelStyle}>推荐配音</span>
+            <strong style={overviewValueStyle}>{formatVoice(recommendation.voice)}</strong>
+            <p style={overviewBodyStyle}>{`${formatSpeechRate(recommendation.speechRate)} · ${recommendation.narrationTone}`}</p>
+          </article>
+        </div>
+      </section>
 
       <section data-form-section="problem-input" style={sectionCardStyle}>
         <SectionHeader
@@ -203,9 +244,7 @@ export function SubmitJobForm({
                 id="targetDurationSec"
                 name="targetDurationSec"
                 value={targetDurationSec}
-                onChange={(event) =>
-                  setTargetDurationSec(Number(event.currentTarget.value) as 30 | 45 | 60)
-                }
+                onChange={(event) => setTargetDurationSec(Number(event.currentTarget.value) as 30 | 45 | 60)}
                 style={selectStyle}
               >
                 <option value={30}>30 秒</option>
@@ -310,7 +349,7 @@ export function SubmitJobForm({
           {previews.length > 0 ? (
             <section style={previewSectionStyle}>
               <p style={previewSectionTitleStyle}>
-                {`当前语速：${formatSpeechRate(speechRate)}，先听听哪种老师更适合这道题。`}
+                {`当前语速：${formatSpeechRate(speechRate)}，先试听哪种老师更适合这道题。`}
               </p>
               <div style={previewGridStyle}>
                 {previews.map((preview) => {
@@ -348,6 +387,29 @@ export function SubmitJobForm({
               </div>
             </section>
           ) : null}
+        </div>
+      </section>
+
+      <section data-form-section="preflight-check" style={preflightSectionStyle}>
+        <SectionHeader
+          eyebrow="生成前检查"
+          title="确认这次任务可以顺畅进入渲染"
+          description="生成前快速扫一眼，确认题目、任务名和配音策略都已经准备好。"
+        />
+        <div style={preflightGridStyle}>
+          <div style={preflightListStyle}>
+            {workspaceChecks.map((check) => (
+              <div key={check.label} style={preflightItemStyle}>
+                <span style={check.done ? preflightDoneDotStyle : preflightPendingDotStyle} />
+                <span style={preflightItemTextStyle}>{check.label}</span>
+              </div>
+            ))}
+          </div>
+          <div style={preflightCardStyle}>
+            <span style={overviewLabelStyle}>默认产出</span>
+            <strong style={overviewValueStyle}>可直接交付</strong>
+            <p style={overviewBodyStyle}>视频成片、字幕文件、封面图、讲解 JSON。</p>
+          </div>
         </div>
       </section>
 
@@ -407,6 +469,48 @@ const titleStyle = {
 const descriptionStyle = {
   color: '#374151',
   lineHeight: 1.7,
+  margin: 0
+};
+
+const overviewSectionStyle = {
+  background: 'linear-gradient(135deg, #102A43 0%, #1B4332 100%)',
+  borderRadius: 22,
+  color: '#fffdf8',
+  display: 'grid',
+  gap: 16,
+  padding: 18
+};
+
+const overviewGridStyle = {
+  display: 'grid',
+  gap: 12,
+  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))'
+};
+
+const overviewCardStyle = {
+  background: 'rgba(255,255,255,0.1)',
+  border: '1px solid rgba(255,255,255,0.14)',
+  borderRadius: 16,
+  display: 'grid',
+  gap: 8,
+  padding: 14
+};
+
+const overviewLabelStyle = {
+  color: '#FFF4CC',
+  fontSize: 12,
+  fontWeight: 800
+};
+
+const overviewValueStyle = {
+  color: 'inherit',
+  fontSize: 20,
+  lineHeight: 1.3
+};
+
+const overviewBodyStyle = {
+  color: 'rgba(255,253,248,0.88)',
+  lineHeight: 1.6,
   margin: 0
 };
 
@@ -691,6 +795,67 @@ const audioStyle = {
   width: '100%'
 };
 
+const preflightSectionStyle = {
+  background: '#fffaf1',
+  border: '1px solid #eadfca',
+  borderRadius: 22,
+  display: 'grid',
+  gap: 16,
+  padding: 18
+};
+
+const preflightGridStyle = {
+  display: 'grid',
+  gap: 14,
+  gridTemplateColumns: 'minmax(0, 1.2fr) minmax(220px, 0.8fr)'
+};
+
+const preflightListStyle = {
+  display: 'grid',
+  gap: 10
+};
+
+const preflightItemStyle = {
+  alignItems: 'center',
+  background: '#ffffff',
+  border: '1px solid #eadfca',
+  borderRadius: 14,
+  display: 'flex',
+  gap: 10,
+  padding: '12px 14px'
+};
+
+const preflightDoneDotStyle = {
+  background: '#6f7d45',
+  borderRadius: 999,
+  display: 'inline-flex',
+  height: 10,
+  width: 10
+};
+
+const preflightPendingDotStyle = {
+  background: '#eadfca',
+  borderRadius: 999,
+  display: 'inline-flex',
+  height: 10,
+  width: 10
+};
+
+const preflightItemTextStyle = {
+  color: '#1f2937',
+  fontSize: 14,
+  fontWeight: 700
+};
+
+const preflightCardStyle = {
+  background: 'linear-gradient(135deg, #102A43 0%, #1B4332 100%)',
+  borderRadius: 18,
+  color: '#fffdf8',
+  display: 'grid',
+  gap: 8,
+  padding: 16
+};
+
 const formatVoice = (voice: VoiceOption) => {
   const labels: Record<VoiceOption, string> = {
     female_clear: '清晰女声',
@@ -713,16 +878,14 @@ const formatSpeechRate = (speechRate: SpeechRate) => {
 
 const formatRequestError = (error: unknown, action: 'submit' | 'preview') => {
   const fallback =
-    action === 'submit'
-      ? '\u89c6\u9891\u751f\u6210\u5931\u8d25\uff0c\u8bf7\u7a0d\u540e\u91cd\u8bd5\u3002'
-      : '\u97f3\u8272\u8bd5\u542c\u751f\u6210\u5931\u8d25\uff0c\u8bf7\u7a0d\u540e\u91cd\u8bd5\u3002';
+    action === 'submit' ? '视频生成失败，请稍后重试。' : '音色试听生成失败，请稍后重试。';
 
   if (!(error instanceof Error)) {
     return fallback;
   }
 
   if (error.message === 'API_UNREACHABLE') {
-    return '\u540e\u7aef\u670d\u52a1\u672a\u8fde\u63a5\uff0c\u8bf7\u5148\u542f\u52a8 API \uff08\u9ed8\u8ba4\u7aef\u53e3 3001\uff09\u540e\u518d\u91cd\u8bd5\u3002';
+    return '后端服务未连接，请先启动 API（默认端口 3001）后再重试。';
   }
 
   return error.message.trim() || fallback;

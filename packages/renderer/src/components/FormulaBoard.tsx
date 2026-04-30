@@ -21,7 +21,10 @@ export const FormulaBoard: React.FC<FormulaBoardProps> = ({formulas, highlights,
           <div key={`${formula}-${index}`} style={formulaCardStyle(index, sceneType, activeHighlights.includes(formula))}>
             <span style={stepBadgeStyle}>{String(index + 1).padStart(2, '0')}</span>
             <div style={formulaContentStyle}>
-              {activeHighlights.includes(formula) ? <strong style={highlightLabelStyle}>{'\u5173\u952e\u5f0f'}</strong> : null}
+              <strong style={formulaRoleStyle(formula, index, sceneType, activeHighlights.includes(formula))}>
+                {getFormulaRoleLabel(formula, index, sceneType, activeHighlights.includes(formula))}
+              </strong>
+              {activeHighlights.includes(formula) ? <strong style={highlightLabelStyle}>{'\u5173\u952e\u53d8\u5f62'}</strong> : null}
               <span style={formulaTextStyle(formula)}>{formula}</span>
             </div>
           </div>
@@ -29,6 +32,26 @@ export const FormulaBoard: React.FC<FormulaBoardProps> = ({formulas, highlights,
       </div>
     </section>
   );
+};
+
+const getFormulaRoleLabel = (formula: string, index: number, sceneType: string, isHighlighted: boolean) => {
+  if (sceneType === 'summary' && (isHighlighted || index === 0)) {
+    return '\u7b54\u6848\u6536\u675f';
+  }
+
+  if (isHighlighted) {
+    return '\u5173\u952e\u5f0f';
+  }
+
+  if (index === 0) {
+    return '\u539f\u5f0f';
+  }
+
+  if (sceneType === 'step' || sceneType === 'problem') {
+    return '\u63a8\u5bfc\u8fc7\u7a0b';
+  }
+
+  return '\u677f\u4e66\u6b65\u9aa4';
 };
 
 const boardStyle = {
@@ -102,6 +125,13 @@ const highlightLabelStyle = {
   fontWeight: 900,
   letterSpacing: 2
 };
+
+const formulaRoleStyle = (_formula: string, _index: number, _sceneType: string, isHighlighted: boolean) => ({
+  color: isHighlighted ? '#FFF4CC' : 'rgba(255,247,214,0.82)',
+  fontSize: 18,
+  fontWeight: 800,
+  letterSpacing: 1.4
+});
 
 const formulaTextStyle = (formula: string) => ({
   color: '#FFF7D6',

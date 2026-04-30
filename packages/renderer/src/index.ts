@@ -2,6 +2,7 @@ export * from './Root';
 export * from './lib/build-timeline';
 export * from './lib/scene-visuals';
 export * from './components/FormulaBoard';
+export * from './components/PresenterMascot';
 export * from './components/SceneProgress';
 export * from './components/ShortVideoShell';
 export * from './compositions/LessonVideo';
