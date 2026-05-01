@@ -119,6 +119,10 @@ describe('featured sample filters', () => {
     const html = renderToStaticMarkup(React.createElement(FeaturedSampleShowcase));
 
     expect(html).toContain('data-featured-stage="linear-equation-basic"');
+    expect(html).toContain('data-sketch-samples="poster-wall"');
+    expect(html).toContain('SAMPLE RAIL / \u6837\u7247\u9884\u89c8');
+    expect(html).toContain('POSTER WALL / \u6837\u7247\u5899');
+    expect(html).toContain('data-sketch-poster="hero"');
     expect(html).toContain('data-featured-rail="sample-switcher"');
     expect(html).toContain('data-featured-nav="previous"');
     expect(html).toContain('data-featured-nav="next"');

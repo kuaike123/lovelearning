@@ -12,6 +12,18 @@ type PillOptions = {
   tone?: 'default' | 'accent' | 'success';
 };
 
+type SketchCardOptions = {
+  tone?: 'default' | 'paper' | 'note' | 'danger';
+};
+
+type SketchButtonOptions = {
+  tone?: 'primary' | 'secondary' | 'dark' | 'quiet';
+};
+
+type SketchPillOptions = {
+  tone?: 'default' | 'accent' | 'success' | 'danger' | 'dark';
+};
+
 export const uiColors = {
   border: '#eadfca',
   borderStrong: '#d7c8a9',
@@ -24,6 +36,22 @@ export const uiColors = {
   surfaceSoft: '#f1ead9',
   warm: '#fff7d6'
 };
+
+export const sketchColors = {
+  accent: '#d9482e',
+  danger: '#f4b6a6',
+  grid: 'rgba(42,36,29,0.07)',
+  ink: '#2a241d',
+  muted: '#4c4439',
+  note: '#fff096',
+  paper: '#fff8df',
+  success: '#eaf4d3',
+  surface: '#ffffff',
+  warm: '#ffef82'
+};
+
+export const createSketchGridBackground = (base = sketchColors.paper, opacity = '0.07') =>
+  `linear-gradient(rgba(42,36,29,${opacity}) 1px, transparent 1px), linear-gradient(90deg, rgba(42,36,29,${opacity}) 1px, transparent 1px), ${base}`;
 
 export const appShellStyle: CSSProperties = {
   background: 'linear-gradient(180deg, #f7f1e3 0%, #fffdf8 26%, #fff9ef 100%)',
@@ -182,4 +210,103 @@ export const createPillStyle = ({tone = 'default'}: PillOptions = {}): CSSProper
   }
 
   return base;
+};
+
+export const createSketchPageStyle = (): CSSProperties => ({
+  background: createSketchGridBackground('#f8efdc'),
+  backgroundSize: '22px 22px',
+  color: sketchColors.ink
+});
+
+export const createSketchSectionStyle = (): CSSProperties => ({
+  ...createSketchPageStyle(),
+  border: `3px solid ${sketchColors.ink}`,
+  borderRadius: 24,
+  boxShadow: `10px 10px 0 ${sketchColors.ink}`,
+  margin: '24px 0',
+  padding: 28
+});
+
+export const createSketchCardStyle = ({tone = 'default'}: SketchCardOptions = {}): CSSProperties => {
+  const background =
+    tone === 'note'
+      ? sketchColors.note
+      : tone === 'danger'
+        ? sketchColors.danger
+        : tone === 'paper'
+          ? sketchColors.paper
+          : sketchColors.surface;
+
+  return {
+    background,
+    border: `3px solid ${sketchColors.ink}`,
+    borderRadius: 18,
+    boxShadow: tone === 'default' ? undefined : `6px 6px 0 ${sketchColors.ink}`,
+    color: sketchColors.ink,
+    display: 'grid',
+    gap: 14,
+    padding: 20
+  };
+};
+
+export const createSketchButtonStyle = ({tone = 'primary'}: SketchButtonOptions = {}): CSSProperties => {
+  const background =
+    tone === 'primary'
+      ? sketchColors.accent
+      : tone === 'dark'
+        ? sketchColors.ink
+        : tone === 'quiet'
+          ? sketchColors.note
+          : sketchColors.surface;
+  const color = tone === 'primary' || tone === 'dark' ? sketchColors.paper : sketchColors.ink;
+
+  return {
+    alignItems: 'center',
+    background,
+    border: `2px solid ${sketchColors.ink}`,
+    borderRadius: 999,
+    color,
+    cursor: 'pointer',
+    display: 'inline-flex',
+    fontWeight: 800,
+    justifyContent: 'center',
+    padding: '10px 16px',
+    textDecoration: 'none'
+  };
+};
+
+export const createSketchEyebrowStyle = (): CSSProperties => ({
+  color: sketchColors.accent,
+  fontSize: 13,
+  fontWeight: 800,
+  letterSpacing: 1.4,
+  margin: 0,
+  textTransform: 'uppercase'
+});
+
+export const createSketchPillStyle = ({tone = 'default'}: SketchPillOptions = {}): CSSProperties => {
+  const background =
+    tone === 'accent'
+      ? sketchColors.note
+      : tone === 'success'
+        ? sketchColors.success
+        : tone === 'danger'
+          ? sketchColors.danger
+          : tone === 'dark'
+            ? sketchColors.ink
+            : sketchColors.surface;
+  const color = tone === 'dark' ? sketchColors.paper : sketchColors.ink;
+
+  return {
+    alignItems: 'center',
+    background,
+    border: `2px solid ${sketchColors.ink}`,
+    borderRadius: 999,
+    color,
+    display: 'inline-flex',
+    fontSize: 12,
+    fontWeight: 800,
+    gap: 6,
+    padding: '6px 10px'
+  };
 };

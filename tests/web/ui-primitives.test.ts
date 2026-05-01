@@ -7,6 +7,12 @@ import {
   createCardStyle,
   createEyebrowStyle,
   createPillStyle,
+  createSketchButtonStyle,
+  createSketchCardStyle,
+  createSketchEyebrowStyle,
+  createSketchPageStyle,
+  createSketchPillStyle,
+  createSketchSectionStyle,
   sectionIntroStyle,
   formControlStyle,
   formFieldLabelStyle,
@@ -32,5 +38,19 @@ describe('web UI primitives', () => {
     expect(optionGridStyle.gridTemplateColumns).toContain('repeat(auto-fit');
     expect(createPillStyle().borderRadius).toBe(999);
     expect(createPillStyle({tone: 'accent'}).background).toBe('#FFF4CC');
+  });
+
+  it('exposes shared sketch styles for the hand-drawn product interface', () => {
+    expect(createSketchPageStyle().background).toContain('#f8efdc');
+    expect(createSketchPageStyle().backgroundSize).toBe('22px 22px');
+    expect(createSketchCardStyle().border).toBe('3px solid #2a241d');
+    expect(createSketchSectionStyle().boxShadow).toBe('10px 10px 0 #2a241d');
+    expect(createSketchSectionStyle().backgroundSize).toBe('22px 22px');
+    expect(createSketchCardStyle({tone: 'paper'}).boxShadow).toBe('6px 6px 0 #2a241d');
+    expect(createSketchCardStyle({tone: 'note'}).background).toBe('#fff096');
+    expect(createSketchButtonStyle({tone: 'primary'}).background).toBe('#d9482e');
+    expect(createSketchButtonStyle({tone: 'secondary'}).border).toBe('2px solid #2a241d');
+    expect(createSketchEyebrowStyle().color).toBe('#d9482e');
+    expect(createSketchPillStyle({tone: 'success'}).background).toBe('#eaf4d3');
   });
 });

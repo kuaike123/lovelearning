@@ -39,5 +39,14 @@ describe('app router page props', () => {
     expect(markup).toContain('\u67e5\u770b\u8fdb\u5ea6');
     expect(markup).toContain('\u521b\u4f5c\u3001\u6837\u7247\u3001\u8fdb\u5ea6\u4e09\u4e2a\u5165\u53e3');
     expect(markup).toContain('\u5185\u5bb9\u6837\u7247\u6d41');
+    expect(markup).toContain('data-sketch-portal="wireframe"');
+    expect(markup).toContain('LoveLearning AI \u00b7 Portal');
+    expect(markup).toContain('WIREFRAME V1');
+    expect(markup).toContain('00 ALL');
+    expect(markup).toContain('01');
+    expect(markup).toContain('\u65b0\u5efa\u8bb2\u89e3');
+    expect(markup).toContain('data-sketch-canvas="home-dashboard"');
+    expect(markup).toContain('lovelearning.ai / portal / dashboard');
+    expect(markup).toContain('\u4eca\u5929\u4f18\u5148\u505a\uff1a\u8ba9\u8001\u5e08\u4e00\u773c\u77e5\u9053\u4ece\u54ea\u91cc\u5f00\u59cb\u751f\u6210');
   });
 });

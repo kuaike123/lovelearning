@@ -2,6 +2,8 @@
 
 import React, {useState} from 'react';
 
+import {createSketchButtonStyle, createSketchEyebrowStyle, sketchColors} from '../../ui-primitives';
+
 type SampleWorkbenchActionsProps = {
   generationHref: string;
   problemText: string;
@@ -22,7 +24,8 @@ export function SampleWorkbenchActions({generationHref, problemText}: SampleWork
   return (
     <section style={workbenchStyle}>
       <div>
-        <p style={eyebrowStyle}>{'\u6837\u7247\u5de5\u4f5c\u53f0'}</p>
+        <p style={eyebrowStyle}>{'WORKBENCH / \u5957\u7528\u751f\u6210'}</p>
+        <p style={legacyEyebrowStyle}>{'\u6837\u7247\u5de5\u4f5c\u53f0'}</p>
         <h2 style={titleStyle}>{'\u628a\u8fd9\u5957\u6837\u7247\u53d8\u6210\u4f60\u7684\u8bb2\u89e3\u89c6\u9891'}</h2>
       </div>
       <div style={actionGridStyle}>
@@ -41,19 +44,26 @@ export function SampleWorkbenchActions({generationHref, problemText}: SampleWork
 }
 
 const workbenchStyle = {
-  background: '#102A43',
-  borderRadius: 18,
-  color: '#FFF7D6',
+  background: sketchColors.ink,
+  border: `3px solid ${sketchColors.ink}`,
+  borderRadius: 16,
+  boxShadow: `6px 6px 0 ${sketchColors.accent}`,
+  color: sketchColors.paper,
   display: 'grid',
   gap: 16,
   padding: 18
 };
 
 const eyebrowStyle = {
-  color: '#F5C542',
+  ...createSketchEyebrowStyle(),
+  color: sketchColors.warm,
+  margin: '0 0 6px'
+};
+
+const legacyEyebrowStyle = {
+  color: 'rgba(255, 248, 223, 0.78)',
   fontSize: 13,
-  fontWeight: 800,
-  letterSpacing: 1.2,
+  fontWeight: 700,
   margin: '0 0 6px'
 };
 
@@ -70,26 +80,16 @@ const actionGridStyle = {
 };
 
 const primaryActionStyle = {
-  background: '#FFF4CC',
-  borderRadius: 999,
-  color: '#7C4A03',
-  display: 'inline-flex',
-  fontWeight: 800,
-  justifyContent: 'center',
+  ...createSketchButtonStyle({tone: 'primary'}),
+  border: `2px solid ${sketchColors.paper}`,
   padding: '11px 14px',
-  textDecoration: 'none'
 };
 
 const secondaryActionStyle = {
-  background: 'rgba(255,255,255,0.08)',
-  border: '1px solid rgba(255,255,255,0.18)',
-  borderRadius: 999,
-  color: '#FFF7D6',
-  display: 'inline-flex',
-  fontWeight: 800,
-  justifyContent: 'center',
+  ...createSketchButtonStyle({tone: 'secondary'}),
+  background: sketchColors.paper,
+  border: `2px solid ${sketchColors.paper}`,
   padding: '11px 14px',
-  textDecoration: 'none'
 };
 
 const secondaryButtonStyle = {

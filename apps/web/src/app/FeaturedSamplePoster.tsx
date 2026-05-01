@@ -1,6 +1,7 @@
 import React from 'react';
 
 import type {FeaturedSample} from './featured-samples';
+import {createSketchGridBackground, createSketchPillStyle, sketchColors} from './ui-primitives';
 
 type FeaturedSamplePosterProps = {
   sample: FeaturedSample;
@@ -22,6 +23,7 @@ export function FeaturedSamplePoster({sample, variant}: FeaturedSamplePosterProp
 
   return (
     <div
+      data-sketch-poster={variant}
       style={{
         ...posterPreviewStyle,
         ...(prominent ? prominentPosterPreviewStyle : {}),
@@ -69,10 +71,12 @@ export function FeaturedSamplePoster({sample, variant}: FeaturedSamplePosterProp
 
 const posterPreviewStyle = {
   aspectRatio: '9 / 16',
-  background: 'linear-gradient(180deg, #14324A 0%, #245B45 100%)',
-  borderRadius: 22,
-  boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.12)',
-  color: '#FFF7D6',
+  background: createSketchGridBackground(sketchColors.paper, '0.08'),
+  backgroundSize: '18px 18px',
+  border: `3px solid ${sketchColors.ink}`,
+  borderRadius: 18,
+  boxShadow: `8px 8px 0 ${sketchColors.ink}`,
+  color: sketchColors.ink,
   display: 'grid',
   gap: 14,
   padding: 18
@@ -96,16 +100,14 @@ const posterTopRowStyle = {
 };
 
 const posterKickerStyle = {
-  background: 'rgba(245,197,66,0.18)',
-  borderRadius: 999,
-  color: '#F5C542',
+  ...createSketchPillStyle({tone: 'default'}),
+  background: sketchColors.warm,
   fontSize: 12,
-  fontWeight: 800,
   padding: '6px 10px'
 };
 
 const posterBrandStyle = {
-  color: 'rgba(255,247,214,0.8)',
+  color: sketchColors.muted,
   fontSize: 12,
   fontWeight: 700,
   letterSpacing: 1
@@ -119,20 +121,16 @@ const posterCategoryRowStyle = {
 };
 
 const posterCategoryBadgeStyle = {
-  background: '#FFF4CC',
-  borderRadius: 999,
-  color: '#7C4A03',
-  display: 'inline-flex',
+  ...createSketchPillStyle({tone: 'success'}),
   fontSize: 12,
-  fontWeight: 800,
   padding: '6px 10px'
 };
 
 const posterTeacherBadgeStyle = {
-  background: 'rgba(255,255,255,0.1)',
-  border: '1px solid rgba(255,255,255,0.18)',
+  background: sketchColors.surface,
+  border: `2px dashed ${sketchColors.muted}`,
   borderRadius: 999,
-  color: '#FFF7D6',
+  color: sketchColors.ink,
   display: 'inline-flex',
   fontSize: 12,
   fontWeight: 700,
@@ -140,9 +138,9 @@ const posterTeacherBadgeStyle = {
 };
 
 const posterFormulaStyle = {
-  background: 'rgba(255,255,255,0.08)',
-  border: '1px solid rgba(255,255,255,0.16)',
-  borderRadius: 18,
+  background: sketchColors.surface,
+  border: `3px solid ${sketchColors.ink}`,
+  borderRadius: 16,
   fontFamily: 'Georgia, "Times New Roman", serif',
   fontSize: 24,
   lineHeight: 1.35,
@@ -178,10 +176,10 @@ const thumbnailPosterCaptionStyle = {
 };
 
 const posterTeacherHookStyle = {
-  background: 'rgba(255,255,255,0.1)',
-  border: '1px solid rgba(255,255,255,0.14)',
-  borderRadius: 16,
-  color: '#FFF7D6',
+  background: sketchColors.danger,
+  border: `2px solid ${sketchColors.ink}`,
+  borderRadius: 14,
+  color: sketchColors.ink,
   fontSize: 13,
   fontWeight: 700,
   lineHeight: 1.6,
@@ -195,27 +193,24 @@ const posterFooterStyle = {
 };
 
 const posterBadgeStyle = {
-  background: '#FFF4CC',
-  borderRadius: 999,
-  color: '#7C4A03',
-  display: 'inline-flex',
+  ...createSketchPillStyle({tone: 'accent'}),
   fontSize: 12,
-  fontWeight: 800,
   padding: '6px 10px',
   width: 'fit-content'
 };
 
 const posterFootnoteStyle = {
-  color: 'rgba(255,247,214,0.84)',
+  color: sketchColors.muted,
   fontSize: 12,
   lineHeight: 1.5
 };
 
 const posterCtaStyle = {
   alignItems: 'center',
-  background: '#FFF4CC',
+  background: sketchColors.accent,
+  border: `2px solid ${sketchColors.ink}`,
   borderRadius: 999,
-  color: '#7C4A03',
+  color: sketchColors.paper,
   display: 'inline-flex',
   gap: 8,
   justifyContent: 'space-between',

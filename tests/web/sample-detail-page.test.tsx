@@ -10,6 +10,11 @@ describe('SampleDetailPage', () => {
       await SampleDetailPage({params: Promise.resolve({slug: 'linear-equation-basic'})})
     );
 
+    expect(html).toContain('data-sketch-sample-detail="director-board"');
+    expect(html).toContain('data-sketch-poster="detail"');
+    expect(html).toContain('SHOT BOARD / \u6837\u7247\u5206\u955c');
+    expect(html).toContain('SCRIPT NOTES / \u8bb2\u89e3\u5356\u70b9');
+    expect(html).toContain('WORKBENCH / \u5957\u7528\u751f\u6210');
     expect(html).toContain('\u6837\u7247\u8be6\u60c5');
     expect(html).toContain('\u521d\u4e00\u65b9\u7a0b\u6807\u51c6\u8bb2\u89e3');
     expect(html).toContain('\u63a8\u8350\u6307\u6570');

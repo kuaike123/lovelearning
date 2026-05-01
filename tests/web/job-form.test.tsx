@@ -14,6 +14,12 @@ describe('HomePage', () => {
     expect(html).toContain('\u628a\u4e00\u9053\u9898\uff0c\u505a\u6210\u4e00\u6761\u4f1a\u8bb2\u8bfe\u7684\u77ed\u89c6\u9891');
     expect(html).toContain('\u5de5\u4f5c\u53f0\u5165\u53e3');
     expect(html).toContain('\u5185\u5bb9\u6837\u7247\u6d41');
+    expect(html).toContain('data-sketch-tabs="portal-sections"');
+    expect(html).toContain('data-sketch-kpi="monthly-videos"');
+    expect(html).toContain('\u672c\u6708\u751f\u6210');
+    expect(html).toContain('\u6700\u8fd1\u751f\u6210\u8d8b\u52bf');
+    expect(html).toContain('\u9898\u578b\u8986\u76d6');
+    expect(html).toContain('NEXT STEP / \u4e0b\u4e00\u6b65\u5efa\u8bae');
     expect(html).toContain('data-home-entry="create"');
     expect(html).toContain('data-home-entry="samples"');
     expect(html).toContain('data-home-entry="jobs"');

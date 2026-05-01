@@ -149,9 +149,9 @@ export function SubmitJobForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} style={formStyle}>
+    <form data-sketch-form="new-video-draft" onSubmit={handleSubmit} style={formStyle}>
       <div style={introCardStyle}>
-        <p style={eyebrowStyle}>开始生成</p>
+        <p style={eyebrowStyle}>DRAFT / 新建讲解</p>
         <h2 style={titleStyle}>把题目变成可直接演示的讲解视频</h2>
         <p style={descriptionStyle}>
           输入题目后，系统会自动生成讲解步骤、字幕、配音和动画视频。固定样片会自动带入推荐时长、风格和任务名称。
@@ -187,7 +187,7 @@ export function SubmitJobForm({
 
       <section data-form-section="problem-input" style={sectionCardStyle}>
         <SectionHeader
-          eyebrow="第一步"
+          eyebrow="QUESTION / 输入题目"
           title="题目输入"
           description="先确定这次要讲哪道题，以及这条视频在任务列表里如何被识别。"
         />
@@ -219,7 +219,7 @@ export function SubmitJobForm({
 
       <section data-form-section="generation-settings" style={sectionCardStyle}>
         <SectionHeader
-          eyebrow="第二步"
+          eyebrow="CONFIG / 生成参数"
           title="生成设置"
           description="控制这条视频的目标时长、讲解风格和默认生成参数。"
         />
@@ -273,7 +273,7 @@ export function SubmitJobForm({
 
       <section data-form-section="voice-preview" style={sectionCardStyle}>
         <SectionHeader
-          eyebrow="第三步"
+          eyebrow="VOICE / 试听配音"
           title="试听与配音选择"
           description="先看系统推荐，再试听三种音色，确认这一题更适合哪种老师声音。"
         />
@@ -392,7 +392,7 @@ export function SubmitJobForm({
 
       <section data-form-section="preflight-check" style={preflightSectionStyle}>
         <SectionHeader
-          eyebrow="生成前检查"
+          eyebrow="CHECKLIST / 渲染前检查"
           title="确认这次任务可以顺畅进入渲染"
           description="生成前快速扫一眼，确认题目、任务名和配音策略都已经准备好。"
         />
@@ -439,43 +439,52 @@ function SectionHeader({
 
 const formStyle = {
   display: 'grid',
-  gap: 16
+  gap: 18,
+  position: 'relative' as const
 };
 
 const introCardStyle = {
-  background: 'linear-gradient(135deg, #FFF7D6 0%, #FFFFFF 100%)',
-  border: '1px solid #eadfca',
-  borderRadius: 20,
+  background:
+    'linear-gradient(#eadfca 1px, transparent 1px), linear-gradient(90deg, #eadfca 1px, transparent 1px), #fffaf1',
+  backgroundSize: '18px 18px',
+  border: '3px solid #2a241d',
+  borderRadius: 14,
+  boxShadow: '6px 7px 0 rgba(42,36,29,0.12)',
   display: 'grid',
   gap: 8,
-  padding: 18
+  padding: 18,
+  transform: 'rotate(-0.35deg)'
 };
 
 const eyebrowStyle = {
-  color: '#6f7d45',
+  color: '#d9482e',
+  fontFamily: 'Consolas, "Courier New", monospace',
   fontSize: 13,
-  fontWeight: 700,
-  letterSpacing: 1.4,
+  fontWeight: 800,
+  letterSpacing: 2,
   margin: 0
 };
 
 const titleStyle = {
-  fontFamily: 'Georgia, "Times New Roman", serif',
-  fontSize: 28,
+  color: '#2a241d',
+  fontFamily: '"Times New Roman", Georgia, "Noto Serif SC", serif',
+  fontSize: 32,
+  fontStyle: 'italic' as const,
   lineHeight: 1.15,
   margin: 0
 };
 
 const descriptionStyle = {
-  color: '#374151',
+  color: '#5f564a',
   lineHeight: 1.7,
   margin: 0
 };
 
 const overviewSectionStyle = {
-  background: 'linear-gradient(135deg, #102A43 0%, #1B4332 100%)',
-  borderRadius: 22,
-  color: '#fffdf8',
+  background: 'rgba(255,250,241,0.9)',
+  border: '3px dashed #4c4439',
+  borderRadius: 14,
+  color: '#2a241d',
   display: 'grid',
   gap: 16,
   padding: 18
@@ -488,39 +497,45 @@ const overviewGridStyle = {
 };
 
 const overviewCardStyle = {
-  background: 'rgba(255,255,255,0.1)',
-  border: '1px solid rgba(255,255,255,0.14)',
-  borderRadius: 16,
+  background: '#fffaf1',
+  border: '2px solid #4c4439',
+  borderRadius: 12,
   display: 'grid',
   gap: 8,
-  padding: 14
+  padding: 14,
+  transform: 'rotate(-0.25deg)'
 };
 
 const overviewLabelStyle = {
-  color: '#FFF4CC',
+  color: '#d9482e',
+  fontFamily: 'Consolas, "Courier New", monospace',
   fontSize: 12,
-  fontWeight: 800
+  fontWeight: 800,
+  letterSpacing: 1.4
 };
 
 const overviewValueStyle = {
-  color: 'inherit',
+  color: '#2a241d',
   fontSize: 20,
   lineHeight: 1.3
 };
 
 const overviewBodyStyle = {
-  color: 'rgba(255,253,248,0.88)',
+  color: '#5f564a',
   lineHeight: 1.6,
   margin: 0
 };
 
 const sectionCardStyle = {
-  background: '#fffdf8',
-  border: '1px solid #eadfca',
-  borderRadius: 22,
+  background:
+    'linear-gradient(#eadfca 1px, transparent 1px), linear-gradient(90deg, #eadfca 1px, transparent 1px), rgba(255,250,241,0.96)',
+  backgroundSize: '18px 18px',
+  border: '3px solid #4c4439',
+  borderRadius: 14,
   display: 'grid',
   gap: 16,
-  padding: 18
+  padding: 18,
+  transform: 'rotate(0.2deg)'
 };
 
 const sectionHeaderStyle = {
@@ -529,22 +544,25 @@ const sectionHeaderStyle = {
 };
 
 const sectionEyebrowStyle = {
-  color: '#6f7d45',
+  color: '#d9482e',
+  fontFamily: 'Consolas, "Courier New", monospace',
   fontSize: 12,
   fontWeight: 800,
-  letterSpacing: 1.2,
+  letterSpacing: 2,
   margin: 0
 };
 
 const sectionTitleStyle = {
-  color: '#102A43',
+  color: '#2a241d',
+  fontFamily: '"Times New Roman", Georgia, "Noto Serif SC", serif',
   fontSize: 24,
+  fontStyle: 'italic' as const,
   lineHeight: 1.2,
   margin: 0
 };
 
 const sectionDescriptionStyle = {
-  color: '#4b5563',
+  color: '#5f564a',
   lineHeight: 1.65,
   margin: 0
 };
@@ -555,16 +573,20 @@ const sectionBodyStyle = {
 };
 
 const fieldLabelStyle = {
-  color: '#1f2937',
+  color: '#2a241d',
   fontSize: 14,
-  fontWeight: 700
+  fontWeight: 800,
+  letterSpacing: 0.8
 };
 
 const textInputStyle = {
-  border: '1px solid #d7c8a9',
-  borderRadius: 14,
+  background: '#fffaf1',
+  border: '2px solid #4c4439',
+  borderRadius: 8,
+  color: '#2a241d',
   fontSize: 15,
-  padding: '12px 14px'
+  outline: 'none',
+  padding: '13px 14px'
 };
 
 const textareaStyle = {
@@ -580,27 +602,31 @@ const optionsGridStyle = {
 };
 
 const selectLabelStyle = {
-  color: '#1f2937',
+  color: '#2a241d',
   display: 'grid',
   fontSize: 14,
-  fontWeight: 700,
+  fontWeight: 800,
   gap: 8
 };
 
 const selectStyle = {
-  border: '1px solid #d7c8a9',
-  borderRadius: 14,
+  background: '#fffaf1',
+  border: '2px solid #4c4439',
+  borderRadius: 8,
+  color: '#2a241d',
   fontSize: 15,
   padding: '12px 14px'
 };
 
 const recommendationCardStyle = {
-  background: 'linear-gradient(135deg, #fffaf1 0%, #f4efe2 100%)',
-  border: '1px solid #eadfca',
-  borderRadius: 18,
+  background: '#fff096',
+  border: '2px solid rgba(42,36,29,0.2)',
+  borderRadius: 4,
+  boxShadow: '7px 8px 0 rgba(42,36,29,0.12)',
   display: 'grid',
   gap: 10,
-  padding: 16
+  padding: 16,
+  transform: 'rotate(-1.2deg)'
 };
 
 const recommendationHeaderStyle = {
@@ -611,21 +637,22 @@ const recommendationHeaderStyle = {
 };
 
 const recommendationEyebrowStyle = {
-  color: '#6f7d45',
+  color: '#d9482e',
+  fontFamily: 'Consolas, "Courier New", monospace',
   fontSize: 12,
-  fontWeight: 700,
-  letterSpacing: 1.2,
+  fontWeight: 800,
+  letterSpacing: 1.8,
   margin: 0
 };
 
 const recommendationVoiceStyle = {
-  color: '#1f2937',
+  color: '#2a241d',
   display: 'block',
   fontSize: 20
 };
 
 const recommendationReasonStyle = {
-  color: '#374151',
+  color: '#2a241d',
   lineHeight: 1.6,
   margin: 0
 };
@@ -637,26 +664,27 @@ const recommendationMetaGridStyle = {
 };
 
 const recommendationMetaItemStyle = {
-  background: 'rgba(255, 255, 255, 0.72)',
-  border: '1px solid #eadfca',
-  borderRadius: 14,
+  background: 'rgba(255,250,241,0.72)',
+  border: '2px solid rgba(42,36,29,0.18)',
+  borderRadius: 8,
   display: 'grid',
   gap: 4,
   padding: 12
 };
 
 const recommendationMetaLabelStyle = {
-  color: '#6b7280',
+  color: '#6f665b',
   fontSize: 12,
   fontWeight: 700
 };
 
 const recommendButtonStyle = {
-  background: '#6f7d45',
-  border: '1px solid #6f7d45',
+  background: '#fffaf1',
+  border: '2px solid #2a241d',
   borderRadius: 999,
-  color: '#ffffff',
+  color: '#2a241d',
   cursor: 'pointer',
+  fontWeight: 800,
   padding: '8px 12px'
 };
 
@@ -667,21 +695,24 @@ const actionsStyle = {
 };
 
 const previewButtonStyle = {
-  background: '#fff7d6',
-  border: '1px solid #eadfca',
+  background: '#fffaf1',
+  border: '2px solid #2a241d',
   borderRadius: 999,
-  color: '#1f2937',
+  color: '#2a241d',
   cursor: 'pointer',
+  fontWeight: 800,
   padding: '10px 16px'
 };
 
 const submitButtonStyle = {
-  background: '#102A43',
-  border: '1px solid #102A43',
+  background: '#d9482e',
+  border: '2px solid #2a241d',
   borderRadius: 999,
-  color: '#ffffff',
+  color: '#fffaf1',
   cursor: 'pointer',
-  padding: '10px 18px'
+  fontWeight: 900,
+  padding: '10px 18px',
+  transform: 'rotate(-0.5deg)'
 };
 
 const previewSectionStyle = {
@@ -796,9 +827,9 @@ const audioStyle = {
 };
 
 const preflightSectionStyle = {
-  background: '#fffaf1',
-  border: '1px solid #eadfca',
-  borderRadius: 22,
+  background: 'rgba(255,250,241,0.92)',
+  border: '3px dashed #4c4439',
+  borderRadius: 14,
   display: 'grid',
   gap: 16,
   padding: 18
@@ -817,16 +848,16 @@ const preflightListStyle = {
 
 const preflightItemStyle = {
   alignItems: 'center',
-  background: '#ffffff',
-  border: '1px solid #eadfca',
-  borderRadius: 14,
+  background: '#fffaf1',
+  border: '2px solid #4c4439',
+  borderRadius: 8,
   display: 'flex',
   gap: 10,
   padding: '12px 14px'
 };
 
 const preflightDoneDotStyle = {
-  background: '#6f7d45',
+  background: '#d9482e',
   borderRadius: 999,
   display: 'inline-flex',
   height: 10,
@@ -834,7 +865,7 @@ const preflightDoneDotStyle = {
 };
 
 const preflightPendingDotStyle = {
-  background: '#eadfca',
+  background: '#d7c8a9',
   borderRadius: 999,
   display: 'inline-flex',
   height: 10,
@@ -842,18 +873,20 @@ const preflightPendingDotStyle = {
 };
 
 const preflightItemTextStyle = {
-  color: '#1f2937',
+  color: '#2a241d',
   fontSize: 14,
   fontWeight: 700
 };
 
 const preflightCardStyle = {
-  background: 'linear-gradient(135deg, #102A43 0%, #1B4332 100%)',
-  borderRadius: 18,
-  color: '#fffdf8',
+  background: '#fff096',
+  border: '2px solid rgba(42,36,29,0.2)',
+  borderRadius: 4,
+  color: '#2a241d',
   display: 'grid',
   gap: 8,
-  padding: 16
+  padding: 16,
+  transform: 'rotate(1deg)'
 };
 
 const formatVoice = (voice: VoiceOption) => {

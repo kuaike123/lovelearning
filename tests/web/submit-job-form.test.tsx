@@ -16,11 +16,16 @@ describe('SubmitJobForm', () => {
     expect(html).toContain('data-form-section="voice-preview"');
     expect(html).toContain('data-form-section="workspace-overview"');
     expect(html).toContain('data-form-section="preflight-check"');
+    expect(html).toContain('data-sketch-form="new-video-draft"');
+    expect(html).toContain('QUESTION / \u8f93\u5165\u9898\u76ee');
+    expect(html).toContain('CONFIG / \u751f\u6210\u53c2\u6570');
+    expect(html).toContain('VOICE / \u8bd5\u542c\u914d\u97f3');
+    expect(html).toContain('CHECKLIST / \u6e32\u67d3\u524d\u68c0\u67e5');
     expect(html).toContain('\u9898\u76ee\u8f93\u5165');
     expect(html).toContain('\u751f\u6210\u8bbe\u7f6e');
     expect(html).toContain('\u8bd5\u542c\u4e0e\u914d\u97f3\u9009\u62e9');
     expect(html).toContain('\u521b\u4f5c\u603b\u89c8');
-    expect(html).toContain('\u751f\u6210\u524d\u68c0\u67e5');
+    expect(html).toContain('CHECKLIST / \u6e32\u67d3\u524d\u68c0\u67e5');
     expect(html).toContain('\u4efb\u52a1\u540d\u79f0');
     expect(html).toContain('\u751f\u6210\u89c6\u9891');
     expect(html).toContain('\u5bf9\u6bd4\u4e09\u79cd\u97f3\u8272');

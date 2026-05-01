@@ -13,7 +13,14 @@ import {
   type UseCaseFilter
 } from './featured-samples';
 import {FeaturedSamplePoster} from './FeaturedSamplePoster';
-import {createButtonStyle, createCardStyle, createPillStyle} from './ui-primitives';
+import {
+  createSketchButtonStyle,
+  createSketchCardStyle,
+  createSketchEyebrowStyle,
+  createSketchPillStyle,
+  createSketchSectionStyle,
+  sketchColors
+} from './ui-primitives';
 
 const categoryOptions: {label: string; value: ProblemCategoryFilter}[] = [
   {label: '\u5168\u90e8', value: 'all'},
@@ -88,9 +95,9 @@ export function FeaturedSampleShowcase() {
   };
 
   return (
-    <section id="featured-samples" style={sectionStyle}>
+    <section id="featured-samples" data-sketch-samples="poster-wall" style={sectionStyle}>
       <div style={headerStyle}>
-        <p style={eyebrowStyle}>{'\u7cbe\u9009\u6837\u7247'}</p>
+        <p style={eyebrowStyle}>{'POSTER WALL / \u6837\u7247\u5899'}</p>
         <h2 style={titleStyle}>{'\u7cbe\u9009\u6837\u7247\u5e93'}</h2>
         <p style={descriptionStyle}>
           {
@@ -143,7 +150,7 @@ export function FeaturedSampleShowcase() {
       {activeSample ? (
         <section data-featured-stage={activeSample.slug} style={previewStageStyle}>
           <div style={previewStageCopyStyle}>
-            <span style={stageEyebrowStyle}>{'\u5c01\u9762\u9884\u89c8\u6d41'}</span>
+            <span style={stageEyebrowStyle}>{'SAMPLE RAIL / \u6837\u7247\u9884\u89c8 · \u5c01\u9762\u9884\u89c8\u6d41'}</span>
             <h3 style={stageTitleStyle}>{'\u5f53\u524d\u9884\u89c8\u6837\u7247'}</h3>
             <p style={stageDescriptionStyle}>
               {
@@ -379,11 +386,7 @@ const renderSampleCard = (sample: FeaturedSample, onPreview: (slug: string) => v
 );
 
 const sectionStyle = {
-  background: 'linear-gradient(135deg, #102A43 0%, #1B4332 100%)',
-  borderRadius: 28,
-  color: '#FFF7D6',
-  margin: '24px 0',
-  padding: 28
+  ...createSketchSectionStyle()
 };
 
 const headerStyle = {
@@ -392,13 +395,7 @@ const headerStyle = {
   marginBottom: 20
 };
 
-const eyebrowStyle = {
-  color: '#F5C542',
-  fontSize: 13,
-  fontWeight: 800,
-  letterSpacing: 1.8,
-  margin: 0
-};
+const eyebrowStyle = createSketchEyebrowStyle();
 
 const titleStyle = {
   fontFamily: 'Georgia, "Times New Roman", serif',
@@ -408,18 +405,14 @@ const titleStyle = {
 };
 
 const descriptionStyle = {
-  color: 'rgba(255,247,214,0.88)',
+  color: sketchColors.muted,
   lineHeight: 1.7,
   margin: 0,
   maxWidth: 820
 };
 
 const filterPanelStyle = {
-  background: 'rgba(255,255,255,0.08)',
-  border: '1px solid rgba(255,255,255,0.14)',
-  borderRadius: 18,
-  display: 'grid',
-  gap: 14,
+  ...createSketchCardStyle({tone: 'paper'}),
   marginBottom: 18,
   padding: 18
 };
@@ -430,21 +423,21 @@ const filterGroupStyle = {
 };
 
 const filterTitleStyle = {
-  color: '#FFF7D6',
+  color: sketchColors.ink,
   fontSize: 15,
   fontWeight: 800,
   margin: 0
 };
 
 const filterSummaryStyle = {
-  color: 'rgba(255,247,214,0.92)',
+  color: sketchColors.muted,
   fontSize: 14,
   fontWeight: 700,
   margin: 0
 };
 
 const filterLabelStyle = {
-  color: 'rgba(255,247,214,0.84)',
+  color: sketchColors.muted,
   fontSize: 13,
   fontWeight: 700
 };
@@ -456,28 +449,21 @@ const filterChipRowStyle = {
 };
 
 const filterChipStyle = {
-  background: 'rgba(255,255,255,0.08)',
-  border: '1px solid rgba(255,255,255,0.18)',
-  borderRadius: 999,
-  color: '#FFF7D6',
-  cursor: 'pointer',
+  ...createSketchButtonStyle({tone: 'secondary'}),
   font: 'inherit',
   fontSize: 13,
-  fontWeight: 700,
   padding: '8px 12px'
 };
 
 const filterChipActiveStyle = {
-  background: '#FFF4CC',
-  borderColor: '#FFF4CC',
-  color: '#7C4A03'
+  background: sketchColors.note,
+  borderColor: sketchColors.ink,
+  color: sketchColors.ink,
+  boxShadow: `3px 3px 0 ${sketchColors.ink}`
 };
 
 const previewStageStyle = {
-  background: 'rgba(255,255,255,0.08)',
-  border: '1px solid rgba(255,255,255,0.14)',
-  borderRadius: 24,
-  display: 'grid',
+  ...createSketchCardStyle(),
   gap: 18,
   marginBottom: 22,
   padding: 18
@@ -489,7 +475,7 @@ const previewStageCopyStyle = {
 };
 
 const stageEyebrowStyle = {
-  color: '#F5C542',
+  color: sketchColors.accent,
   fontSize: 12,
   fontWeight: 800,
   letterSpacing: 1.4
@@ -503,7 +489,7 @@ const stageTitleStyle = {
 };
 
 const stageDescriptionStyle = {
-  color: 'rgba(255,247,214,0.86)',
+  color: sketchColors.muted,
   lineHeight: 1.7,
   margin: 0,
   maxWidth: 720
@@ -517,11 +503,7 @@ const stagePanelStyle = {
 };
 
 const stageInfoStyle = {
-  background: 'rgba(255,250,241,0.96)',
-  border: '1px solid rgba(255,255,255,0.14)',
-  borderRadius: 24,
-  color: '#102A43',
-  display: 'grid',
+  ...createSketchCardStyle({tone: 'paper'}),
   gap: 14,
   padding: 20
 };
@@ -534,17 +516,13 @@ const stageMetaTopStyle = {
 };
 
 const stageSampleLabelStyle = {
-  background: '#FFF4CC',
-  borderRadius: 999,
-  color: '#7C4A03',
-  display: 'inline-flex',
+  ...createSketchPillStyle({tone: 'accent'}),
   fontSize: 12,
-  fontWeight: 800,
   padding: '6px 10px'
 };
 
 const stageDateStyle = {
-  color: '#6B7280',
+  color: sketchColors.muted,
   fontSize: 13,
   fontWeight: 700
 };
@@ -556,7 +534,7 @@ const stageSampleTitleStyle = {
 };
 
 const stageSampleDescriptionStyle = {
-  color: '#374151',
+  color: sketchColors.muted,
   lineHeight: 1.7,
   margin: 0
 };
@@ -568,15 +546,15 @@ const stageInsightGridStyle = {
 };
 
 const stageInsightCardStyle = {
-  background: '#FFF7E0',
-  borderRadius: 16,
+  ...createSketchCardStyle(),
+  borderWidth: 2,
   display: 'grid',
   gap: 4,
   padding: '12px 14px'
 };
 
 const stageInsightValueStyle = {
-  color: '#102A43',
+  color: sketchColors.ink,
   fontSize: 16,
   lineHeight: 1.4
 };
@@ -600,13 +578,13 @@ const previewRailHeadingStyle = {
 };
 
 const previewRailTitleStyle = {
-  color: '#FFF7D6',
+  color: sketchColors.ink,
   fontSize: 15,
   fontWeight: 800
 };
 
 const previewRailBodyStyle = {
-  color: 'rgba(255,247,214,0.82)',
+  color: sketchColors.muted,
   fontSize: 13,
   lineHeight: 1.5
 };
@@ -620,21 +598,13 @@ const previewRailNavStyle = {
 };
 
 const previewRailPagePillStyle = {
-  background: 'rgba(255,255,255,0.12)',
-  border: '1px solid rgba(255,255,255,0.18)',
-  borderRadius: 999,
-  color: '#FFF7D6',
-  display: 'inline-flex',
+  ...createSketchPillStyle({tone: 'dark'}),
   fontSize: 12,
-  fontWeight: 800,
   padding: '7px 11px'
 };
 
 const previewRailNavButtonStyle = {
-  ...createButtonStyle({tone: 'quiet'}),
-  background: 'rgba(255,255,255,0.14)',
-  border: '1px solid rgba(255,255,255,0.18)',
-  color: '#FFF7D6',
+  ...createSketchButtonStyle({tone: 'secondary'}),
   padding: '8px 12px'
 };
 
@@ -659,7 +629,7 @@ const previewRailDotsStyle = {
 };
 
 const previewRailDotStyle = {
-  background: 'rgba(255,255,255,0.28)',
+  background: '#d7c8a9',
   border: 'none',
   borderRadius: 999,
   cursor: 'pointer',
@@ -671,18 +641,15 @@ const previewRailDotStyle = {
 };
 
 const previewRailDotActiveStyle = {
-  background: '#FFF4CC',
-  boxShadow: '0 0 0 4px rgba(255,244,204,0.18)',
+  background: sketchColors.accent,
+  boxShadow: '0 0 0 4px rgba(217,72,46,0.18)',
   width: 20
 };
 
 const previewRailItemStyle = {
-  background: 'rgba(255,255,255,0.08)',
-  border: '1px solid rgba(255,255,255,0.14)',
-  borderRadius: 18,
-  color: '#FFF7D6',
+  ...createSketchCardStyle({tone: 'paper'}),
+  borderWidth: 2,
   cursor: 'pointer',
-  display: 'grid',
   flex: '0 0 220px',
   gap: 10,
   padding: 12,
@@ -691,9 +658,9 @@ const previewRailItemStyle = {
 };
 
 const previewRailItemActiveStyle = {
-  background: 'rgba(255,244,204,0.16)',
-  borderColor: '#FFF4CC',
-  boxShadow: '0 8px 20px rgba(16, 42, 67, 0.18)'
+  background: sketchColors.note,
+  borderColor: sketchColors.ink,
+  boxShadow: `5px 5px 0 ${sketchColors.ink}`
 };
 
 const previewRailPosterStyle = {
@@ -706,13 +673,10 @@ const previewRailCopyStyle = {
 };
 
 const previewRailCurrentBadgeStyle = {
-  background: 'rgba(255,244,204,0.16)',
-  border: '1px solid rgba(255,244,204,0.4)',
-  borderRadius: 999,
-  color: '#FFF4CC',
-  display: 'inline-flex',
+  ...createSketchPillStyle({tone: 'danger'}),
+  background: sketchColors.accent,
+  color: sketchColors.paper,
   fontSize: 11,
-  fontWeight: 800,
   padding: '5px 8px',
   width: 'fit-content'
 };
@@ -723,7 +687,7 @@ const previewRailItemTitleStyle = {
 };
 
 const previewRailItemMetaStyle = {
-  color: 'rgba(255,247,214,0.78)',
+  color: sketchColors.muted,
   fontSize: 12,
   lineHeight: 1.5
 };
@@ -750,24 +714,20 @@ const sectionHeadingStyle = {
 };
 
 const sectionEyebrowStyle = {
-  color: '#FFF7D6',
+  color: sketchColors.ink,
   fontSize: 14,
   fontWeight: 800,
   margin: 0
 };
 
 const sectionDescriptionStyle = {
-  color: 'rgba(255,247,214,0.82)',
+  color: sketchColors.muted,
   lineHeight: 1.6,
   margin: 0
 };
 
 const cardStyle = {
-  ...createCardStyle(),
-  background: 'rgba(255, 250, 241, 0.94)',
-  border: '1px solid rgba(255,255,255,0.16)',
-  borderRadius: 22,
-  color: '#102A43',
+  ...createSketchCardStyle({tone: 'paper'}),
   gap: 12,
   padding: 20
 };
@@ -780,13 +740,13 @@ const cardHeaderStyle = {
 };
 
 const previewSwitchButtonStyle = {
-  ...createButtonStyle({tone: 'quiet'}),
+  ...createSketchButtonStyle({tone: 'quiet'}),
   fontSize: 12,
   padding: '8px 12px'
 };
 
 const cardEyebrowStyle = {
-  color: '#1F5134',
+  color: sketchColors.accent,
   fontSize: 12,
   fontWeight: 800,
   letterSpacing: 1.4,
@@ -800,7 +760,7 @@ const cardTitleStyle = {
 };
 
 const cardDescriptionStyle = {
-  color: '#374151',
+  color: sketchColors.muted,
   lineHeight: 1.6,
   margin: 0
 };
@@ -812,21 +772,21 @@ const insightGridStyle = {
 };
 
 const insightItemStyle = {
-  background: '#FFF7E0',
-  borderRadius: 14,
+  ...createSketchCardStyle(),
+  borderWidth: 2,
   display: 'grid',
   gap: 4,
   padding: '10px 12px'
 };
 
 const insightLabelStyle = {
-  color: '#7C4A03',
+  color: sketchColors.accent,
   fontSize: 12,
   fontWeight: 700
 };
 
 const insightValueStyle = {
-  color: '#102A43',
+  color: sketchColors.ink,
   fontSize: 15,
   lineHeight: 1.4
 };
@@ -838,20 +798,18 @@ const metaRowStyle = {
 };
 
 const summaryLineStyle = {
-  color: '#4b5563',
+  color: sketchColors.muted,
   lineHeight: 1.6,
   margin: 0
 };
 
 const metaChipStyle = {
-  ...createPillStyle({tone: 'success'}),
+  ...createSketchPillStyle({tone: 'success'}),
   fontSize: 13
 };
 
 const actionLinkStyle = {
-  ...createButtonStyle({tone: 'primary'}),
-  background: '#102A43',
-  color: '#FFF7D6'
+  ...createSketchButtonStyle({tone: 'primary'})
 };
 
 const actionRowStyle = {
@@ -861,28 +819,26 @@ const actionRowStyle = {
 };
 
 const secondaryActionLinkStyle = {
-  ...createButtonStyle({tone: 'secondary'}),
-  color: '#102A43'
+  ...createSketchButtonStyle({tone: 'secondary'})
 };
 
 const emptyStateStyle = {
-  background: 'rgba(255,255,255,0.08)',
-  border: '1px dashed rgba(255,255,255,0.2)',
+  ...createSketchCardStyle(),
+  border: `2px dashed ${sketchColors.ink}`,
   borderRadius: 18,
-  display: 'grid',
   gap: 8,
   padding: 24
 };
 
 const emptyStateTitleStyle = {
-  color: '#FFF7D6',
+  color: sketchColors.ink,
   fontSize: 18,
   fontWeight: 800,
   margin: 0
 };
 
 const emptyStateBodyStyle = {
-  color: 'rgba(255,247,214,0.84)',
+  color: sketchColors.muted,
   lineHeight: 1.7,
   margin: 0,
   maxWidth: 640

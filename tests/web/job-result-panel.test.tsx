@@ -15,6 +15,8 @@ describe('JobResultPage', () => {
   it('uses a Chinese page title', async () => {
     const html = renderToStaticMarkup(await JobResultPage({params: Promise.resolve({id: 'job-1'})}));
 
+    expect(html).toContain('data-sketch-job-page="delivery-center"');
+    expect(html).toContain('DELIVERY BOARD / \u751f\u6210\u4ea4\u4ed8');
     expect(html).toContain('\u751f\u6210\u7ed3\u679c');
     expect(html).not.toContain('Generation Result');
   });
@@ -37,6 +39,9 @@ describe('JobResultPanel product copy', () => {
       />
     );
 
+    expect(html).toContain('data-sketch-result="progress-board"');
+    expect(html).toContain('PROGRESS MAP / \u751f\u6210\u8def\u5f84');
+    expect(html).toContain('RESULT BOARD / \u4efb\u52a1\u5206\u955c');
     expect(html).toContain('\u4efb\u52a1\u6982\u89c8');
     expect(html).toContain('\u5f53\u524d\u751f\u6210\u9636\u6bb5');
     expect(html).toContain('\u9884\u8ba1\u7ed3\u679c');
@@ -75,6 +80,7 @@ describe('JobAssetList', () => {
       />
     );
 
+    expect(html).toContain('DELIVERY CHECKLIST / \u4ea4\u4ed8\u6e05\u5355');
     expect(html).toContain('http://localhost:3001/artifacts/jobs/job-1/output.mp4');
     expect(html).toContain('http://localhost:3001/artifacts/jobs/job-1/audio/s1.wav');
     expect(html).toContain('http://localhost:3001/artifacts/jobs/job-1/subtitles.srt');
@@ -97,6 +103,7 @@ describe('JobAssetList', () => {
       />
     );
 
+    expect(html).toContain('FINAL CUT / \u6210\u7247\u9884\u89c8');
     expect(html).toContain('<video');
     expect(html).toContain('controls=""');
     expect(html).toContain('poster="http://localhost:3001/artifacts/jobs/job-1/cover.png"');
@@ -172,6 +179,7 @@ describe('LessonPlanSummary', () => {
       />
     );
 
+    expect(html).toContain('LESSON SCRIPT / \u8bb2\u89e3\u811a\u672c');
     expect(html).toContain('data-result-section="lesson-outline"');
     expect(html).toContain('\u8bb2\u89e3\u5927\u7eb2');
     expect(html).toContain('Solve 2x + 3 = 11');

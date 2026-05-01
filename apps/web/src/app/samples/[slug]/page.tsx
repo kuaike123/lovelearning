@@ -10,6 +10,14 @@ import {
   getRelatedFeaturedSamples
 } from '../../featured-samples';
 import {FeaturedSamplePoster} from '../../FeaturedSamplePoster';
+import {
+  createSketchButtonStyle,
+  createSketchCardStyle,
+  createSketchEyebrowStyle,
+  createSketchPageStyle,
+  createSketchPillStyle,
+  sketchColors
+} from '../../ui-primitives';
 import {SampleWorkbenchActions} from './SampleWorkbenchActions';
 
 type SampleDetailPageProps = {
@@ -36,7 +44,7 @@ export default async function SampleDetailPage({params}: SampleDetailPageProps) 
   const relatedSamples = getRelatedFeaturedSamples(sample.slug, 2);
 
   return (
-    <main style={pageStyle}>
+    <main data-sketch-sample-detail="director-board" style={pageStyle}>
       <a href="/" style={backLinkStyle}>
         {'\u8fd4\u56de\u9996\u9875'}
       </a>
@@ -100,6 +108,7 @@ export default async function SampleDetailPage({params}: SampleDetailPageProps) 
           </div>
           <div style={detailGridStyle}>
             <section style={detailSectionStyle}>
+              <p style={sectionEyebrowStyle}>{'SCRIPT NOTES / \u8bb2\u89e3\u5356\u70b9'}</p>
               <h2 style={sectionTitleStyle}>{'\u8bb2\u89e3\u4eae\u70b9'}</h2>
               <ul style={listStyle}>
                 {sample.highlights.map((highlight) => (
@@ -119,6 +128,7 @@ export default async function SampleDetailPage({params}: SampleDetailPageProps) 
             </section>
           </div>
           <section style={problemSectionStyle}>
+            <p style={sectionEyebrowStyle}>{'SHOT BOARD / \u6837\u7247\u5206\u955c'}</p>
             <h2 style={sectionTitleStyle}>{'\u6837\u7247\u9898\u76ee'}</h2>
             <p style={problemTextStyle}>{sample.content}</p>
           </section>
@@ -155,19 +165,15 @@ export default async function SampleDetailPage({params}: SampleDetailPageProps) 
 }
 
 const pageStyle = {
-  background: '#fbf7ef',
-  color: '#102A43',
+  ...createSketchPageStyle(),
   margin: '0 auto',
   maxWidth: 1120,
   padding: 32
 };
 
 const backLinkStyle = {
-  color: '#1F5134',
-  display: 'inline-flex',
-  fontWeight: 700,
-  marginBottom: 20,
-  textDecoration: 'none'
+  ...createSketchButtonStyle({tone: 'secondary'}),
+  marginBottom: 20
 };
 
 const topNavStyle = {
@@ -185,10 +191,7 @@ const topNavHeaderStyle = {
 };
 
 const libraryBackLinkStyle = {
-  color: '#7C4A03',
-  display: 'inline-flex',
-  fontWeight: 700,
-  textDecoration: 'none'
+  ...createSketchButtonStyle({tone: 'quiet'})
 };
 
 const pageIndicatorWrapStyle = {
@@ -198,19 +201,15 @@ const pageIndicatorWrapStyle = {
 };
 
 const pageIndicatorLabelStyle = {
-  color: '#6B7280',
+  color: sketchColors.muted,
   fontSize: 12,
   fontWeight: 800,
   letterSpacing: 1.2
 };
 
 const pageIndicatorPillStyle = {
-  background: '#102A43',
-  borderRadius: 999,
-  color: '#FFF7D6',
-  display: 'inline-flex',
+  ...createSketchPillStyle({tone: 'dark'}),
   fontSize: 12,
-  fontWeight: 800,
   padding: '8px 12px'
 };
 
@@ -221,18 +220,14 @@ const sampleNavGridStyle = {
 };
 
 const sampleNavCardStyle = {
-  background: '#fffaf1',
-  border: '1px solid #eadfca',
-  borderRadius: 18,
-  color: '#102A43',
-  display: 'grid',
+  ...createSketchCardStyle({tone: 'paper'}),
   gap: 6,
   padding: 16,
   textDecoration: 'none'
 };
 
 const sampleNavEyebrowStyle = {
-  color: '#6f7d45',
+  color: sketchColors.accent,
   fontSize: 12,
   fontWeight: 800,
   letterSpacing: 1.2
@@ -329,13 +324,7 @@ const contentStyle = {
   gap: 18
 };
 
-const eyebrowStyle = {
-  color: '#6f7d45',
-  fontSize: 13,
-  fontWeight: 800,
-  letterSpacing: 1.4,
-  margin: 0
-};
+const eyebrowStyle = createSketchEyebrowStyle();
 
 const titleStyle = {
   fontFamily: 'Georgia, "Times New Roman", serif',
@@ -345,7 +334,7 @@ const titleStyle = {
 };
 
 const descriptionStyle = {
-  color: '#374151',
+  color: sketchColors.muted,
   fontSize: 18,
   lineHeight: 1.7,
   margin: 0
@@ -358,21 +347,20 @@ const overviewGridStyle = {
 };
 
 const overviewItemStyle = {
-  background: '#fff7e0',
-  borderRadius: 16,
-  display: 'grid',
+  ...createSketchCardStyle(),
+  borderWidth: 2,
   gap: 6,
   padding: '12px 14px'
 };
 
 const overviewLabelStyle = {
-  color: '#7c4a03',
+  color: sketchColors.accent,
   fontSize: 12,
   fontWeight: 700
 };
 
 const overviewValueStyle = {
-  color: '#102A43',
+  color: sketchColors.ink,
   fontSize: 16,
   lineHeight: 1.4
 };
@@ -384,12 +372,9 @@ const metaRowStyle = {
 };
 
 const metaChipStyle = {
-  background: '#E7F0DA',
-  borderRadius: 999,
-  color: '#1F5134',
+  ...createSketchPillStyle({tone: 'success'}),
   fontSize: 13,
-  fontWeight: 700,
-  padding: '6px 10px'
+  fontWeight: 700
 };
 
 const detailGridStyle = {
@@ -399,10 +384,16 @@ const detailGridStyle = {
 };
 
 const detailSectionStyle = {
-  background: '#fffaf1',
-  border: '1px solid #eadfca',
-  borderRadius: 18,
+  ...createSketchCardStyle({tone: 'paper'}),
   padding: 18
+};
+
+const sectionEyebrowStyle = {
+  color: sketchColors.accent,
+  fontSize: 12,
+  fontWeight: 800,
+  letterSpacing: 1.2,
+  margin: '0 0 8px'
 };
 
 const sectionTitleStyle = {
@@ -411,7 +402,7 @@ const sectionTitleStyle = {
 };
 
 const listStyle = {
-  color: '#374151',
+  color: sketchColors.muted,
   lineHeight: 1.7,
   margin: 0,
   paddingLeft: 18
@@ -424,18 +415,14 @@ const useCaseListStyle = {
 };
 
 const useCaseChipStyle = {
-  background: '#FFF4CC',
-  borderRadius: 999,
-  color: '#7C4A03',
+  ...createSketchPillStyle({tone: 'accent'}),
   fontSize: 12,
-  fontWeight: 700,
-  padding: '6px 10px'
+  fontWeight: 700
 };
 
 const problemSectionStyle = {
-  background: '#ffffff',
-  border: '1px solid #eadfca',
-  borderRadius: 18,
+  ...createSketchCardStyle(),
+  border: `3px dashed ${sketchColors.ink}`,
   padding: 18
 };
 
@@ -458,7 +445,7 @@ const relatedHeaderStyle = {
 };
 
 const relatedEyebrowStyle = {
-  color: '#6f7d45',
+  color: sketchColors.accent,
   fontSize: 13,
   fontWeight: 800,
   letterSpacing: 1.2,
@@ -478,11 +465,7 @@ const relatedGridStyle = {
 };
 
 const relatedCardStyle = {
-  background: '#fffaf1',
-  border: '1px solid #eadfca',
-  borderRadius: 20,
-  color: '#102A43',
-  display: 'grid',
+  ...createSketchCardStyle({tone: 'paper'}),
   gap: 8,
   padding: 18,
   textDecoration: 'none'
@@ -493,7 +476,7 @@ const relatedPosterStyle = {
 };
 
 const relatedCardEyebrowStyle = {
-  color: '#7C4A03',
+  color: sketchColors.accent,
   fontSize: 12,
   fontWeight: 800,
   letterSpacing: 1.2
@@ -505,7 +488,7 @@ const relatedCardTitleStyle = {
 };
 
 const relatedCardBodyStyle = {
-  color: '#4b5563',
+  color: sketchColors.muted,
   lineHeight: 1.65,
   margin: 0
 };
@@ -517,10 +500,7 @@ const relatedMetaRowStyle = {
 };
 
 const relatedMetaChipStyle = {
-  background: '#E7F0DA',
-  borderRadius: 999,
-  color: '#1F5134',
+  ...createSketchPillStyle({tone: 'success'}),
   fontSize: 12,
-  fontWeight: 700,
-  padding: '6px 10px'
+  fontWeight: 700
 };

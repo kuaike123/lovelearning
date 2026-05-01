@@ -3,7 +3,14 @@
 import React, {useEffect, useState} from 'react';
 
 import {getJob, getLessonPlan, regenerateJob} from '../../../lib/api-client';
-import {createButtonStyle, createCardStyle} from '../../ui-primitives';
+import {
+  createSketchButtonStyle,
+  createSketchCardStyle,
+  createSketchEyebrowStyle,
+  createSketchGridBackground,
+  createSketchPillStyle,
+  sketchColors
+} from '../../ui-primitives';
 
 type Job = {
   jobId: string;
@@ -209,8 +216,9 @@ export function JobStatusSummary({
 
   return (
     <>
-      <section data-result-section="result-overview" style={overviewCardStyle}>
-        <p style={eyebrowStyle}>{copy.overviewEyebrow}</p>
+      <section data-result-section="result-overview" data-sketch-result="progress-board" style={overviewCardStyle}>
+        <p style={eyebrowStyle}>{'RESULT BOARD / \u4efb\u52a1\u5206\u955c'}</p>
+        <p style={subEyebrowStyle}>{copy.overviewEyebrow}</p>
         <div style={overviewGridStyle}>
           <div style={overviewItemStyle}>
             <span style={overviewLabelStyle}>{copy.overviewTask}</span>
@@ -274,7 +282,7 @@ export function JobStatusSummary({
 
       <section data-stage-timeline="job-progress" style={timelineSectionStyle}>
         <div style={timelineHeaderStyle}>
-          <strong style={timelineTitleStyle}>{'生成路径'}</strong>
+          <strong style={timelineTitleStyle}>{'PROGRESS MAP / \u751f\u6210\u8def\u5f84'}</strong>
           <span style={timelineHintStyle}>{`当前节点：${stageLabel}`}</span>
         </div>
         <div style={timelineStepsStyle}>
@@ -327,7 +335,8 @@ export function JobAssetPreview({job}: {job: Job}) {
 
   return (
     <section style={previewPanelStyle}>
-      <p style={eyebrowStyle}>{copy.assetPreviewTitle}</p>
+      <p style={eyebrowStyle}>{'FINAL CUT / \u6210\u7247\u9884\u89c8'}</p>
+      <p style={subEyebrowStyle}>{copy.assetPreviewTitle}</p>
       <div style={previewCardStyle}>
         {job.videoUrl ? (
           <video controls poster={job.coverUrl} src={job.videoUrl} style={videoStyle}>
@@ -348,7 +357,8 @@ export function JobAssetList({job}: {job: Job}) {
   return (
     <section data-result-section="delivery-assets" style={deliverySectionStyle}>
       <div style={linkCardStyle}>
-        <p style={eyebrowStyle}>{copy.assetDownloadTitle}</p>
+        <p style={eyebrowStyle}>{'DELIVERY CHECKLIST / \u4ea4\u4ed8\u6e05\u5355'}</p>
+        <p style={subEyebrowStyle}>{copy.assetDownloadTitle}</p>
         <div style={deliveryBlockStyle}>
           <p style={deliveryTitleStyle}>{copy.assetDeliveryList}</p>
           <div style={deliveryChipListStyle}>
@@ -391,7 +401,8 @@ export function JobAssetList({job}: {job: Job}) {
 export function LessonPlanSummary({lessonPlan}: {lessonPlan: LessonPlan}) {
   return (
     <section data-result-section="lesson-outline" style={lessonPanelStyle}>
-      <p style={eyebrowStyle}>{copy.lessonOutline}</p>
+      <p style={eyebrowStyle}>{'LESSON SCRIPT / \u8bb2\u89e3\u811a\u672c'}</p>
+      <p style={subEyebrowStyle}>{copy.lessonOutline}</p>
       <h2 style={lessonTitleStyle}>{lessonPlan.title}</h2>
       {lessonPlan.learningGoal ? (
         <p>
@@ -580,26 +591,28 @@ const getFailureAdvice = (error: string | undefined) => {
 const clampProgress = (progress: number) => Math.max(0, Math.min(100, Math.round(progress)));
 
 const panelStyle = {
-  background: 'linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,250,241,0.92))',
-  border: '1px solid #eadfca',
-  borderRadius: 28,
-  boxShadow: '0 18px 56px rgba(16, 42, 67, 0.08)',
-  color: '#1f2937',
+  background: createSketchGridBackground('#f8efdc', '0.06'),
+  backgroundSize: '22px 22px',
+  border: `3px solid ${sketchColors.ink}`,
+  borderRadius: 24,
+  boxShadow: `10px 10px 0 ${sketchColors.ink}`,
+  color: sketchColors.ink,
   margin: 0,
   maxWidth: 1120,
   padding: 30
 };
 
-const eyebrowStyle = {
-  color: '#6f7d45',
+const eyebrowStyle = createSketchEyebrowStyle();
+
+const subEyebrowStyle = {
+  color: sketchColors.muted,
   fontSize: 13,
-  fontWeight: 700,
-  letterSpacing: 1.6,
-  textTransform: 'uppercase' as const
+  fontWeight: 800,
+  margin: '4px 0 0'
 };
 
 const titleStyle = {
-  color: '#1c1a17',
+  color: sketchColors.ink,
   fontFamily: '"Times New Roman", Georgia, "Noto Serif SC", serif',
   fontSize: 44,
   lineHeight: 1.1,
@@ -607,7 +620,7 @@ const titleStyle = {
 };
 
 const mutedTextStyle = {
-  color: '#6b7280'
+  color: sketchColors.muted
 };
 
 const heroGridStyle = {
@@ -631,26 +644,18 @@ const actionsStyle = {
 };
 
 const homeLinkStyle = {
-  ...createButtonStyle({tone: 'secondary'}),
-  alignItems: 'center',
+  ...createSketchButtonStyle({tone: 'secondary'}),
   padding: '8px 14px'
 };
 
 const regenerateButtonStyle = {
-  ...createButtonStyle({tone: 'primary'}),
-  background: '#1f5134',
-  border: '1px solid #1f5134',
+  ...createSketchButtonStyle({tone: 'primary'}),
   padding: '8px 14px'
 };
 
 const overviewCardStyle = {
-  background:
-    'radial-gradient(circle at 92% 8%, rgba(255, 36, 66, 0.08), transparent 26%), linear-gradient(135deg, #fffaf1 0%, #ffffff 100%)',
-  border: '1px solid #eadfca',
-  borderRadius: 20,
-  display: 'grid',
-  gap: 16,
-  padding: 20
+  ...createSketchCardStyle({tone: 'paper'}),
+  gap: 16
 };
 
 const overviewGridStyle = {
@@ -665,13 +670,13 @@ const overviewItemStyle = {
 };
 
 const overviewLabelStyle = {
-  color: '#6b7280',
+  color: sketchColors.accent,
   fontSize: 13,
   fontWeight: 700
 };
 
 const overviewValueStyle = {
-  color: '#1f2937',
+  color: sketchColors.ink,
   fontSize: 18,
   lineHeight: 1.4
 };
@@ -683,9 +688,7 @@ const statusGridStyle = {
 };
 
 const timelineSectionStyle = {
-  background: '#ffffff',
-  border: '1px solid #eadfca',
-  borderRadius: 18,
+  ...createSketchCardStyle(),
   display: 'grid',
   gap: 12,
   marginTop: 16,
@@ -701,13 +704,13 @@ const timelineHeaderStyle = {
 };
 
 const timelineTitleStyle = {
-  color: '#102A43',
+  color: sketchColors.ink,
   fontSize: 16,
   fontWeight: 800
 };
 
 const timelineHintStyle = {
-  color: '#6b7280',
+  color: sketchColors.muted,
   fontSize: 13,
   fontWeight: 700
 };
@@ -726,29 +729,30 @@ const timelineStepStyle = {
 };
 
 const timelineStepDoneStyle = {
-  background: '#e7f0da',
-  border: '1px solid #cfe0bc'
+  background: sketchColors.success,
+  border: `2px solid ${sketchColors.ink}`
 };
 
 const timelineStepCurrentStyle = {
-  background: '#fff4cc',
-  border: '1px solid #f5c542',
-  boxShadow: '0 8px 16px rgba(245, 197, 66, 0.18)'
+  background: sketchColors.note,
+  border: `2px solid ${sketchColors.ink}`,
+  boxShadow: `4px 4px 0 ${sketchColors.ink}`
 };
 
 const timelineStepPendingStyle = {
-  background: '#f8fafc',
-  border: '1px solid #e5e7eb'
+  background: sketchColors.paper,
+  border: `2px dashed ${sketchColors.muted}`
 };
 
 const timelineStepLabelStyle = {
-  color: '#102A43',
+  color: sketchColors.ink,
   fontSize: 14,
   fontWeight: 700
 };
 
 const progressTrackStyle = {
-  background: '#eadfca',
+  background: sketchColors.surface,
+  border: `2px solid ${sketchColors.ink}`,
   borderRadius: 999,
   height: 12,
   marginTop: 12,
@@ -756,13 +760,12 @@ const progressTrackStyle = {
 };
 
 const progressFillStyle = {
-  background: '#6f7d45',
+  background: sketchColors.accent,
   height: '100%'
 };
 
 const failureAdviceStyle = {
-  background: '#fff1f2',
-  border: '1px solid #fecdd3',
+  ...createSketchCardStyle({tone: 'danger'}),
   borderRadius: 16,
   display: 'grid',
   gap: 8,
@@ -771,19 +774,19 @@ const failureAdviceStyle = {
 };
 
 const failureAdviceTitleStyle = {
-  color: '#9f1239',
+  color: sketchColors.ink,
   fontSize: 15,
   fontWeight: 800
 };
 
 const failureAdviceBodyStyle = {
-  color: '#881337',
+  color: sketchColors.ink,
   lineHeight: 1.7,
   margin: 0
 };
 
 const previewPanelStyle = {
-  ...createCardStyle()
+  ...createSketchCardStyle({tone: 'paper'})
 };
 
 const previewCardStyle = {
@@ -794,13 +797,15 @@ const previewCardStyle = {
 const videoStyle = {
   aspectRatio: '9 / 16',
   background: '#111827',
-  borderRadius: 20,
+  border: `3px solid ${sketchColors.ink}`,
+  borderRadius: 16,
   maxHeight: 720,
   width: '100%'
 };
 
 const coverStyle = {
-  borderRadius: 16,
+  border: `3px solid ${sketchColors.ink}`,
+  borderRadius: 14,
   maxWidth: 220,
   width: '100%'
 };
@@ -810,7 +815,7 @@ const deliverySectionStyle = {
 };
 
 const linkCardStyle = {
-  ...createCardStyle(),
+  ...createSketchCardStyle({tone: 'paper'}),
   gap: 12
 };
 
@@ -820,7 +825,7 @@ const deliveryBlockStyle = {
 };
 
 const deliveryTitleStyle = {
-  color: '#1f2937',
+  color: sketchColors.ink,
   fontSize: 14,
   fontWeight: 800,
   margin: 0
@@ -833,17 +838,12 @@ const deliveryChipListStyle = {
 };
 
 const deliveryChipStyle = {
-  background: '#f1ead9',
-  borderRadius: 999,
-  color: '#374151',
-  display: 'inline-flex',
-  fontSize: 12,
-  fontWeight: 700,
-  padding: '6px 10px'
+  ...createSketchPillStyle({tone: 'accent'}),
+  fontWeight: 700
 };
 
 const usageBlockStyle = {
-  borderTop: '1px solid #eadfca',
+  borderTop: `2px dashed ${sketchColors.ink}`,
   display: 'grid',
   gap: 8,
   marginTop: 4,
@@ -851,20 +851,20 @@ const usageBlockStyle = {
 };
 
 const usageListStyle = {
-  color: '#374151',
+  color: sketchColors.muted,
   lineHeight: 1.6,
   margin: 0,
   paddingLeft: 18
 };
 
 const positioningTextStyle = {
-  color: '#374151',
+  color: sketchColors.muted,
   lineHeight: 1.7,
   margin: 0
 };
 
 const lessonPanelStyle = {
-  ...createCardStyle(),
+  ...createSketchCardStyle({tone: 'paper'}),
   marginTop: 24,
   padding: 24
 };
@@ -885,9 +885,9 @@ const stepListStyle = {
 };
 
 const stepCardStyle = {
-  background: '#ffffff',
-  border: '1px solid #eadfca',
-  borderRadius: 16,
+  background: sketchColors.surface,
+  border: `2px solid ${sketchColors.ink}`,
+  borderRadius: 14,
   padding: 16
 };
 
@@ -904,17 +904,14 @@ const keyTextListStyle = {
 };
 
 const keyTextStyle = {
-  background: '#f1ead9',
-  borderRadius: 999,
-  color: '#374151',
-  display: 'inline-flex',
+  ...createSketchPillStyle({tone: 'success'}),
   fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
   fontSize: 13,
-  padding: '6px 10px'
+  fontWeight: 700
 };
 
 const summaryStyle = {
-  borderTop: '1px solid #eadfca',
+  borderTop: `2px dashed ${sketchColors.ink}`,
   margin: '18px 0 0',
   paddingTop: 16
 };
