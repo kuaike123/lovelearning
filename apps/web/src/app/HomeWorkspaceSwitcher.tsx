@@ -8,9 +8,10 @@ import {SubmitJobForm} from './SubmitJobForm';
 import {SupportedScope} from './SupportedScope';
 import {createButtonStyle, createCardStyle, createPillStyle, uiColors} from './ui-primitives';
 
-type ViewId = 'create' | 'samples' | 'jobs';
+type ViewId = 'dashboard' | 'create' | 'samples' | 'jobs' | 'materials' | 'roadmap';
 
 type HomeWorkspaceSwitcherProps = {
+  dashboardSlot?: React.ReactNode;
   initialContent: string;
   initialSpeechRate?: 'slow' | 'normal' | 'fast';
   initialStyle?: 'teacher' | 'kids' | 'exam';
@@ -26,6 +27,7 @@ type ViewCard = {
   eyebrow: string;
   helper: string;
   id: ViewId;
+  navLabel?: string;
   panelBody: string;
   panelTitle: string;
   title: string;
@@ -33,11 +35,23 @@ type ViewCard = {
 
 const viewCards: ViewCard[] = [
   {
+    accent: '#D9482E',
+    body: '\u603b\u89c8\u4eca\u65e5\u4ea7\u51fa\u3001\u9898\u578b\u80fd\u529b\u548c\u4e0b\u4e00\u6b65\u4f18\u5316\u91cd\u70b9\u3002',
+    eyebrow: '\u4ea7\u54c1\u603b\u89c8',
+    helper: '\u56fa\u5b9a\u9879\u76ee\u680f\u8ba9\u8001\u5e08\u50cf\u4f7f\u7528\u4e3b\u6d41 SaaS \u4e00\u6837\u5207\u6362\u5de5\u4f5c\u533a\uff0c\u53f3\u4fa7\u518d\u5c55\u793a\u5bf9\u5e94\u9875\u9762\u3002',
+    id: 'dashboard',
+    navLabel: '\u5de5\u4f5c\u53f0',
+    panelBody: '\u628a\u751f\u6210\u6570\u636e\u3001\u9898\u578b\u8fb9\u754c\u548c\u8fd1\u671f\u4efb\u52a1\u653e\u5230\u9996\u5c4f\uff0c\u5148\u770b\u72b6\u6001\uff0c\u518d\u8fdb\u5165\u521b\u4f5c\u3002',
+    panelTitle: '\u6559\u57f9\u89c6\u9891\u751f\u4ea7\u5de5\u4f5c\u53f0',
+    title: '\u5de5\u4f5c\u53f0\u603b\u89c8'
+  },
+  {
     accent: '#102A43',
     body: '输入题目、试听音色，并开始生成讲解视频。',
     eyebrow: '创作模式',
     helper: '默认推荐从这里开始，把一道题快速变成可演示的讲解视频任务。',
     id: 'create',
+    navLabel: '\u65b0\u5efa\u89c6\u9891',
     panelBody: '聚焦题目输入、配音策略和生成操作，适合直接开始做一条新视频。',
     panelTitle: '新建一条教培讲解视频',
     title: '新建视频'
@@ -48,6 +62,7 @@ const viewCards: ViewCard[] = [
     eyebrow: '样片模式',
     helper: '先看哪种成片风格最适合，再套用样片配置，适合招生、演示和运营素材制作。',
     id: 'samples',
+    navLabel: '\u6837\u7247\u5e93',
     panelBody: '把样片库独立成一个浏览工作区，方便先选风格，再决定要不要套用。',
     panelTitle: '从样片库里挑一个合适的起点',
     title: '浏览样片'
@@ -58,13 +73,37 @@ const viewCards: ViewCard[] = [
     eyebrow: '运营模式',
     helper: '这里更像运营面板，集中看最近在生成什么，也看当前 V1 能力边界。',
     id: 'jobs',
+    navLabel: '\u751f\u6210\u4efb\u52a1',
     panelBody: '用于跟进任务进度、回看交付结果，并随时从示例题重新开始。',
     panelTitle: '集中查看进度与可用能力',
     title: '查看进度'
+  },
+  {
+    accent: '#39708F',
+    body: '\u6c89\u6dc0\u9898\u5e93\u3001\u8bfe\u4ef6\u3001\u8bb2\u4e49\u548c\u5c01\u9762\u7d20\u6750\u3002',
+    eyebrow: '\u7d20\u6750\u7ba1\u7406',
+    helper: '\u8fd9\u4e2a\u5165\u53e3\u5148\u4f5c\u4e3a\u89c4\u5212\u5360\u4f4d\uff0c\u540e\u7eed\u53ef\u63a5 OCR\u3001\u9898\u5e93\u3001\u8bfe\u4ef6\u5bfc\u5165\u548c\u5c01\u9762\u8d44\u4ea7\u3002',
+    id: 'materials',
+    navLabel: '\u8bfe\u7a0b\u7d20\u6750',
+    panelBody: '\u628a\u9898\u76ee\u3001\u77e5\u8bc6\u70b9\u3001\u5c01\u9762\u548c\u914d\u56fe\u8fdb\u884c\u7edf\u4e00\u7ba1\u7406\uff0c\u4e3a\u5168\u5b66\u79d1\u6269\u5c55\u505a\u51c6\u5907\u3002',
+    panelTitle: '\u8bfe\u7a0b\u7d20\u6750\u4e2d\u5fc3',
+    title: '\u8bfe\u7a0b\u7d20\u6750'
+  },
+  {
+    accent: '#5D4B8C',
+    body: '\u89c4\u5212\u6570\u5b66\u3001\u82f1\u8bed\u3001\u7269\u7406\u7b49\u5b66\u79d1\u7684\u9898\u578b\u6269\u5c55\u8def\u7ebf\u3002',
+    eyebrow: '\u5168\u5b66\u79d1\u8def\u7ebf',
+    helper: '\u4e0d\u628a\u4ee3\u7801\u5199\u6b7b\u5728\u6570\u5b66\u91cc\uff0c\u800c\u662f\u7528\u5b66\u79d1\u3001\u9898\u578b\u548c\u573a\u666f\u6a21\u677f\u7ee7\u7eed\u6a2a\u5411\u6269\u5c55\u3002',
+    id: 'roadmap',
+    navLabel: '\u5b66\u79d1\u89c4\u5212',
+    panelBody: '\u8fd9\u91cc\u653e\u540e\u7eed\u5b66\u79d1\u80fd\u529b\u3001\u9898\u578b\u6a21\u677f\u548c\u52a8\u753b\u89d2\u8272\u8def\u7ebf\uff0c\u4fbf\u4e8e\u6309\u9636\u6bb5\u63a8\u8fdb\u3002',
+    panelTitle: '\u5168\u5b66\u79d1\u80fd\u529b\u89c4\u5212',
+    title: '\u5b66\u79d1\u89c4\u5212'
   }
 ];
 
 export function HomeWorkspaceSwitcher({
+  dashboardSlot,
   initialContent,
   initialSpeechRate,
   initialStyle,
@@ -77,10 +116,17 @@ export function HomeWorkspaceSwitcher({
   const activeCard = viewCards.find((entry) => entry.id === activeView) ?? viewCards[0];
 
   return (
-    <section style={workspaceSectionStyle}>
+    <section data-saas-shell="home-workspace" style={workspaceShellStyle}>
       <style>{homeMotionStyles}</style>
 
-      <div style={entryGridStyle}>
+      <aside data-saas-sidebar="project-nav" style={projectSidebarStyle}>
+        <div style={sidebarBrandBlockStyle}>
+          <span style={sidebarBrandEyebrowStyle}>LoveLearning</span>
+          <strong style={sidebarBrandTitleStyle}>全科 AI</strong>
+          <p style={sidebarBrandBodyStyle}>固定项目栏 · 右侧切换页面</p>
+        </div>
+
+        <div style={projectNavListStyle}>
         {viewCards.map((entry) => {
           const selected = entry.id === activeView;
 
@@ -89,10 +135,11 @@ export function HomeWorkspaceSwitcher({
               key={entry.id}
               type="button"
               data-home-entry={entry.id}
+              data-saas-nav={entry.id}
               onClick={() => setActiveView(entry.id)}
               style={{
-                ...entryCardStyle,
-                ...(selected ? createActiveEntryCardStyle(entry.accent) : {})
+                ...projectNavButtonStyle,
+                ...(selected ? createActiveProjectNavButtonStyle(entry.accent) : {})
               }}
             >
               <div style={entryTopRowStyle}>
@@ -110,14 +157,20 @@ export function HomeWorkspaceSwitcher({
                 </span>
               </div>
               <span style={{...entryEyebrowStyle, color: entry.accent}}>{entry.eyebrow}</span>
-              <p style={entryTitleStyle}>{entry.title}</p>
+              <p style={entryTitleStyle}>{entry.navLabel ?? entry.title}</p>
               <p style={entryBodyStyle}>{entry.body}</p>
             </button>
           );
         })}
       </div>
 
-      <div style={panelStyle}>
+        <div style={sidebarFooterStyle}>
+          <span style={sidebarFooterKickerStyle}>V1 能力边界</span>
+          <p style={sidebarFooterBodyStyle}>先稳定数学题讲解，再扩展全学科和动画数字人。</p>
+        </div>
+      </aside>
+
+      <main data-saas-main="workspace-page" data-saas-page={activeView} style={panelStyle}>
         <section
           data-home-motion="panel-hero"
           style={{
@@ -184,8 +237,61 @@ export function HomeWorkspaceSwitcher({
             <SupportedScope />
           </section>
         ) : null}
-      </div>
+
+        {activeView === 'dashboard' ? (
+          <section data-home-panel="dashboard" style={panelContentStyle}>
+            {dashboardSlot ?? <PlaceholderWorkspace accent={activeCard.accent} mode="dashboard" />}
+          </section>
+        ) : null}
+
+        {activeView === 'materials' ? (
+          <section data-home-panel="materials" style={panelContentStyle}>
+            <PlaceholderWorkspace accent={activeCard.accent} mode="materials" />
+          </section>
+        ) : null}
+
+        {activeView === 'roadmap' ? (
+          <section data-home-panel="roadmap" style={panelContentStyle}>
+            <PlaceholderWorkspace accent={activeCard.accent} mode="roadmap" />
+          </section>
+        ) : null}
+      </main>
     </section>
+  );
+}
+
+function PlaceholderWorkspace({accent, mode}: {accent: string; mode: Extract<ViewId, 'dashboard' | 'materials' | 'roadmap'>}) {
+  const copy = {
+    dashboard: {
+      title: '\u5de5\u4f5c\u53f0\u603b\u89c8',
+      body: '\u5f53\u524d\u603b\u89c8\u6570\u636e\u5df2\u63a5\u5165\u9996\u9875\u4eea\u8868\u76d8\uff0c\u540e\u7eed\u53ef\u7ee7\u7eed\u52a0\u4e0a\u771f\u5b9e\u8fd0\u8425\u6307\u6807\u3002',
+      points: ['\u4eca\u65e5\u4ea7\u51fa', '\u6700\u8fd1\u4efb\u52a1', '\u80fd\u529b\u8fb9\u754c']
+    },
+    materials: {
+      title: '\u8bfe\u7a0b\u7d20\u6750\u4e2d\u5fc3',
+      body: '\u8fd9\u91cc\u5c06\u627f\u8f7d\u9898\u5e93\u3001\u8bfe\u4ef6\u3001\u8bb2\u4e49\u3001\u5c01\u9762\u548c\u89d2\u8272\u7d20\u6750\uff0c\u4e3a\u5168\u5b66\u79d1\u751f\u4ea7\u63d0\u4f9b\u7edf\u4e00\u5165\u53e3\u3002',
+      points: ['\u9898\u76ee OCR', '\u77e5\u8bc6\u70b9\u5e93', '\u89c6\u9891\u5c01\u9762\u8d44\u4ea7']
+    },
+    roadmap: {
+      title: '\u5b66\u79d1\u80fd\u529b\u89c4\u5212',
+      body: '\u4ee5\u5b66\u79d1 + \u9898\u578b + \u573a\u666f\u6a21\u677f\u7ec4\u5408\u65b9\u5f0f\u6269\u5c55\uff0c\u907f\u514d\u4ee3\u7801\u548c UI \u7ed1\u6b7b\u5728\u5355\u4e00\u6570\u5b66\u6d41\u7a0b\u91cc\u3002',
+      points: ['\u6570\u5b66\u9898\u578b\u6df1\u5316', '\u82f1\u8bed\u8bfb\u89e3\u8bb2\u89e3', '\u7269\u7406\u6982\u5ff5\u52a8\u753b']
+    }
+  }[mode];
+
+  return (
+    <article style={{...placeholderCardStyle, borderColor: accent}}>
+      <span style={{...placeholderKickerStyle, color: accent}}>COMING NEXT</span>
+      <h3 style={placeholderTitleStyle}>{copy.title}</h3>
+      <p style={placeholderBodyStyle}>{copy.body}</p>
+      <div style={placeholderPointGridStyle}>
+        {copy.points.map((point) => (
+          <span key={point} style={placeholderPointStyle}>
+            {point}
+          </span>
+        ))}
+      </div>
+    </article>
   );
 }
 
@@ -320,6 +426,158 @@ function ModeIllustration({accent, mode}: {accent: string; mode: ViewId}) {
     </div>
   );
 }
+
+const workspaceShellStyle = {
+  alignItems: 'start',
+  display: 'grid',
+  gap: 24,
+  gridTemplateColumns: '260px minmax(0, 1fr)'
+};
+
+const projectSidebarStyle = {
+  alignSelf: 'start',
+  background: 'rgba(255, 250, 241, 0.94)',
+  border: '3px solid #2a241d',
+  borderRadius: 24,
+  boxShadow: '8px 9px 0 rgba(42,36,29,0.14)',
+  display: 'grid',
+  gap: 18,
+  padding: 16,
+  position: 'sticky' as const,
+  top: 20
+};
+
+const sidebarBrandBlockStyle = {
+  background: 'linear-gradient(rgba(42,36,29,0.08) 1px, transparent 1px), #fff8df',
+  backgroundSize: '18px 18px',
+  border: '2px dashed #4c4439',
+  borderRadius: 18,
+  display: 'grid',
+  gap: 6,
+  padding: 16
+};
+
+const sidebarBrandEyebrowStyle = {
+  color: '#d9482e',
+  fontFamily: 'Consolas, "Courier New", monospace',
+  fontSize: 12,
+  fontWeight: 900,
+  letterSpacing: 2
+};
+
+const sidebarBrandTitleStyle = {
+  color: '#2a241d',
+  fontFamily: '"Times New Roman", Georgia, "Noto Serif SC", serif',
+  fontSize: 34,
+  fontStyle: 'italic' as const,
+  lineHeight: 1
+};
+
+const sidebarBrandBodyStyle = {
+  color: '#4c4439',
+  fontSize: 13,
+  lineHeight: 1.5,
+  margin: 0
+};
+
+const projectNavListStyle = {
+  display: 'grid',
+  gap: 10
+};
+
+const projectNavButtonStyle = {
+  ...createCardStyle({tone: 'default'}),
+  background: 'rgba(255, 253, 248, 0.78)',
+  border: `1px solid ${uiColors.border}`,
+  borderRadius: 18,
+  boxShadow: 'none',
+  cursor: 'pointer',
+  gap: 8,
+  padding: 14,
+  textAlign: 'left' as const,
+  transition: 'transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease'
+};
+
+const createActiveProjectNavButtonStyle = (accent: string) => ({
+  border: `2px solid ${accent}`,
+  boxShadow: `5px 6px 0 ${accent}`,
+  transform: 'translate(-2px, -2px)'
+});
+
+const sidebarFooterStyle = {
+  background: '#fff096',
+  border: '2px solid rgba(42,36,29,0.22)',
+  borderRadius: 12,
+  boxShadow: '5px 6px 0 rgba(42,36,29,0.12)',
+  display: 'grid',
+  gap: 6,
+  padding: 14,
+  transform: 'rotate(-1deg)'
+};
+
+const sidebarFooterKickerStyle = {
+  color: '#d9482e',
+  fontFamily: 'Consolas, "Courier New", monospace',
+  fontSize: 12,
+  fontWeight: 900,
+  letterSpacing: 1.6
+};
+
+const sidebarFooterBodyStyle = {
+  color: '#2a241d',
+  fontSize: 13,
+  lineHeight: 1.55,
+  margin: 0
+};
+
+const placeholderCardStyle = {
+  background: 'linear-gradient(135deg, rgba(255,250,241,0.98), rgba(255,248,223,0.95))',
+  border: '3px solid #2a241d',
+  borderRadius: 22,
+  boxShadow: '7px 8px 0 rgba(42,36,29,0.14)',
+  display: 'grid',
+  gap: 14,
+  padding: 24
+};
+
+const placeholderKickerStyle = {
+  fontFamily: 'Consolas, "Courier New", monospace',
+  fontSize: 13,
+  fontWeight: 900,
+  letterSpacing: 2
+};
+
+const placeholderTitleStyle = {
+  color: '#2a241d',
+  fontFamily: '"Times New Roman", Georgia, "Noto Serif SC", serif',
+  fontSize: 32,
+  fontStyle: 'italic' as const,
+  lineHeight: 1.15,
+  margin: 0
+};
+
+const placeholderBodyStyle = {
+  color: '#4c4439',
+  lineHeight: 1.75,
+  margin: 0
+};
+
+const placeholderPointGridStyle = {
+  display: 'flex',
+  flexWrap: 'wrap' as const,
+  gap: 10
+};
+
+const placeholderPointStyle = {
+  background: '#fffaf1',
+  border: '2px solid #4c4439',
+  borderRadius: 999,
+  color: '#2a241d',
+  display: 'inline-flex',
+  fontSize: 14,
+  fontWeight: 800,
+  padding: '8px 12px'
+};
 
 const workspaceSectionStyle = {
   display: 'grid',

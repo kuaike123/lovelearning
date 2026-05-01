@@ -37,8 +37,10 @@ describe('app router page props', () => {
     expect(markup).toContain('\u65b0\u5efa\u89c6\u9891');
     expect(markup).toContain('\u6d4f\u89c8\u6837\u7247');
     expect(markup).toContain('\u67e5\u770b\u8fdb\u5ea6');
-    expect(markup).toContain('\u521b\u4f5c\u3001\u6837\u7247\u3001\u8fdb\u5ea6\u4e09\u4e2a\u5165\u53e3');
-    expect(markup).toContain('\u5185\u5bb9\u6837\u7247\u6d41');
+    expect(markup).toContain('data-saas-shell="home-workspace"');
+    expect(markup).toContain('data-saas-sidebar="project-nav"');
+    expect(markup).toContain('data-saas-page="create"');
+    expect(markup).toContain('\u56fa\u5b9a\u9879\u76ee\u680f');
     expect(markup).toContain('data-sketch-portal="wireframe"');
     expect(markup).toContain('LoveLearning AI \u00b7 Portal');
     expect(markup).toContain('WIREFRAME V1');

@@ -12,14 +12,17 @@ describe('HomePage', () => {
     expect(html).toContain('data-home-layout="workspace"');
     expect(html).toContain('\u4e2d\u56fd\u6559\u57f9\u56e2\u961f\u7684 AI \u8bb2\u89e3\u89c6\u9891\u5de5\u4f5c\u53f0');
     expect(html).toContain('\u628a\u4e00\u9053\u9898\uff0c\u505a\u6210\u4e00\u6761\u4f1a\u8bb2\u8bfe\u7684\u77ed\u89c6\u9891');
-    expect(html).toContain('\u5de5\u4f5c\u53f0\u5165\u53e3');
-    expect(html).toContain('\u5185\u5bb9\u6837\u7247\u6d41');
+    expect(html).toContain('data-saas-shell="home-workspace"');
+    expect(html).toContain('data-saas-sidebar="project-nav"');
+    expect(html).toContain('data-saas-nav="dashboard"');
+    expect(html).toContain('data-saas-nav="materials"');
+    expect(html).toContain('data-saas-nav="roadmap"');
+    expect(html).toContain('data-saas-page="create"');
+    expect(html).toContain('\u5de5\u4f5c\u53f0');
+    expect(html).toContain('\u8bfe\u7a0b\u7d20\u6750');
+    expect(html).toContain('\u5b66\u79d1\u89c4\u5212');
+    expect(html).toContain('\u56fa\u5b9a\u9879\u76ee\u680f');
     expect(html).toContain('data-sketch-tabs="portal-sections"');
-    expect(html).toContain('data-sketch-kpi="monthly-videos"');
-    expect(html).toContain('\u672c\u6708\u751f\u6210');
-    expect(html).toContain('\u6700\u8fd1\u751f\u6210\u8d8b\u52bf');
-    expect(html).toContain('\u9898\u578b\u8986\u76d6');
-    expect(html).toContain('NEXT STEP / \u4e0b\u4e00\u6b65\u5efa\u8bae');
     expect(html).toContain('data-home-entry="create"');
     expect(html).toContain('data-home-entry="samples"');
     expect(html).toContain('data-home-entry="jobs"');
@@ -29,6 +32,22 @@ describe('HomePage', () => {
     expect(html).toContain('\u9898\u76ee\u5185\u5bb9');
     expect(html).toContain('\u89e3\u65b9\u7a0b\uff1a2x + 3 = 11');
     expect(html).toContain('\u751f\u6210\u89c6\u9891');
+  });
+
+  it('shows the dashboard overview from the fixed SaaS sidebar', async () => {
+    const html = renderToStaticMarkup(
+      await HomePage({
+        searchParams: Promise.resolve({view: 'dashboard'})
+      })
+    );
+
+    expect(html).toContain('data-saas-page="dashboard"');
+    expect(html).toContain('data-home-panel="dashboard"');
+    expect(html).toContain('data-sketch-kpi="monthly-videos"');
+    expect(html).toContain('\u672c\u6708\u751f\u6210');
+    expect(html).toContain('\u6700\u8fd1\u751f\u6210\u8d8b\u52bf');
+    expect(html).toContain('\u9898\u578b\u8986\u76d6');
+    expect(html).toContain('NEXT STEP / \u4e0b\u4e00\u6b65\u5efa\u8bae');
   });
 
   it('shows V1 supported scope and clickable example problems in jobs panel', async () => {

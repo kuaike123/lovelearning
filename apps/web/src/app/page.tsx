@@ -10,13 +10,15 @@ import {
   sketchColors
 } from './ui-primitives';
 
+type HomeView = 'dashboard' | 'create' | 'samples' | 'jobs' | 'materials' | 'roadmap';
+
 type HomePageProps = {
   searchParams?: Promise<{
     content?: string;
     style?: 'teacher' | 'kids' | 'exam';
     targetDurationSec?: string;
     taskName?: string;
-    view?: 'create' | 'samples' | 'jobs';
+    view?: HomeView;
     voice?: 'female_warm' | 'female_clear' | 'male_calm';
     speechRate?: 'slow' | 'normal' | 'fast';
   }>;
@@ -79,40 +81,18 @@ export default async function HomePage({searchParams}: HomePageProps = {}) {
             <span style={browserUserStyle}>teacher.ops</span>
           </div>
 
-          <div style={sketchCanvasGridStyle}>
-            <aside data-sketch-sidebar="portal-nav" style={sketchSidebarStyle}>
-              <h2 style={sidebarBrandStyle}>全科 AI</h2>
-              {sidebarItems.map((item) => (
-                <a key={item.label} href={item.href} style={item.active ? activeSidebarItemStyle : sidebarItemStyle}>
-                  <span style={sketchCheckBoxStyle} aria-hidden="true" />
-                  <span>{item.label}</span>
-                </a>
-              ))}
-            </aside>
-
-            <section style={dashboardAreaStyle}>
-              <SketchDashboardOverview />
-
-              <section id="generator-workbench" style={workbenchFrameStyle}>
-                <div style={workbenchIntroStyle}>
-                  <p style={sectionEyebrowStyle}>{'\u5de5\u4f5c\u53f0\u5165\u53e3'}</p>
-                  <h2 style={sectionTitleStyle}>{'\u521b\u4f5c\u3001\u6837\u7247\u3001\u8fdb\u5ea6\u4e09\u4e2a\u5165\u53e3\uff0c\u4e0d\u518d\u6324\u5728\u4e00\u5c4f\u91cc'}</h2>
-                  <p style={sectionDescriptionStyle}>
-                    {'\u9996\u9875\u5148\u505a\u51b3\u7b56\u5206\u6d41\uff1a\u8981\u751f\u6210\u65b0\u89c6\u9891\u3001\u8981\u6d4f\u89c8\u6837\u7247\u6d41\uff0c\u8fd8\u662f\u8981\u56de\u770b\u4efb\u52a1\u8fdb\u5ea6\uff0c\u90fd\u80fd\u7528\u4e00\u4e2a\u660e\u786e\u5165\u53e3\u5f00\u59cb\u3002'}
-                  </p>
-                </div>
-                <HomeWorkspaceSwitcher
-                  initialContent={initialContent}
-                  initialStyle={initialStyle}
-                  initialTargetDurationSec={initialTargetDurationSec}
-                  initialTaskName={initialTaskName}
-                  initialView={initialView}
-                  initialVoice={initialVoice}
-                  initialSpeechRate={initialSpeechRate}
-                />
-              </section>
-            </section>
-          </div>
+          <section id="generator-workbench" style={workbenchFrameStyle}>
+            <HomeWorkspaceSwitcher
+              dashboardSlot={<SketchDashboardOverview />}
+              initialContent={initialContent}
+              initialStyle={initialStyle}
+              initialTargetDurationSec={initialTargetDurationSec}
+              initialTaskName={initialTaskName}
+              initialView={initialView}
+              initialVoice={initialVoice}
+              initialSpeechRate={initialSpeechRate}
+            />
+          </section>
         </section>
       </div>
     </main>
@@ -153,8 +133,15 @@ const parseSpeechRate = (value: string | undefined): 'slow' | 'normal' | 'fast' 
   return undefined;
 };
 
-const parseView = (value: string | undefined): 'create' | 'samples' | 'jobs' => {
-  if (value === 'create' || value === 'samples' || value === 'jobs') {
+const parseView = (value: string | undefined): HomeView => {
+  if (
+    value === 'dashboard' ||
+    value === 'create' ||
+    value === 'samples' ||
+    value === 'jobs' ||
+    value === 'materials' ||
+    value === 'roadmap'
+  ) {
     return value;
   }
 
