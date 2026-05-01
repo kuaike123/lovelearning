@@ -1,6 +1,14 @@
 import React from 'react';
 
 import {HomeWorkspaceSwitcher} from './HomeWorkspaceSwitcher';
+import {
+  createSketchCardStyle,
+  createSketchEyebrowStyle,
+  createSketchGridBackground,
+  createSketchPageStyle,
+  createSketchPillStyle,
+  sketchColors
+} from './ui-primitives';
 
 type HomePageProps = {
   searchParams?: Promise<{
@@ -170,9 +178,9 @@ const sidebarItems = [
 ];
 
 const kpiCards = [
-  {accent: '#d9482e', id: 'monthly-videos', label: '\u672c\u6708\u751f\u6210', subline: '\u8f83\u4e0a\u5468 +6 \u6761', value: '24'},
+  {accent: sketchColors.accent, id: 'monthly-videos', label: '\u672c\u6708\u751f\u6210', subline: '\u8f83\u4e0a\u5468 +6 \u6761', value: '24'},
   {accent: '#39708f', id: 'success-rate', label: '\u751f\u6210\u6210\u529f\u7387', subline: '\u5df2\u8fde\u7eed\u4f18\u5316 TTS', value: '92%'},
-  {accent: '#d9482e', id: 'average-video', label: '\u5e73\u5747\u6210\u7247', subline: '\u7ad6\u5c4f\u6559\u57f9\u77ed\u89c6\u9891', value: '45s'},
+  {accent: sketchColors.accent, id: 'average-video', label: '\u5e73\u5747\u6210\u7247', subline: '\u7ad6\u5c4f\u6559\u57f9\u77ed\u89c6\u9891', value: '45s'},
   {accent: '#39708f', id: 'problem-types', label: '\u5df2\u652f\u6301\u9898\u578b', subline: '\u65b9\u7a0b + \u6570\u91cf\u5173\u7cfb', value: '2'}
 ];
 
@@ -250,7 +258,7 @@ function SketchDashboardOverview() {
 const sketchShellStyle = {
   background:
     'radial-gradient(circle at 10% 8%, rgba(217,72,46,0.05), transparent 26%), linear-gradient(180deg, #f8f1e4 0%, #fbf6ec 100%)',
-  color: '#2a241d',
+  color: sketchColors.ink,
   minHeight: '100vh',
   padding: '38px 22px 80px'
 };
@@ -264,7 +272,7 @@ const sketchPageStyle = {
 
 const sketchHeaderStyle = {
   alignItems: 'end',
-  borderBottom: '3px solid #2a241d',
+  borderBottom: `3px solid ${sketchColors.ink}`,
   display: 'grid',
   gap: 24,
   gridTemplateColumns: 'minmax(0, 1.2fr) minmax(300px, 0.8fr)',
@@ -284,7 +292,7 @@ const sketchTitleRowStyle = {
 };
 
 const sketchTitleStyle = {
-  color: '#2a241d',
+  color: sketchColors.ink,
   fontFamily: '"Times New Roman", Georgia, "Noto Serif SC", serif',
   fontSize: 58,
   fontStyle: 'italic' as const,
@@ -295,8 +303,8 @@ const sketchTitleStyle = {
 };
 
 const wireframeStampStyle = {
-  border: '2px dashed #d9482e',
-  color: '#d9482e',
+  border: `2px dashed ${sketchColors.accent}`,
+  color: sketchColors.accent,
   display: 'inline-flex',
   fontFamily: 'Consolas, "Courier New", monospace',
   fontSize: 14,
@@ -307,7 +315,7 @@ const wireframeStampStyle = {
 };
 
 const sketchSubtitleStyle = {
-  color: '#5f564a',
+  color: sketchColors.muted,
   fontSize: 17,
   letterSpacing: 0.8,
   lineHeight: 1.65,
@@ -336,7 +344,7 @@ const sketchTabsStyle = {
 
 const sketchTabStyle = {
   alignItems: 'center',
-  color: '#2a241d',
+  color: sketchColors.ink,
   display: 'inline-flex',
   fontFamily: 'Consolas, "Courier New", monospace',
   fontSize: 15,
@@ -348,30 +356,29 @@ const sketchTabStyle = {
 
 const activeSketchTabStyle = {
   ...sketchTabStyle,
-  background: '#ffd76a',
+  background: sketchColors.warm,
   fontWeight: 800,
   transform: 'rotate(-0.6deg)'
 };
 
 const sketchCheckBoxStyle = {
-  border: '2px solid #2a241d',
+  border: `2px solid ${sketchColors.ink}`,
   display: 'inline-flex',
   height: 16,
   width: 16
 };
 
 const tabCodeStyle = {
-  border: '2px solid #2a241d',
+  border: `2px solid ${sketchColors.ink}`,
   display: 'inline-flex',
   fontSize: 13,
   padding: '4px 8px'
 };
 
 const sketchCanvasStyle = {
-  background:
-    'linear-gradient(#e8ddbf 1px, transparent 1px), linear-gradient(90deg, #e8ddbf 1px, transparent 1px), #f8f1e4',
+  background: createSketchGridBackground('#f8f1e4', '0.07'),
   backgroundSize: '24px 24px',
-  border: '4px solid #2a241d',
+  border: `4px solid ${sketchColors.ink}`,
   borderRadius: 24,
   boxShadow: '8px 10px 0 rgba(42,36,29,0.16)',
   display: 'grid',
@@ -383,9 +390,9 @@ const sketchCanvasStyle = {
 };
 
 const yellowStickyNoteStyle = {
-  background: '#fff096',
+  background: sketchColors.note,
   boxShadow: '10px 10px 0 rgba(42,36,29,0.14)',
-  color: '#2a241d',
+  color: sketchColors.ink,
   fontSize: 16,
   lineHeight: 1.55,
   maxWidth: 300,
@@ -399,7 +406,7 @@ const yellowStickyNoteStyle = {
 
 const pinkStickyNoteStyle = {
   ...yellowStickyNoteStyle,
-  background: '#ffd2c5',
+  background: sketchColors.danger,
   bottom: 500,
   maxWidth: 270,
   right: 130,
@@ -410,7 +417,7 @@ const pinkStickyNoteStyle = {
 const browserChromeStyle = {
   alignItems: 'center',
   background: 'rgba(255,250,241,0.9)',
-  border: '3px solid #4c4439',
+  border: `3px solid ${sketchColors.muted}`,
   borderRadius: 999,
   display: 'grid',
   gap: 10,
@@ -421,7 +428,7 @@ const browserChromeStyle = {
 };
 
 const browserDotStyle = {
-  border: '2px solid #4c4439',
+  border: `2px solid ${sketchColors.muted}`,
   borderRadius: 999,
   display: 'inline-flex',
   height: 12,
@@ -455,8 +462,8 @@ const sketchSidebarStyle = {
 };
 
 const sidebarBrandStyle = {
-  borderBottom: '3px solid #2a241d',
-  color: '#2a241d',
+  borderBottom: `3px solid ${sketchColors.ink}`,
+  color: sketchColors.ink,
   fontFamily: '"Times New Roman", Georgia, "Noto Serif SC", serif',
   fontSize: 36,
   fontStyle: 'italic' as const,
@@ -467,7 +474,7 @@ const sidebarBrandStyle = {
 
 const sidebarItemStyle = {
   alignItems: 'center',
-  color: '#2a241d',
+  color: sketchColors.ink,
   display: 'inline-flex',
   fontSize: 18,
   gap: 12,
@@ -476,7 +483,7 @@ const sidebarItemStyle = {
 
 const activeSidebarItemStyle = {
   ...sidebarItemStyle,
-  background: '#ffd76a',
+  background: sketchColors.warm,
   fontWeight: 800,
   padding: '4px 8px',
   transform: 'rotate(-0.4deg)',
@@ -506,7 +513,7 @@ const overviewKickerStyle = {
 };
 
 const overviewTitleStyle = {
-  color: '#2a241d',
+  color: sketchColors.ink,
   fontFamily: '"Times New Roman", Georgia, "Noto Serif SC", serif',
   fontSize: 38,
   fontStyle: 'italic' as const,
@@ -515,7 +522,7 @@ const overviewTitleStyle = {
 };
 
 const overviewBodyStyle = {
-  color: '#5f564a',
+  color: sketchColors.muted,
   fontSize: 16,
   lineHeight: 1.7,
   margin: 0
@@ -528,10 +535,8 @@ const kpiGridStyle = {
 };
 
 const sketchKpiCardStyle = {
-  background: 'rgba(255,250,241,0.9)',
-  border: '3px solid #4c4439',
-  borderRadius: 14,
-  display: 'grid',
+  ...createSketchCardStyle({tone: 'paper'}),
+  borderColor: sketchColors.muted,
   gap: 8,
   minHeight: 128,
   padding: 18,
@@ -539,7 +544,7 @@ const sketchKpiCardStyle = {
 };
 
 const kpiLabelStyle = {
-  color: '#4f473d',
+  color: sketchColors.muted,
   fontSize: 15,
   letterSpacing: 1.4
 };
@@ -551,7 +556,7 @@ const kpiValueStyle = {
 };
 
 const kpiSublineStyle = {
-  color: '#5f564a',
+  color: sketchColors.muted,
   fontSize: 13
 };
 
@@ -562,10 +567,8 @@ const chartGridStyle = {
 };
 
 const sketchChartCardStyle = {
-  background: 'rgba(255,250,241,0.92)',
-  border: '3px solid #4c4439',
-  borderRadius: 16,
-  display: 'grid',
+  ...createSketchCardStyle({tone: 'paper'}),
+  borderColor: sketchColors.muted,
   gap: 12,
   minHeight: 250,
   padding: 20
@@ -618,17 +621,15 @@ const barLabelStyle = {
 };
 
 const nextStepStyle = {
-  background: 'rgba(255,250,241,0.88)',
-  border: '3px solid #d9482e',
-  borderRadius: 14,
-  display: 'grid',
+  ...createSketchCardStyle({tone: 'paper'}),
+  border: `3px solid ${sketchColors.accent}`,
   gap: 12,
   padding: 18
 };
 
 const nextStepTitleStyle = {
-  borderBottom: '3px solid #2a241d',
-  color: '#d9482e',
+  borderBottom: `3px solid ${sketchColors.ink}`,
+  color: sketchColors.accent,
   fontFamily: 'Consolas, "Courier New", monospace',
   fontSize: 18,
   letterSpacing: 2.4,
@@ -637,14 +638,14 @@ const nextStepTitleStyle = {
 };
 
 const nextStepListStyle = {
-  color: '#2a241d',
+  color: sketchColors.ink,
   lineHeight: 1.8,
   margin: 0,
   paddingLeft: 22
 };
 
 const workbenchFrameStyle = {
-  border: '3px dashed #4c4439',
+  border: `3px dashed ${sketchColors.muted}`,
   borderRadius: 18,
   display: 'grid',
   gap: 18,
@@ -657,7 +658,7 @@ const workbenchIntroStyle = {
 };
 
 const sectionEyebrowStyle = {
-  color: '#d9482e',
+  color: sketchColors.accent,
   fontFamily: 'Consolas, "Courier New", monospace',
   fontSize: 13,
   fontWeight: 800,
@@ -666,7 +667,7 @@ const sectionEyebrowStyle = {
 };
 
 const sectionTitleStyle = {
-  color: '#2a241d',
+  color: sketchColors.ink,
   fontFamily: '"Times New Roman", Georgia, "Noto Serif SC", serif',
   fontSize: 32,
   fontStyle: 'italic' as const,
@@ -675,7 +676,7 @@ const sectionTitleStyle = {
 };
 
 const sectionDescriptionStyle = {
-  color: '#5f564a',
+  color: sketchColors.muted,
   lineHeight: 1.75,
   margin: 0
 };

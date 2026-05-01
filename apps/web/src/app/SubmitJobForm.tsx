@@ -3,6 +3,14 @@
 import React, {FormEvent, useMemo, useState} from 'react';
 
 import {createJob, previewTts} from '../lib/api-client';
+import {
+  createSketchButtonStyle,
+  createSketchCardStyle,
+  createSketchEyebrowStyle,
+  createSketchGridBackground,
+  createSketchPillStyle,
+  sketchColors
+} from './ui-primitives';
 import {recommendVoicePreset} from './voice-recommendation';
 
 type VoiceOption = 'female_warm' | 'female_clear' | 'male_calm';
@@ -444,10 +452,9 @@ const formStyle = {
 };
 
 const introCardStyle = {
-  background:
-    'linear-gradient(#eadfca 1px, transparent 1px), linear-gradient(90deg, #eadfca 1px, transparent 1px), #fffaf1',
+  background: createSketchGridBackground('#fffaf1', '0.09'),
   backgroundSize: '18px 18px',
-  border: '3px solid #2a241d',
+  border: `3px solid ${sketchColors.ink}`,
   borderRadius: 14,
   boxShadow: '6px 7px 0 rgba(42,36,29,0.12)',
   display: 'grid',
@@ -457,16 +464,13 @@ const introCardStyle = {
 };
 
 const eyebrowStyle = {
-  color: '#d9482e',
+  ...createSketchEyebrowStyle(),
   fontFamily: 'Consolas, "Courier New", monospace',
-  fontSize: 13,
-  fontWeight: 800,
-  letterSpacing: 2,
-  margin: 0
+  letterSpacing: 2
 };
 
 const titleStyle = {
-  color: '#2a241d',
+  color: sketchColors.ink,
   fontFamily: '"Times New Roman", Georgia, "Noto Serif SC", serif',
   fontSize: 32,
   fontStyle: 'italic' as const,
@@ -475,17 +479,15 @@ const titleStyle = {
 };
 
 const descriptionStyle = {
-  color: '#5f564a',
+  color: sketchColors.muted,
   lineHeight: 1.7,
   margin: 0
 };
 
 const overviewSectionStyle = {
-  background: 'rgba(255,250,241,0.9)',
-  border: '3px dashed #4c4439',
-  borderRadius: 14,
-  color: '#2a241d',
-  display: 'grid',
+  ...createSketchCardStyle({tone: 'paper'}),
+  border: `3px dashed ${sketchColors.muted}`,
+  boxShadow: undefined,
   gap: 16,
   padding: 18
 };
@@ -497,17 +499,16 @@ const overviewGridStyle = {
 };
 
 const overviewCardStyle = {
-  background: '#fffaf1',
-  border: '2px solid #4c4439',
-  borderRadius: 12,
-  display: 'grid',
+  ...createSketchCardStyle({tone: 'paper'}),
+  border: `2px solid ${sketchColors.muted}`,
+  boxShadow: undefined,
   gap: 8,
   padding: 14,
   transform: 'rotate(-0.25deg)'
 };
 
 const overviewLabelStyle = {
-  color: '#d9482e',
+  color: sketchColors.accent,
   fontFamily: 'Consolas, "Courier New", monospace',
   fontSize: 12,
   fontWeight: 800,
@@ -515,22 +516,21 @@ const overviewLabelStyle = {
 };
 
 const overviewValueStyle = {
-  color: '#2a241d',
+  color: sketchColors.ink,
   fontSize: 20,
   lineHeight: 1.3
 };
 
 const overviewBodyStyle = {
-  color: '#5f564a',
+  color: sketchColors.muted,
   lineHeight: 1.6,
   margin: 0
 };
 
 const sectionCardStyle = {
-  background:
-    'linear-gradient(#eadfca 1px, transparent 1px), linear-gradient(90deg, #eadfca 1px, transparent 1px), rgba(255,250,241,0.96)',
+  background: createSketchGridBackground('rgba(255,250,241,0.96)', '0.09'),
   backgroundSize: '18px 18px',
-  border: '3px solid #4c4439',
+  border: `3px solid ${sketchColors.muted}`,
   borderRadius: 14,
   display: 'grid',
   gap: 16,
@@ -544,7 +544,7 @@ const sectionHeaderStyle = {
 };
 
 const sectionEyebrowStyle = {
-  color: '#d9482e',
+  color: sketchColors.accent,
   fontFamily: 'Consolas, "Courier New", monospace',
   fontSize: 12,
   fontWeight: 800,
@@ -553,7 +553,7 @@ const sectionEyebrowStyle = {
 };
 
 const sectionTitleStyle = {
-  color: '#2a241d',
+  color: sketchColors.ink,
   fontFamily: '"Times New Roman", Georgia, "Noto Serif SC", serif',
   fontSize: 24,
   fontStyle: 'italic' as const,
@@ -562,7 +562,7 @@ const sectionTitleStyle = {
 };
 
 const sectionDescriptionStyle = {
-  color: '#5f564a',
+  color: sketchColors.muted,
   lineHeight: 1.65,
   margin: 0
 };
@@ -573,7 +573,7 @@ const sectionBodyStyle = {
 };
 
 const fieldLabelStyle = {
-  color: '#2a241d',
+  color: sketchColors.ink,
   fontSize: 14,
   fontWeight: 800,
   letterSpacing: 0.8
@@ -581,9 +581,9 @@ const fieldLabelStyle = {
 
 const textInputStyle = {
   background: '#fffaf1',
-  border: '2px solid #4c4439',
+  border: `2px solid ${sketchColors.muted}`,
   borderRadius: 8,
-  color: '#2a241d',
+  color: sketchColors.ink,
   fontSize: 15,
   outline: 'none',
   padding: '13px 14px'
@@ -602,7 +602,7 @@ const optionsGridStyle = {
 };
 
 const selectLabelStyle = {
-  color: '#2a241d',
+  color: sketchColors.ink,
   display: 'grid',
   fontSize: 14,
   fontWeight: 800,
@@ -611,15 +611,15 @@ const selectLabelStyle = {
 
 const selectStyle = {
   background: '#fffaf1',
-  border: '2px solid #4c4439',
+  border: `2px solid ${sketchColors.muted}`,
   borderRadius: 8,
-  color: '#2a241d',
+  color: sketchColors.ink,
   fontSize: 15,
   padding: '12px 14px'
 };
 
 const recommendationCardStyle = {
-  background: '#fff096',
+  background: sketchColors.note,
   border: '2px solid rgba(42,36,29,0.2)',
   borderRadius: 4,
   boxShadow: '7px 8px 0 rgba(42,36,29,0.12)',
@@ -637,7 +637,7 @@ const recommendationHeaderStyle = {
 };
 
 const recommendationEyebrowStyle = {
-  color: '#d9482e',
+  color: sketchColors.accent,
   fontFamily: 'Consolas, "Courier New", monospace',
   fontSize: 12,
   fontWeight: 800,
@@ -646,13 +646,13 @@ const recommendationEyebrowStyle = {
 };
 
 const recommendationVoiceStyle = {
-  color: '#2a241d',
+  color: sketchColors.ink,
   display: 'block',
   fontSize: 20
 };
 
 const recommendationReasonStyle = {
-  color: '#2a241d',
+  color: sketchColors.ink,
   lineHeight: 1.6,
   margin: 0
 };
@@ -679,12 +679,7 @@ const recommendationMetaLabelStyle = {
 };
 
 const recommendButtonStyle = {
-  background: '#fffaf1',
-  border: '2px solid #2a241d',
-  borderRadius: 999,
-  color: '#2a241d',
-  cursor: 'pointer',
-  fontWeight: 800,
+  ...createSketchButtonStyle({tone: 'secondary'}),
   padding: '8px 12px'
 };
 
@@ -695,31 +690,20 @@ const actionsStyle = {
 };
 
 const previewButtonStyle = {
-  background: '#fffaf1',
-  border: '2px solid #2a241d',
-  borderRadius: 999,
-  color: '#2a241d',
-  cursor: 'pointer',
-  fontWeight: 800,
+  ...createSketchButtonStyle({tone: 'secondary'}),
   padding: '10px 16px'
 };
 
 const submitButtonStyle = {
-  background: '#d9482e',
-  border: '2px solid #2a241d',
-  borderRadius: 999,
-  color: '#fffaf1',
-  cursor: 'pointer',
+  ...createSketchButtonStyle({tone: 'primary'}),
   fontWeight: 900,
   padding: '10px 18px',
   transform: 'rotate(-0.5deg)'
 };
 
 const previewSectionStyle = {
-  background: '#fffaf1',
-  border: '1px solid #eadfca',
-  borderRadius: 18,
-  display: 'grid',
+  ...createSketchCardStyle({tone: 'paper'}),
+  boxShadow: undefined,
   gap: 14,
   padding: 16
 };
@@ -736,10 +720,9 @@ const previewGridStyle = {
 };
 
 const previewCardStyle = {
-  background: '#ffffff',
-  border: '1px solid #eadfca',
-  borderRadius: 14,
-  display: 'grid',
+  ...createSketchCardStyle(),
+  borderWidth: 2,
+  boxShadow: undefined,
   gap: 12,
   padding: 14
 };
@@ -787,39 +770,25 @@ const previewBadgeRowStyle = {
 };
 
 const recommendBadgeStyle = {
-  background: '#f5efe2',
-  borderRadius: 999,
-  color: '#6f7d45',
-  display: 'inline-flex',
-  fontSize: 12,
+  ...createSketchPillStyle({tone: 'success'}),
   fontWeight: 700,
   padding: '4px 10px'
 };
 
 const selectedBadgeStyle = {
-  background: '#6f7d45',
-  borderRadius: 999,
-  color: '#ffffff',
-  display: 'inline-flex',
-  fontSize: 12,
+  ...createSketchPillStyle({tone: 'dark'}),
   fontWeight: 700,
   padding: '4px 10px'
 };
 
 const selectVoiceButtonStyle = {
-  background: '#f5efe2',
-  border: '1px solid #eadfca',
-  borderRadius: 999,
-  color: '#1f2937',
-  cursor: 'pointer',
+  ...createSketchButtonStyle({tone: 'quiet'}),
   padding: '8px 12px'
 };
 
 const selectedVoiceButtonStyle = {
-  ...selectVoiceButtonStyle,
-  background: '#6f7d45',
-  border: '1px solid #6f7d45',
-  color: '#ffffff'
+  ...createSketchButtonStyle({tone: 'dark'}),
+  padding: '8px 12px'
 };
 
 const audioStyle = {
@@ -828,7 +797,7 @@ const audioStyle = {
 
 const preflightSectionStyle = {
   background: 'rgba(255,250,241,0.92)',
-  border: '3px dashed #4c4439',
+  border: `3px dashed ${sketchColors.muted}`,
   borderRadius: 14,
   display: 'grid',
   gap: 16,
@@ -849,7 +818,7 @@ const preflightListStyle = {
 const preflightItemStyle = {
   alignItems: 'center',
   background: '#fffaf1',
-  border: '2px solid #4c4439',
+  border: `2px solid ${sketchColors.muted}`,
   borderRadius: 8,
   display: 'flex',
   gap: 10,
@@ -857,7 +826,7 @@ const preflightItemStyle = {
 };
 
 const preflightDoneDotStyle = {
-  background: '#d9482e',
+  background: sketchColors.accent,
   borderRadius: 999,
   display: 'inline-flex',
   height: 10,
@@ -873,16 +842,16 @@ const preflightPendingDotStyle = {
 };
 
 const preflightItemTextStyle = {
-  color: '#2a241d',
+  color: sketchColors.ink,
   fontSize: 14,
   fontWeight: 700
 };
 
 const preflightCardStyle = {
-  background: '#fff096',
+  background: sketchColors.note,
   border: '2px solid rgba(42,36,29,0.2)',
   borderRadius: 4,
-  color: '#2a241d',
+  color: sketchColors.ink,
   display: 'grid',
   gap: 8,
   padding: 16,
