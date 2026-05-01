@@ -580,13 +580,14 @@ const getFailureAdvice = (error: string | undefined) => {
 const clampProgress = (progress: number) => Math.max(0, Math.min(100, Math.round(progress)));
 
 const panelStyle = {
-  background: '#fbf7ef',
+  background: 'linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,250,241,0.92))',
   border: '1px solid #eadfca',
-  borderRadius: 24,
+  borderRadius: 28,
+  boxShadow: '0 18px 56px rgba(16, 42, 67, 0.08)',
   color: '#1f2937',
-  margin: '40px auto',
+  margin: 0,
   maxWidth: 1120,
-  padding: 32
+  padding: 30
 };
 
 const eyebrowStyle = {
@@ -598,7 +599,8 @@ const eyebrowStyle = {
 };
 
 const titleStyle = {
-  fontFamily: 'Georgia, "Times New Roman", serif',
+  color: '#1c1a17',
+  fontFamily: '"Times New Roman", Georgia, "Noto Serif SC", serif',
   fontSize: 44,
   lineHeight: 1.1,
   margin: '8px 0 16px'
@@ -642,7 +644,8 @@ const regenerateButtonStyle = {
 };
 
 const overviewCardStyle = {
-  background: 'linear-gradient(135deg, #fffaf1 0%, #f6efdd 100%)',
+  background:
+    'radial-gradient(circle at 92% 8%, rgba(255, 36, 66, 0.08), transparent 26%), linear-gradient(135deg, #fffaf1 0%, #ffffff 100%)',
   border: '1px solid #eadfca',
   borderRadius: 20,
   display: 'grid',

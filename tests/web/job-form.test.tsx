@@ -10,9 +10,10 @@ describe('HomePage', () => {
     const html = renderToStaticMarkup(await HomePage());
 
     expect(html).toContain('data-home-layout="workspace"');
-    expect(html).toContain('\u4e2d\u5c0f\u5b66\u6559\u57f9\u89c6\u9891\u5de5\u5382');
-    expect(html).toContain('\u4ece\u9898\u76ee\u5230\u77ed\u89c6\u9891');
-    expect(html).toContain('\u5de5\u4f5c\u533a\u5207\u6362');
+    expect(html).toContain('\u4e2d\u56fd\u6559\u57f9\u56e2\u961f\u7684 AI \u8bb2\u89e3\u89c6\u9891\u5de5\u4f5c\u53f0');
+    expect(html).toContain('\u628a\u4e00\u9053\u9898\uff0c\u505a\u6210\u4e00\u6761\u4f1a\u8bb2\u8bfe\u7684\u77ed\u89c6\u9891');
+    expect(html).toContain('\u5de5\u4f5c\u53f0\u5165\u53e3');
+    expect(html).toContain('\u5185\u5bb9\u6837\u7247\u6d41');
     expect(html).toContain('data-home-entry="create"');
     expect(html).toContain('data-home-entry="samples"');
     expect(html).toContain('data-home-entry="jobs"');
