@@ -7,6 +7,7 @@ import {
   createSketchEyebrowStyle,
   sketchColors
 } from '../../ui-primitives';
+import {designTokens} from '../../ui-primitives-v2';
 import {JobResultPanel} from './JobResultPanel';
 
 type JobResultPageProps = {
@@ -19,7 +20,7 @@ export default async function JobResultPage({params}: JobResultPageProps) {
   const {id} = await params;
 
   return (
-    <main data-sketch-job-page="delivery-center" style={appShellStyle}>
+    <main data-job-typography="product-editorial" data-sketch-job-page="delivery-center" style={appShellStyle}>
       <div style={contentShellStyle}>
         <header style={resultHeaderStyle}>
           <p style={resultEyebrowStyle}>{'DELIVERY BOARD / \u751f\u6210\u4ea4\u4ed8'}</p>
@@ -47,7 +48,7 @@ const resultHeaderStyle = {
 const resultEyebrowStyle = createSketchEyebrowStyle();
 
 const resultSubEyebrowStyle = {
-  color: sketchColors.muted,
+  color: designTokens.colors.neutral[500],
   fontSize: 13,
   fontWeight: 800,
   margin: 0
@@ -55,15 +56,18 @@ const resultSubEyebrowStyle = {
 
 const resultTitleStyle = {
   color: sketchColors.ink,
-  fontFamily: '"Times New Roman", Georgia, "Noto Serif SC", serif',
-  fontSize: 42,
-  lineHeight: 1.1,
+  fontFamily:
+    '"Avenir Next", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif',
+  fontSize: 40,
+  fontWeight: designTokens.fontWeight.extrabold,
+  letterSpacing: '-0.03em',
+  lineHeight: 1.12,
   margin: 0
 };
 
 const resultDescriptionStyle = {
-  color: sketchColors.muted,
-  lineHeight: 1.75,
+  color: designTokens.colors.neutral[600],
+  lineHeight: designTokens.lineHeight.relaxed,
   margin: 0,
   maxWidth: 820
 };

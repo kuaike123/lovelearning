@@ -7,6 +7,11 @@ import {RecentJobsPanel} from './RecentJobsPanel';
 import {SubmitJobForm} from './SubmitJobForm';
 import {SupportedScope} from './SupportedScope';
 import {createButtonStyle, createCardStyle, createPillStyle, uiColors} from './ui-primitives';
+import {
+  createCardStyle as createProfessionalCardStyle,
+  designTokens,
+  keyframes as professionalKeyframes
+} from './ui-primitives-v2';
 
 type ViewId = 'dashboard' | 'create' | 'samples' | 'jobs' | 'materials' | 'roadmap';
 
@@ -116,7 +121,13 @@ export function HomeWorkspaceSwitcher({
   const activeCard = viewCards.find((entry) => entry.id === activeView) ?? viewCards[0];
 
   return (
-    <section data-saas-shell="home-workspace" style={workspaceShellStyle}>
+    <section
+      data-saas-shell="home-workspace"
+      data-responsive-shell="desktop-sidebar"
+      data-design-mode="professional"
+      data-ui-system="v2"
+      style={workspaceShellStyle}
+    >
       <style>{homeMotionStyles}</style>
 
       <aside data-saas-sidebar="project-nav" style={projectSidebarStyle}>
@@ -436,45 +447,44 @@ const workspaceShellStyle = {
 
 const projectSidebarStyle = {
   alignSelf: 'start',
-  background: 'rgba(255, 250, 241, 0.94)',
-  border: '3px solid #2a241d',
-  borderRadius: 24,
-  boxShadow: '8px 9px 0 rgba(42,36,29,0.14)',
+  background: designTokens.colors.background.primary,
+  border: `1px solid ${designTokens.colors.neutral[200]}`,
+  borderRadius: designTokens.borderRadius.xl,
+  boxShadow: designTokens.shadows.lg,
   display: 'grid',
   gap: 18,
-  padding: 16,
+  padding: designTokens.spacing[4],
   position: 'sticky' as const,
   top: 20
 };
 
 const sidebarBrandBlockStyle = {
-  background: 'linear-gradient(rgba(42,36,29,0.08) 1px, transparent 1px), #fff8df',
-  backgroundSize: '18px 18px',
-  border: '2px dashed #4c4439',
-  borderRadius: 18,
+  background: `linear-gradient(135deg, ${designTokens.colors.neutral[50]}, ${designTokens.colors.warning.bg})`,
+  border: `1px solid ${designTokens.colors.neutral[200]}`,
+  borderRadius: designTokens.borderRadius.lg,
   display: 'grid',
   gap: 6,
   padding: 16
 };
 
 const sidebarBrandEyebrowStyle = {
-  color: '#d9482e',
-  fontFamily: 'Consolas, "Courier New", monospace',
+  color: designTokens.colors.brand.primary,
+  fontFamily: designTokens.fonts.mono,
   fontSize: 12,
   fontWeight: 900,
   letterSpacing: 2
 };
 
 const sidebarBrandTitleStyle = {
-  color: '#2a241d',
-  fontFamily: '"Times New Roman", Georgia, "Noto Serif SC", serif',
-  fontSize: 34,
-  fontStyle: 'italic' as const,
+  color: designTokens.colors.neutral[900],
+  fontFamily: designTokens.fonts.sans,
+  fontSize: designTokens.fontSize['3xl'],
+  fontStyle: 'normal' as const,
   lineHeight: 1
 };
 
 const sidebarBrandBodyStyle = {
-  color: '#4c4439',
+  color: designTokens.colors.neutral[600],
   fontSize: 13,
   lineHeight: 1.5,
   margin: 0
@@ -486,45 +496,45 @@ const projectNavListStyle = {
 };
 
 const projectNavButtonStyle = {
-  ...createCardStyle({tone: 'default'}),
-  background: 'rgba(255, 253, 248, 0.78)',
-  border: `1px solid ${uiColors.border}`,
-  borderRadius: 18,
+  ...createProfessionalCardStyle('flat'),
+  background: designTokens.colors.background.primary,
+  border: `1px solid ${designTokens.colors.neutral[200]}`,
+  borderRadius: designTokens.borderRadius.lg,
   boxShadow: 'none',
   cursor: 'pointer',
   gap: 8,
-  padding: 14,
+  padding: designTokens.spacing[4],
   textAlign: 'left' as const,
-  transition: 'transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease'
+  transition: `transform ${designTokens.transitions.base}, box-shadow ${designTokens.transitions.base}, border-color ${designTokens.transitions.base}`
 };
 
 const createActiveProjectNavButtonStyle = (accent: string) => ({
-  border: `2px solid ${accent}`,
-  boxShadow: `5px 6px 0 ${accent}`,
-  transform: 'translate(-2px, -2px)'
+  background: designTokens.colors.neutral[50],
+  border: `1px solid ${accent}`,
+  boxShadow: designTokens.shadows.md,
+  transform: 'translateY(-1px)'
 });
 
 const sidebarFooterStyle = {
-  background: '#fff096',
-  border: '2px solid rgba(42,36,29,0.22)',
-  borderRadius: 12,
-  boxShadow: '5px 6px 0 rgba(42,36,29,0.12)',
+  background: designTokens.colors.warning.bg,
+  border: `1px solid ${designTokens.colors.warning.light}`,
+  borderRadius: designTokens.borderRadius.lg,
+  boxShadow: designTokens.shadows.sm,
   display: 'grid',
   gap: 6,
-  padding: 14,
-  transform: 'rotate(-1deg)'
+  padding: 14
 };
 
 const sidebarFooterKickerStyle = {
-  color: '#d9482e',
-  fontFamily: 'Consolas, "Courier New", monospace',
+  color: designTokens.colors.warning.dark,
+  fontFamily: designTokens.fonts.mono,
   fontSize: 12,
   fontWeight: 900,
   letterSpacing: 1.6
 };
 
 const sidebarFooterBodyStyle = {
-  color: '#2a241d',
+  color: designTokens.colors.neutral[700],
   fontSize: 13,
   lineHeight: 1.55,
   margin: 0
@@ -658,12 +668,12 @@ const entryHintStyle = {
 
 const panelStyle = {
   display: 'grid',
-  gap: 18
+  gap: designTokens.spacing[6]
 };
 
 const panelContentStyle = {
   display: 'grid',
-  gap: 16
+  gap: designTokens.spacing[4]
 };
 
 const panelHeroStyle = {
@@ -995,6 +1005,18 @@ const buildPanelGradient = (accent: string) => {
 };
 
 const homeMotionStyles = `
+  ${professionalKeyframes}
+
+  @media (max-width: 960px) {
+    [data-responsive-shell="desktop-sidebar"] {
+      grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    [data-saas-sidebar="project-nav"] {
+      position: static !important;
+    }
+  }
+
   @keyframes heroFloat {
     0%, 100% {
       transform: translateY(0px);

@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {HomeWorkspaceSwitcher} from './HomeWorkspaceSwitcher';
+import {ThemeToggle} from './ThemeToggle';
 import {
   createSketchCardStyle,
   createSketchEyebrowStyle,
@@ -9,6 +10,7 @@ import {
   createSketchPillStyle,
   sketchColors
 } from './ui-primitives';
+import {designTokens} from './ui-primitives-v2';
 
 type HomeView = 'dashboard' | 'create' | 'samples' | 'jobs' | 'materials' | 'roadmap';
 
@@ -37,21 +39,32 @@ export default async function HomePage({searchParams}: HomePageProps = {}) {
   const initialView = parseView(resolvedSearchParams?.view);
 
   return (
-    <main data-home-layout="workspace" data-sketch-portal="wireframe" style={sketchShellStyle}>
+    <main
+      data-home-layout="workspace"
+      data-home-typography="product-editorial"
+      data-home-visual-system="studio-shell"
+      data-sketch-portal="wireframe"
+      style={sketchShellStyle}
+    >
       <div style={sketchPageStyle}>
-        <header data-sketch-header="portal-title" style={sketchHeaderStyle}>
+        <header
+          data-home-banner="studio-hero"
+          data-sketch-header="portal-title"
+          style={sketchHeaderStyle}
+        >
           <div style={sketchTitleBlockStyle}>
             <div style={sketchTitleRowStyle}>
-              <h1 style={sketchTitleStyle}>LoveLearning AI · Portal</h1>
-              <span style={wireframeStampStyle}>WIREFRAME V1</span>
+              <h1 style={sketchTitleStyle}>LoveLearning AI Studio</h1>
+              <span style={wireframeStampStyle}>PRODUCT BETA</span>
             </div>
             <p style={sketchSubtitleStyle}>
               {'\u4e2d\u56fd\u6559\u57f9\u56e2\u961f\u7684 AI \u8bb2\u89e3\u89c6\u9891\u5de5\u4f5c\u53f0 · \u628a\u4e00\u9053\u9898\uff0c\u505a\u6210\u4e00\u6761\u4f1a\u8bb2\u8bfe\u7684\u77ed\u89c6\u9891'}
             </p>
           </div>
           <div style={sketchHeaderMetaStyle}>
-            <span>{'DESIGN NOTE / \u6559\u6848\u5de5\u4f5c\u53f0\u8349\u56fe'}</span>
-            <span>{'DATE 2026-05-01 · DEVICE DESKTOP 1440 · FIDELITY LOW'}</span>
+            <ThemeToggle />
+            <span>{'PRODUCT NOTE / \u6559\u57f9\u89c6\u9891\u751f\u6210\u5de5\u4f5c\u53f0'}</span>
+            <span>{'DATE 2026-05-03 · DEVICE DESKTOP 1440 · MODE STUDIO'}</span>
           </div>
         </header>
 
@@ -66,18 +79,34 @@ export default async function HomePage({searchParams}: HomePageProps = {}) {
         </nav>
 
         <section data-sketch-canvas="home-dashboard" style={sketchCanvasStyle}>
-          <aside style={yellowStickyNoteStyle}>
-            {'\u4eca\u5929\u4f18\u5148\u505a\uff1a\u8ba9\u8001\u5e08\u4e00\u773c\u77e5\u9053\u4ece\u54ea\u91cc\u5f00\u59cb\u751f\u6210'}
+          <aside data-home-callout="priority-focus" style={priorityCalloutStyle}>
+            <span style={calloutEyebrowStyle}>PRIORITY FOCUS</span>
+            <strong style={calloutTitleStyle}>
+              {'\u4eca\u65e5\u91cd\u70b9\uff1a\u8ba9\u8001\u5e08\u5feb\u901f\u5f00\u59cb\u751f\u6210'}
+            </strong>
+            <span style={calloutBodyStyle}>
+              {
+                '\u6536\u655b\u9996\u9875\u5165\u53e3\u3001\u964d\u4f4e\u64cd\u4f5c\u51b3\u7b56\u6210\u672c\uff0c\u8ba9\u9996\u6b21\u4f7f\u7528\u8005\u4e5f\u80fd\u7acb\u523b\u627e\u5230\u201c\u65b0\u5efa\u8bb2\u89e3\u201d\u3002'
+              }
+            </span>
           </aside>
-          <aside style={pinkStickyNoteStyle}>
-            {'page-1 / \u5148\u628a\u9996\u9875\u6539\u6210\u6559\u6848\u5de5\u4f5c\u53f0\uff0c\u518d\u8fc1\u79fb\u6837\u7247\u548c\u4efb\u52a1\u9875\u3002'}
+          <aside data-home-callout="roadmap-focus" style={roadmapCalloutStyle}>
+            <span style={calloutEyebrowStyle}>ROADMAP FOCUS</span>
+            <strong style={calloutTitleStyle}>
+              {'\u4ea7\u54c1\u6536\u53e3\uff1a\u5148\u5de5\u4f5c\u53f0\uff0c\u518d\u6837\u7247\u4e0e\u4efb\u52a1'}
+            </strong>
+            <span style={calloutBodyStyle}>
+              {
+                '\u9996\u5c4f\u5148\u5efa\u7acb\u7a33\u5b9a\u7684 SaaS \u5de5\u4f5c\u53f0\u611f\uff0c\u518d\u628a\u6837\u7247\u6d4f\u89c8\u3001\u4efb\u52a1\u8ddf\u8e2a\u548c\u7d20\u6750\u4e2d\u5fc3\u9010\u6b65\u63a5\u5165\u540c\u4e00\u5957\u4ea7\u54c1\u8bed\u8a00\u3002'
+              }
+            </span>
           </aside>
 
           <div style={browserChromeStyle}>
             <span style={browserDotStyle} />
             <span style={browserDotStyle} />
             <span style={browserDotStyle} />
-            <span style={browserUrlStyle}>lovelearning.ai / portal / dashboard</span>
+            <span style={browserUrlStyle}>lovelearning.ai / studio / dashboard</span>
             <span style={browserUserStyle}>teacher.ops</span>
           </div>
 
@@ -164,6 +193,27 @@ const sidebarItems = [
   {active: false, href: '#subject-roadmap', label: '\u5b66\u79d1\u89c4\u5212'}
 ];
 
+const quickActions = [
+  {
+    description: '\u76f4\u63a5\u8f93\u5165\u9898\u76ee\uff0c\u751f\u6210\u8bb2\u89e3\u89c6\u9891',
+    href: '/?view=create#generator-workbench',
+    icon: '+',
+    label: '\u65b0\u5efa\u89c6\u9891'
+  },
+  {
+    description: '\u4ece\u6807\u51c6\u6837\u7247\u5feb\u901f\u5957\u7528\u914d\u7f6e',
+    href: '/?view=samples#featured-samples',
+    icon: '\u25a6',
+    label: '\u4f7f\u7528\u6a21\u677f'
+  },
+  {
+    description: '\u9884\u7559 OCR\u3001\u9898\u5e93\u548c\u8bfe\u4ef6\u5bfc\u5165\u5165\u53e3',
+    href: '/?view=materials#generator-workbench',
+    icon: '\u2191',
+    label: '\u6279\u91cf\u5bfc\u5165'
+  }
+];
+
 const kpiCards = [
   {accent: sketchColors.accent, id: 'monthly-videos', label: '\u672c\u6708\u751f\u6210', subline: '\u8f83\u4e0a\u5468 +6 \u6761', value: '24'},
   {accent: '#39708f', id: 'success-rate', label: '\u751f\u6210\u6210\u529f\u7387', subline: '\u5df2\u8fde\u7eed\u4f18\u5316 TTS', value: '92%'},
@@ -180,7 +230,7 @@ const subjectBars = [
 
 function SketchDashboardOverview() {
   return (
-    <section data-sketch-overview="dashboard" style={overviewStyle}>
+    <section data-dashboard-typography="product-editorial" data-sketch-overview="dashboard" style={overviewStyle}>
       <div style={overviewHeadingStyle}>
         <span style={overviewKickerStyle}>{'\u6b22\u8fce\u56de\u6765'}</span>
         <h2 style={overviewTitleStyle}>{'\u4eca\u5929\u51c6\u5907\u751f\u6210\u54ea\u6761\u8bb2\u89e3\u89c6\u9891\uff1f'}</h2>
@@ -188,6 +238,24 @@ function SketchDashboardOverview() {
           {'\u8fd9\u4e00\u5c42\u4f5c\u4e3a\u6559\u6848\u5de5\u4f5c\u53f0\u7684\u603b\u89c8\uff1a\u5148\u770b\u4ea7\u51fa\u3001\u80fd\u529b\u548c\u4e0b\u4e00\u6b65\uff0c\u518d\u8fdb\u5165\u65b0\u5efa\u89c6\u9891\u3001\u5185\u5bb9\u6837\u7247\u6d41\u6216\u4efb\u52a1\u3002'}
         </p>
       </div>
+
+      <section data-dashboard-quick-actions="primary" style={quickActionsStyle}>
+        <div style={quickActionsHeaderStyle}>
+          <span style={quickActionsKickerStyle}>{'\u5feb\u901f\u64cd\u4f5c'}</span>
+          <strong style={quickActionsTitleStyle}>{'\u5e38\u7528\u5165\u53e3\u76f4\u63a5\u5f00\u59cb'}</strong>
+        </div>
+        <div style={quickActionsGridStyle}>
+          {quickActions.map((action) => (
+            <a key={action.label} href={action.href} style={quickActionCardStyle}>
+              <span style={quickActionIconStyle}>{action.icon}</span>
+              <span style={quickActionTextStyle}>
+                <strong style={quickActionLabelStyle}>{action.label}</strong>
+                <span style={quickActionDescriptionStyle}>{action.description}</span>
+              </span>
+            </a>
+          ))}
+        </div>
+      </section>
 
       <div style={kpiGridStyle}>
         {kpiCards.map((card) => (
@@ -280,12 +348,12 @@ const sketchTitleRowStyle = {
 
 const sketchTitleStyle = {
   color: sketchColors.ink,
-  fontFamily: '"Times New Roman", Georgia, "Noto Serif SC", serif',
-  fontSize: 58,
-  fontStyle: 'italic' as const,
-  fontWeight: 900,
-  letterSpacing: -1.4,
-  lineHeight: 0.95,
+  fontFamily:
+    '"Avenir Next", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif',
+  fontSize: 54,
+  fontWeight: 800,
+  letterSpacing: '-0.04em',
+  lineHeight: 1,
   margin: 0
 };
 
@@ -302,10 +370,10 @@ const wireframeStampStyle = {
 };
 
 const sketchSubtitleStyle = {
-  color: sketchColors.muted,
+  color: designTokens.colors.neutral[600],
   fontSize: 17,
-  letterSpacing: 0.8,
-  lineHeight: 1.65,
+  letterSpacing: 0.2,
+  lineHeight: 1.7,
   margin: 0
 };
 
@@ -376,29 +444,56 @@ const sketchCanvasStyle = {
   position: 'relative' as const
 };
 
-const yellowStickyNoteStyle = {
-  background: sketchColors.note,
-  boxShadow: '10px 10px 0 rgba(42,36,29,0.14)',
+const sharedCalloutStyle = {
+  backdropFilter: 'blur(16px)',
+  background: 'rgba(255,255,255,0.92)',
+  border: `1px solid ${designTokens.colors.neutral[200]}`,
+  borderRadius: 22,
+  boxShadow: '0 18px 38px rgba(15, 23, 42, 0.12)',
   color: sketchColors.ink,
-  fontSize: 16,
-  lineHeight: 1.55,
-  maxWidth: 300,
+  display: 'grid',
+  gap: 10,
+  maxWidth: 320,
   padding: '18px 20px',
   position: 'absolute' as const,
-  right: 54,
-  top: 28,
-  transform: 'rotate(2.3deg)',
   zIndex: 2
 };
 
-const pinkStickyNoteStyle = {
-  ...yellowStickyNoteStyle,
-  background: sketchColors.danger,
+const priorityCalloutStyle = {
+  ...sharedCalloutStyle,
+  right: 42,
+  top: 26
+};
+
+const roadmapCalloutStyle = {
+  ...sharedCalloutStyle,
   bottom: 500,
-  maxWidth: 270,
-  right: 130,
-  top: 'auto',
-  transform: 'rotate(-4deg)'
+  maxWidth: 300,
+  right: 116
+};
+
+const calloutEyebrowStyle = {
+  color: designTokens.colors.brand.primary,
+  fontFamily: 'Consolas, "Courier New", monospace',
+  fontSize: 12,
+  fontWeight: 800,
+  letterSpacing: 2.2
+};
+
+const calloutTitleStyle = {
+  color: designTokens.colors.neutral[900],
+  fontFamily:
+    '"Avenir Next", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif',
+  fontSize: 16,
+  fontWeight: 800,
+  letterSpacing: '-0.01em',
+  lineHeight: 1.5
+};
+
+const calloutBodyStyle = {
+  color: designTokens.colors.neutral[600],
+  fontSize: 13,
+  lineHeight: 1.7
 };
 
 const browserChromeStyle = {
@@ -501,18 +596,99 @@ const overviewKickerStyle = {
 
 const overviewTitleStyle = {
   color: sketchColors.ink,
-  fontFamily: '"Times New Roman", Georgia, "Noto Serif SC", serif',
-  fontSize: 38,
-  fontStyle: 'italic' as const,
-  lineHeight: 1.1,
+  fontFamily:
+    '"Avenir Next", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif',
+  fontSize: 36,
+  fontWeight: 800,
+  letterSpacing: '-0.03em',
+  lineHeight: 1.12,
   margin: 0
 };
 
 const overviewBodyStyle = {
-  color: sketchColors.muted,
+  color: designTokens.colors.neutral[600],
   fontSize: 16,
   lineHeight: 1.7,
   margin: 0
+};
+
+const quickActionsStyle = {
+  background: 'rgba(255,250,241,0.92)',
+  border: `3px solid ${sketchColors.ink}`,
+  borderRadius: 18,
+  boxShadow: '6px 6px 0 rgba(42,36,29,0.14)',
+  display: 'grid',
+  gap: 14,
+  padding: 18
+};
+
+const quickActionsHeaderStyle = {
+  alignItems: 'end',
+  display: 'flex',
+  flexWrap: 'wrap' as const,
+  gap: 10,
+  justifyContent: 'space-between'
+};
+
+const quickActionsKickerStyle = {
+  color: sketchColors.accent,
+  fontFamily: 'Consolas, "Courier New", monospace',
+  fontSize: 13,
+  fontWeight: 900,
+  letterSpacing: 2
+};
+
+const quickActionsTitleStyle = {
+  color: sketchColors.ink,
+  fontSize: 18
+};
+
+const quickActionsGridStyle = {
+  display: 'grid',
+  gap: 12,
+  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))'
+};
+
+const quickActionCardStyle = {
+  alignItems: 'center',
+  background: '#fff8df',
+  border: `2px solid ${sketchColors.muted}`,
+  borderRadius: 14,
+  color: sketchColors.ink,
+  display: 'flex',
+  gap: 12,
+  padding: 14,
+  textDecoration: 'none'
+};
+
+const quickActionIconStyle = {
+  alignItems: 'center',
+  background: sketchColors.accent,
+  borderRadius: 999,
+  color: '#fff8df',
+  display: 'inline-flex',
+  flexShrink: 0,
+  fontSize: 20,
+  fontWeight: 900,
+  height: 42,
+  justifyContent: 'center',
+  width: 42
+};
+
+const quickActionTextStyle = {
+  display: 'grid',
+  gap: 4
+};
+
+const quickActionLabelStyle = {
+  color: sketchColors.ink,
+  fontSize: 16
+};
+
+const quickActionDescriptionStyle = {
+  color: sketchColors.muted,
+  fontSize: 13,
+  lineHeight: 1.5
 };
 
 const kpiGridStyle = {
@@ -537,9 +713,12 @@ const kpiLabelStyle = {
 };
 
 const kpiValueStyle = {
-  fontFamily: '"Times New Roman", Georgia, "Noto Serif SC", serif',
-  fontSize: 54,
-  lineHeight: 0.95
+  fontFamily:
+    '"Avenir Next", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif',
+  fontSize: 52,
+  fontWeight: 800,
+  letterSpacing: '-0.04em',
+  lineHeight: 1
 };
 
 const kpiSublineStyle = {
@@ -655,9 +834,11 @@ const sectionEyebrowStyle = {
 
 const sectionTitleStyle = {
   color: sketchColors.ink,
-  fontFamily: '"Times New Roman", Georgia, "Noto Serif SC", serif',
-  fontSize: 32,
-  fontStyle: 'italic' as const,
+  fontFamily:
+    '"Avenir Next", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif',
+  fontSize: 30,
+  fontWeight: 800,
+  letterSpacing: '-0.03em',
   lineHeight: 1.15,
   margin: 0
 };

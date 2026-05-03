@@ -20,6 +20,14 @@ import {
   textareaControlStyle,
   workspaceGridStyle
 } from '../../apps/web/src/app/ui-primitives';
+import {
+  createButtonStyle as createButtonStyleV2,
+  createCardStyle as createCardStyleV2,
+  createInputStyle as createInputStyleV2,
+  designTokens,
+  getThemeColors,
+  keyframes as keyframesV2
+} from '../../apps/web/src/app/ui-primitives-v2';
 
 describe('web UI primitives', () => {
   it('exposes shared page, card, button, form, and section styles for product pages', () => {
@@ -52,5 +60,16 @@ describe('web UI primitives', () => {
     expect(createSketchButtonStyle({tone: 'secondary'}).border).toBe('2px solid #2a241d');
     expect(createSketchEyebrowStyle().color).toBe('#d9482e');
     expect(createSketchPillStyle({tone: 'success'}).background).toBe('#eaf4d3');
+  });
+
+  it('exposes the professional v2 design system for SaaS screens', () => {
+    expect(designTokens.colors.brand.primary).toBe('#C73E1D');
+    expect(createButtonStyleV2('primary', 'lg').height).toBe('48px');
+    expect(createButtonStyleV2('outline', 'sm').border).toContain(designTokens.colors.neutral[300]);
+    expect(createCardStyleV2('medium').boxShadow).toBe(designTokens.shadows.md);
+    expect(createInputStyleV2().borderRadius).toBe(designTokens.borderRadius.md);
+    expect(getThemeColors('creative')).toMatchObject({accent: '#d9482e'});
+    expect(getThemeColors('professional')).toBe(designTokens.colors);
+    expect(keyframesV2).toContain('@keyframes fadeIn');
   });
 });

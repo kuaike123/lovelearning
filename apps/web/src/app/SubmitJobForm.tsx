@@ -1,6 +1,6 @@
 'use client';
 
-import React, {FormEvent, useMemo, useState} from 'react';
+import React, {ButtonHTMLAttributes, FormEvent, useMemo, useState} from 'react';
 
 import {createJob, previewTts} from '../lib/api-client';
 import {
@@ -11,10 +11,21 @@ import {
   createSketchPillStyle,
   sketchColors
 } from './ui-primitives';
+import {
+  createBadgeStyle as createBadgeStyleV2,
+  createButtonStyle as createButtonStyleV2,
+  createCardStyle as createCardStyleV2,
+  createInputStyle as createInputStyleV2,
+  createLabelStyle as createLabelStyleV2,
+  designTokens,
+  keyframes as keyframesV2
+} from './ui-primitives-v2';
 import {recommendVoicePreset} from './voice-recommendation';
 
 type VoiceOption = 'female_warm' | 'female_clear' | 'male_calm';
 type SpeechRate = 'slow' | 'normal' | 'fast';
+type FormStep = 'content' | 'settings' | 'voice' | 'review';
+type CreationStep = {id: FormStep; label: string; meta: string; targetId: string};
 
 type VoicePreview = {
   audioUrl: string;
@@ -35,6 +46,12 @@ type SubmitJobFormProps = {
 };
 
 const previewVoices: VoiceOption[] = ['female_warm', 'female_clear', 'male_calm'];
+const creationSteps: CreationStep[] = [
+  {id: 'content', label: '输入题目', meta: '必填', targetId: 'problem-input'},
+  {id: 'settings', label: '生成设置', meta: '推荐值', targetId: 'generation-settings'},
+  {id: 'voice', label: '配音选择', meta: '可试听', targetId: 'voice-preview'},
+  {id: 'review', label: '确认生成', meta: '一键提交', targetId: 'preflight-check'}
+];
 
 export function SubmitJobForm({
   initialContent,
@@ -84,6 +101,7 @@ export function SubmitJobForm({
     ],
     [recommendation.speechRate, recommendation.voice, speechRate, trimmedContent.length, trimmedTaskName.length, voice]
   );
+  const completedCheckCount = workspaceChecks.filter((check) => check.done).length;
 
   const applyRecommendation = () => {
     setVoice(recommendation.voice);
@@ -157,16 +175,30 @@ export function SubmitJobForm({
   };
 
   return (
-    <form data-sketch-form="new-video-draft" onSubmit={handleSubmit} style={formStyle}>
-      <div style={introCardStyle}>
-        <p style={eyebrowStyle}>DRAFT / 新建讲解</p>
-        <h2 style={titleStyle}>把题目变成可直接演示的讲解视频</h2>
-        <p style={descriptionStyle}>
-          输入题目后，系统会自动生成讲解步骤、字幕、配音和动画视频。固定样片会自动带入推荐时长、风格和任务名称。
-        </p>
-      </div>
+    <form
+      data-form-visual-system="clean-saas"
+      data-form-typography="product-editorial"
+      data-sketch-form="new-video-draft"
+      data-form-shell="professional-workflow"
+      onSubmit={handleSubmit}
+      style={formStyle}
+    >
+      <style>{formMotionStyles}</style>
+      <StepIndicator completedCount={completedCheckCount} totalCount={workspaceChecks.length} />
 
-      <section data-form-section="workspace-overview" style={overviewSectionStyle}>
+      <div data-form-workspace="content-with-preview" style={formWorkspaceStyle}>
+        <CreationRail completedCount={completedCheckCount} totalCount={workspaceChecks.length} />
+
+        <div data-form-editing-canvas="lesson-draft" style={formMainColumnStyle}>
+          <div style={introCardStyle}>
+            <p style={eyebrowStyle}>DRAFT / 新建讲解</p>
+            <h2 style={titleStyle}>把题目变成可直接演示的讲解视频</h2>
+            <p style={descriptionStyle}>
+              输入题目后，系统会自动生成讲解步骤、字幕、配音和动画视频。固定样片会自动带入推荐时长、风格和任务名称。
+            </p>
+          </div>
+
+      <section data-card-variant="overview-clean" data-form-section="workspace-overview" style={overviewSectionStyle}>
         <SectionHeader
           eyebrow="创作总览"
           title="先确认这次创作的交付方向"
@@ -193,7 +225,7 @@ export function SubmitJobForm({
         </div>
       </section>
 
-      <section data-form-section="problem-input" style={sectionCardStyle}>
+      <section data-card-variant="section-clean" data-form-section="problem-input" id="problem-input" style={sectionCardStyle}>
         <SectionHeader
           eyebrow="QUESTION / 输入题目"
           title="题目输入"
@@ -225,7 +257,7 @@ export function SubmitJobForm({
         </div>
       </section>
 
-      <section data-form-section="generation-settings" style={sectionCardStyle}>
+      <section data-card-variant="section-clean" data-form-section="generation-settings" id="generation-settings" style={sectionCardStyle}>
         <SectionHeader
           eyebrow="CONFIG / 生成参数"
           title="生成设置"
@@ -279,14 +311,14 @@ export function SubmitJobForm({
         </div>
       </section>
 
-      <section data-form-section="voice-preview" style={sectionCardStyle}>
+      <section data-card-variant="section-clean" data-form-section="voice-preview" id="voice-preview" style={sectionCardStyle}>
         <SectionHeader
           eyebrow="VOICE / 试听配音"
           title="试听与配音选择"
           description="先看系统推荐，再试听三种音色，确认这一题更适合哪种老师声音。"
         />
         <div style={sectionBodyStyle}>
-          <section style={recommendationCardStyle}>
+          <section data-card-variant="recommendation-clean" style={recommendationCardStyle}>
             <div style={recommendationHeaderStyle}>
               <div>
                 <p style={recommendationEyebrowStyle}>推荐配音</p>
@@ -346,13 +378,34 @@ export function SubmitJobForm({
           </div>
 
           <div style={actionsStyle}>
-            <button type="button" onClick={() => void handlePreview()} style={previewButtonStyle}>
-              {previewStatus === 'loading' ? '生成试听中...' : '对比三种音色'}
-            </button>
-            <button type="submit" disabled={status === 'submitting'} style={submitButtonStyle}>
-              {status === 'submitting' ? '正在生成...' : '生成视频'}
-            </button>
+            <LoadingButton
+              dataKey="preview-audio"
+              isLoading={previewStatus === 'loading'}
+              loadingLabel="生成试听中..."
+              onClick={() => void handlePreview()}
+              style={previewButtonStyle}
+              type="button"
+            >
+              对比三种音色
+            </LoadingButton>
+            <LoadingButton
+              dataKey="generate-video"
+              disabled={status === 'submitting'}
+              isLoading={status === 'submitting'}
+              loadingLabel="正在生成..."
+              style={submitButtonStyle}
+              type="submit"
+            >
+              生成视频
+            </LoadingButton>
           </div>
+
+          <FormFeedback
+            previewError={previewError}
+            previewStatus={previewStatus}
+            status={status}
+            submitError={submitError}
+          />
 
           {previews.length > 0 ? (
             <section style={previewSectionStyle}>
@@ -398,7 +451,7 @@ export function SubmitJobForm({
         </div>
       </section>
 
-      <section data-form-section="preflight-check" style={preflightSectionStyle}>
+      <section data-card-variant="preflight-clean" data-form-section="preflight-check" id="preflight-check" style={preflightSectionStyle}>
         <SectionHeader
           eyebrow="CHECKLIST / 渲染前检查"
           title="确认这次任务可以顺畅进入渲染"
@@ -421,9 +474,172 @@ export function SubmitJobForm({
         </div>
       </section>
 
-      {status === 'failed' && submitError ? <p role="alert">{submitError}</p> : null}
-      {previewStatus === 'failed' && previewError ? <p role="alert">{previewError}</p> : null}
+        </div>
+
+        <LivePreview
+          content={trimmedContent}
+          isReady={workspaceChecks.every((check) => check.done)}
+          speechRate={speechRate}
+          taskName={trimmedTaskName}
+          targetDurationSec={targetDurationSec}
+          voice={voice}
+        />
+      </div>
+
+      {status === 'failed' && submitError ? <p role="alert" style={alertStyle}>{submitError}</p> : null}
+      {previewStatus === 'failed' && previewError ? <p role="alert" style={alertStyle}>{previewError}</p> : null}
     </form>
+  );
+}
+
+function LoadingButton({
+  children,
+  dataKey,
+  isLoading,
+  loadingLabel,
+  style,
+  ...buttonProps
+}: ButtonHTMLAttributes<HTMLButtonElement> & {
+  dataKey: 'preview-audio' | 'generate-video';
+  isLoading: boolean;
+  loadingLabel: string;
+}) {
+  return (
+    <button
+      {...buttonProps}
+      aria-busy={isLoading}
+      data-loading-button={dataKey}
+      disabled={buttonProps.disabled || isLoading}
+      style={{...style, ...(isLoading ? loadingButtonStyle : {})}}
+    >
+      {isLoading ? <span aria-hidden="true" data-loading-spinner="inline" style={spinnerStyle} /> : null}
+      {isLoading ? loadingLabel : children}
+    </button>
+  );
+}
+
+function FormFeedback({
+  previewError,
+  previewStatus,
+  status,
+  submitError
+}: {
+  previewError: string | null;
+  previewStatus: 'idle' | 'loading' | 'failed';
+  status: 'idle' | 'submitting' | 'failed';
+  submitError: string | null;
+}) {
+  const isError = status === 'failed' || previewStatus === 'failed';
+  const message =
+    status === 'submitting'
+      ? '正在创建视频任务，请稍候。'
+      : previewStatus === 'loading'
+        ? '正在生成试听音频，请稍候。'
+        : submitError || previewError || '准备就绪，填写题目后可以试听音色或生成视频。';
+
+  return (
+    <div
+      aria-live="polite"
+      data-form-feedback="operation-status"
+      style={isError ? feedbackErrorStyle : feedbackStyle}
+    >
+      <span style={isError ? feedbackErrorDotStyle : feedbackDotStyle} />
+      <p style={feedbackTextStyle}>{message}</p>
+    </div>
+  );
+}
+
+function StepIndicator({completedCount, totalCount}: {completedCount: number; totalCount: number}) {
+  return (
+    <nav aria-label="表单步骤" data-form-stepper="generation-flow" style={stepperStyle}>
+      <div data-step-progress="form-completion" style={stepProgressStyle}>
+        <span style={stepProgressLabelStyle}>准备进度</span>
+        <strong style={stepProgressValueStyle}>{`${completedCount}/${totalCount} 已完成`}</strong>
+      </div>
+      <div style={stepperListStyle}>
+        {creationSteps.map((step, index) => (
+          <a
+            data-step-anchor={step.id}
+            href={`#${step.targetId}`}
+            key={step.id}
+            style={stepItemStyle}
+          >
+            <span style={stepIndexStyle}>{index + 1}</span>
+            <span style={stepTextStyle}>
+              <strong style={stepLabelStyle}>{step.label}</strong>
+              <span style={stepMetaStyle}>{step.meta}</span>
+            </span>
+          </a>
+        ))}
+      </div>
+    </nav>
+  );
+}
+
+function CreationRail({completedCount, totalCount}: {completedCount: number; totalCount: number}) {
+  return (
+    <aside data-form-rail="creation-steps" style={creationRailStyle}>
+      <div style={creationRailHeaderStyle}>
+        <p style={creationRailEyebrowStyle}>CREATION FLOW</p>
+        <h3 style={creationRailTitleStyle}>按步骤完成一条讲解视频</h3>
+        <p style={creationRailBodyStyle}>当前已完成 {completedCount}/{totalCount} 项准备检查。</p>
+      </div>
+      <div style={creationRailListStyle}>
+        {creationSteps.map((step, index) => (
+          <a href={`#${step.targetId}`} key={step.id} style={creationRailItemStyle}>
+            <span style={creationRailIndexStyle}>{index + 1}</span>
+            <span style={creationRailTextStyle}>
+              <strong style={creationRailLabelStyle}>{step.label}</strong>
+              <span style={creationRailMetaStyle}>{step.meta}</span>
+            </span>
+          </a>
+        ))}
+      </div>
+    </aside>
+  );
+}
+
+function LivePreview({
+  content,
+  isReady,
+  speechRate,
+  taskName,
+  targetDurationSec,
+  voice
+}: {
+  content: string;
+  isReady: boolean;
+  speechRate: SpeechRate;
+  taskName: string;
+  targetDurationSec: 30 | 45 | 60;
+  voice: VoiceOption;
+}) {
+  return (
+    <aside data-form-preview="live-summary" style={livePreviewStyle}>
+      <span style={createBadgeStyleV2(isReady ? 'success' : 'warning')}>
+        {isReady ? '填写完整，可以生成' : '仍需确认'}
+      </span>
+      <div style={livePreviewHeaderStyle}>
+        <p style={livePreviewKickerStyle}>LIVE PREVIEW</p>
+        <h3 style={livePreviewTitleStyle}>实时预览</h3>
+        <p style={livePreviewBodyStyle}>右侧会随着题目、任务名和配音策略实时更新，帮助老师在提交前快速确认。</p>
+      </div>
+      <div style={livePreviewListStyle}>
+        <PreviewRow label="任务名称" value={taskName || '未填写任务名称'} />
+        <PreviewRow label="题目内容" value={content ? `${content.slice(0, 48)}${content.length > 48 ? '…' : ''}` : '等待输入题目'} />
+        <PreviewRow label="预计产出" value={`${targetDurationSec} 秒竖屏视频 + 字幕 + 配音`} />
+        <PreviewRow label="配音策略" value={`${formatVoice(voice)} · ${formatSpeechRate(speechRate)}`} />
+      </div>
+    </aside>
+  );
+}
+
+function PreviewRow({label, value}: {label: string; value: string}) {
+  return (
+    <div style={previewRowStyle}>
+      <span style={previewRowLabelStyle}>{label}</span>
+      <strong style={previewRowValueStyle}>{value}</strong>
+    </div>
   );
 }
 
@@ -447,20 +663,243 @@ function SectionHeader({
 
 const formStyle = {
   display: 'grid',
-  gap: 18,
+  gap: designTokens.spacing[5],
   position: 'relative' as const
 };
 
-const introCardStyle = {
-  background: createSketchGridBackground('#fffaf1', '0.09'),
-  backgroundSize: '18px 18px',
-  border: `3px solid ${sketchColors.ink}`,
-  borderRadius: 14,
-  boxShadow: '6px 7px 0 rgba(42,36,29,0.12)',
+const formWorkspaceStyle = {
+  alignItems: 'start',
   display: 'grid',
-  gap: 8,
-  padding: 18,
-  transform: 'rotate(-0.35deg)'
+  gap: designTokens.spacing[6],
+  gridTemplateColumns: 'minmax(190px, 230px) minmax(0, 1fr) minmax(260px, 340px)'
+};
+
+const formMainColumnStyle = {
+  display: 'grid',
+  gap: designTokens.spacing[5],
+  minWidth: 0
+};
+
+const stepperStyle = {
+  ...createCardStyleV2('low'),
+  display: 'grid',
+  gap: designTokens.spacing[3],
+  padding: designTokens.spacing[4]
+};
+
+const stepProgressStyle = {
+  alignItems: 'center',
+  display: 'flex',
+  gap: designTokens.spacing[2],
+  justifyContent: 'space-between'
+};
+
+const stepProgressLabelStyle = {
+  color: designTokens.colors.neutral[500],
+  fontSize: designTokens.fontSize.xs,
+  fontWeight: designTokens.fontWeight.semibold,
+  letterSpacing: '0.08em'
+};
+
+const stepProgressValueStyle = {
+  color: designTokens.colors.brand.primary,
+  fontSize: designTokens.fontSize.sm
+};
+
+const stepperListStyle = {
+  alignItems: 'center',
+  display: 'grid',
+  gap: designTokens.spacing[3],
+  gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))'
+};
+
+const stepItemStyle = {
+  alignItems: 'center',
+  color: 'inherit',
+  display: 'flex',
+  gap: designTokens.spacing[3],
+  textDecoration: 'none'
+};
+
+const stepIndexStyle = {
+  alignItems: 'center',
+  background: designTokens.colors.brand.primary,
+  borderRadius: designTokens.borderRadius.full,
+  color: '#fff',
+  display: 'inline-flex',
+  flexShrink: 0,
+  fontSize: designTokens.fontSize.sm,
+  fontWeight: designTokens.fontWeight.bold,
+  height: 34,
+  justifyContent: 'center',
+  width: 34
+};
+
+const stepTextStyle = {
+  display: 'grid',
+  gap: 2
+};
+
+const stepLabelStyle = {
+  color: designTokens.colors.neutral[900],
+  fontSize: designTokens.fontSize.sm
+};
+
+const stepMetaStyle = {
+  color: designTokens.colors.neutral[500],
+  fontSize: designTokens.fontSize.xs
+};
+
+const creationRailStyle = {
+  ...createCardStyleV2('low'),
+  gap: designTokens.spacing[5],
+  position: 'sticky' as const,
+  top: 24
+};
+
+const creationRailHeaderStyle = {
+  display: 'grid',
+  gap: designTokens.spacing[2]
+};
+
+const creationRailEyebrowStyle = {
+  color: designTokens.colors.brand.primary,
+  fontFamily: designTokens.fonts.mono,
+  fontSize: designTokens.fontSize.xs,
+  fontWeight: designTokens.fontWeight.extrabold,
+  letterSpacing: '0.12em',
+  margin: 0
+};
+
+const creationRailTitleStyle = {
+  color: designTokens.colors.neutral[900],
+  fontSize: designTokens.fontSize.lg,
+  lineHeight: designTokens.lineHeight.tight,
+  margin: 0
+};
+
+const creationRailBodyStyle = {
+  color: designTokens.colors.neutral[600],
+  fontSize: designTokens.fontSize.sm,
+  lineHeight: designTokens.lineHeight.relaxed,
+  margin: 0
+};
+
+const creationRailListStyle = {
+  display: 'grid',
+  gap: designTokens.spacing[3]
+};
+
+const creationRailItemStyle = {
+  alignItems: 'center',
+  background: designTokens.colors.neutral[50],
+  border: `1px solid ${designTokens.colors.neutral[200]}`,
+  borderRadius: designTokens.borderRadius.lg,
+  color: 'inherit',
+  display: 'flex',
+  gap: designTokens.spacing[3],
+  padding: designTokens.spacing[3],
+  textDecoration: 'none'
+};
+
+const creationRailIndexStyle = {
+  alignItems: 'center',
+  background: designTokens.colors.brand.primary,
+  borderRadius: designTokens.borderRadius.full,
+  color: '#fff',
+  display: 'inline-flex',
+  flexShrink: 0,
+  fontSize: designTokens.fontSize.xs,
+  fontWeight: designTokens.fontWeight.bold,
+  height: 28,
+  justifyContent: 'center',
+  width: 28
+};
+
+const creationRailTextStyle = {
+  display: 'grid',
+  gap: 2
+};
+
+const creationRailLabelStyle = {
+  color: designTokens.colors.neutral[900],
+  fontSize: designTokens.fontSize.sm
+};
+
+const creationRailMetaStyle = {
+  color: designTokens.colors.neutral[500],
+  fontSize: designTokens.fontSize.xs
+};
+
+const livePreviewStyle = {
+  ...createCardStyleV2('medium'),
+  gap: designTokens.spacing[5],
+  position: 'sticky' as const,
+  top: 24
+};
+
+const livePreviewHeaderStyle = {
+  display: 'grid',
+  gap: designTokens.spacing[2]
+};
+
+const livePreviewKickerStyle = {
+  color: designTokens.colors.brand.primary,
+  fontFamily: designTokens.fonts.mono,
+  fontSize: designTokens.fontSize.xs,
+  fontWeight: designTokens.fontWeight.extrabold,
+  letterSpacing: '0.12em',
+  margin: 0
+};
+
+const livePreviewTitleStyle = {
+  color: designTokens.colors.neutral[900],
+  fontFamily: designTokens.fonts.sans,
+  fontSize: designTokens.fontSize['2xl'],
+  lineHeight: designTokens.lineHeight.tight,
+  margin: 0
+};
+
+const livePreviewBodyStyle = {
+  color: designTokens.colors.neutral[600],
+  lineHeight: designTokens.lineHeight.relaxed,
+  margin: 0
+};
+
+const livePreviewListStyle = {
+  display: 'grid',
+  gap: designTokens.spacing[3]
+};
+
+const previewRowStyle = {
+  background: designTokens.colors.neutral[50],
+  border: `1px solid ${designTokens.colors.neutral[200]}`,
+  borderRadius: designTokens.borderRadius.lg,
+  display: 'grid',
+  gap: designTokens.spacing[1],
+  padding: designTokens.spacing[3]
+};
+
+const previewRowLabelStyle = {
+  color: designTokens.colors.neutral[500],
+  fontSize: designTokens.fontSize.xs,
+  fontWeight: designTokens.fontWeight.semibold
+};
+
+const previewRowValueStyle = {
+  color: designTokens.colors.neutral[800],
+  fontSize: designTokens.fontSize.sm,
+  lineHeight: designTokens.lineHeight.snug
+};
+
+const introCardStyle = {
+  background: `linear-gradient(135deg, ${designTokens.colors.neutral[50]}, ${designTokens.colors.warning.bg})`,
+  border: `1px solid ${designTokens.colors.neutral[200]}`,
+  borderRadius: designTokens.borderRadius.xl,
+  boxShadow: designTokens.shadows.md,
+  display: 'grid',
+  gap: designTokens.spacing[2],
+  padding: designTokens.spacing[6]
 };
 
 const eyebrowStyle = {
@@ -470,26 +909,26 @@ const eyebrowStyle = {
 };
 
 const titleStyle = {
-  color: sketchColors.ink,
-  fontFamily: '"Times New Roman", Georgia, "Noto Serif SC", serif',
-  fontSize: 32,
-  fontStyle: 'italic' as const,
-  lineHeight: 1.15,
+  color: designTokens.colors.neutral[900],
+  fontFamily:
+    '"Avenir Next", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif',
+  fontSize: 30,
+  fontWeight: designTokens.fontWeight.extrabold,
+  letterSpacing: '-0.03em',
+  lineHeight: 1.18,
   margin: 0
 };
 
 const descriptionStyle = {
-  color: sketchColors.muted,
-  lineHeight: 1.7,
+  color: designTokens.colors.neutral[600],
+  lineHeight: designTokens.lineHeight.relaxed,
   margin: 0
 };
 
 const overviewSectionStyle = {
-  ...createSketchCardStyle({tone: 'paper'}),
-  border: `3px dashed ${sketchColors.muted}`,
-  boxShadow: undefined,
-  gap: 16,
-  padding: 18
+  ...createCardStyleV2('medium'),
+  gap: designTokens.spacing[4],
+  padding: designTokens.spacing[5]
 };
 
 const overviewGridStyle = {
@@ -499,12 +938,12 @@ const overviewGridStyle = {
 };
 
 const overviewCardStyle = {
-  ...createSketchCardStyle({tone: 'paper'}),
-  border: `2px solid ${sketchColors.muted}`,
-  boxShadow: undefined,
-  gap: 8,
-  padding: 14,
-  transform: 'rotate(-0.25deg)'
+  background: designTokens.colors.neutral[50],
+  border: `1px solid ${designTokens.colors.neutral[200]}`,
+  borderRadius: designTokens.borderRadius.lg,
+  display: 'grid',
+  gap: designTokens.spacing[2],
+  padding: designTokens.spacing[4]
 };
 
 const overviewLabelStyle = {
@@ -528,14 +967,10 @@ const overviewBodyStyle = {
 };
 
 const sectionCardStyle = {
-  background: createSketchGridBackground('rgba(255,250,241,0.96)', '0.09'),
-  backgroundSize: '18px 18px',
-  border: `3px solid ${sketchColors.muted}`,
-  borderRadius: 14,
+  ...createCardStyleV2('medium'),
   display: 'grid',
-  gap: 16,
-  padding: 18,
-  transform: 'rotate(0.2deg)'
+  gap: designTokens.spacing[4],
+  padding: designTokens.spacing[5]
 };
 
 const sectionHeaderStyle = {
@@ -553,17 +988,19 @@ const sectionEyebrowStyle = {
 };
 
 const sectionTitleStyle = {
-  color: sketchColors.ink,
-  fontFamily: '"Times New Roman", Georgia, "Noto Serif SC", serif',
-  fontSize: 24,
-  fontStyle: 'italic' as const,
-  lineHeight: 1.2,
+  color: designTokens.colors.neutral[900],
+  fontFamily:
+    '"Avenir Next", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif',
+  fontSize: designTokens.fontSize.xl,
+  fontWeight: designTokens.fontWeight.bold,
+  letterSpacing: '-0.02em',
+  lineHeight: designTokens.lineHeight.tight,
   margin: 0
 };
 
 const sectionDescriptionStyle = {
-  color: sketchColors.muted,
-  lineHeight: 1.65,
+  color: designTokens.colors.neutral[600],
+  lineHeight: designTokens.lineHeight.relaxed,
   margin: 0
 };
 
@@ -573,20 +1010,15 @@ const sectionBodyStyle = {
 };
 
 const fieldLabelStyle = {
-  color: sketchColors.ink,
-  fontSize: 14,
-  fontWeight: 800,
-  letterSpacing: 0.8
+  ...createLabelStyleV2(),
+  color: designTokens.colors.neutral[800],
+  fontWeight: designTokens.fontWeight.semibold,
+  letterSpacing: 0.2
 };
 
 const textInputStyle = {
-  background: '#fffaf1',
-  border: `2px solid ${sketchColors.muted}`,
-  borderRadius: 8,
-  color: sketchColors.ink,
-  fontSize: 15,
-  outline: 'none',
-  padding: '13px 14px'
+  ...createInputStyleV2(),
+  boxShadow: designTokens.shadows.inner
 };
 
 const textareaStyle = {
@@ -602,31 +1034,26 @@ const optionsGridStyle = {
 };
 
 const selectLabelStyle = {
-  color: sketchColors.ink,
+  color: designTokens.colors.neutral[800],
   display: 'grid',
-  fontSize: 14,
-  fontWeight: 800,
+  fontSize: designTokens.fontSize.sm,
+  fontWeight: designTokens.fontWeight.semibold,
   gap: 8
 };
 
 const selectStyle = {
-  background: '#fffaf1',
-  border: `2px solid ${sketchColors.muted}`,
-  borderRadius: 8,
-  color: sketchColors.ink,
-  fontSize: 15,
-  padding: '12px 14px'
+  ...createInputStyleV2(),
+  cursor: 'pointer'
 };
 
 const recommendationCardStyle = {
-  background: sketchColors.note,
-  border: '2px solid rgba(42,36,29,0.2)',
-  borderRadius: 4,
-  boxShadow: '7px 8px 0 rgba(42,36,29,0.12)',
+  background: `linear-gradient(135deg, ${designTokens.colors.warning.bg}, ${designTokens.colors.neutral[50]})`,
+  border: `1px solid ${designTokens.colors.warning.light}`,
+  borderRadius: designTokens.borderRadius.xl,
+  boxShadow: designTokens.shadows.sm,
   display: 'grid',
-  gap: 10,
-  padding: 16,
-  transform: 'rotate(-1.2deg)'
+  gap: designTokens.spacing[3],
+  padding: designTokens.spacing[4]
 };
 
 const recommendationHeaderStyle = {
@@ -664,9 +1091,9 @@ const recommendationMetaGridStyle = {
 };
 
 const recommendationMetaItemStyle = {
-  background: 'rgba(255,250,241,0.72)',
-  border: '2px solid rgba(42,36,29,0.18)',
-  borderRadius: 8,
+  background: 'rgba(255,255,255,0.72)',
+  border: `1px solid ${designTokens.colors.neutral[200]}`,
+  borderRadius: designTokens.borderRadius.lg,
   display: 'grid',
   gap: 4,
   padding: 12
@@ -679,8 +1106,7 @@ const recommendationMetaLabelStyle = {
 };
 
 const recommendButtonStyle = {
-  ...createSketchButtonStyle({tone: 'secondary'}),
-  padding: '8px 12px'
+  ...createButtonStyleV2('outline', 'sm')
 };
 
 const actionsStyle = {
@@ -690,15 +1116,65 @@ const actionsStyle = {
 };
 
 const previewButtonStyle = {
-  ...createSketchButtonStyle({tone: 'secondary'}),
-  padding: '10px 16px'
+  ...createButtonStyleV2('outline', 'md')
 };
 
 const submitButtonStyle = {
-  ...createSketchButtonStyle({tone: 'primary'}),
-  fontWeight: 900,
-  padding: '10px 18px',
-  transform: 'rotate(-0.5deg)'
+  ...createButtonStyleV2('primary', 'md'),
+  fontWeight: 900
+};
+
+const loadingButtonStyle = {
+  opacity: 0.82,
+  pointerEvents: 'none' as const
+};
+
+const spinnerStyle = {
+  animation: 'buttonSpinner 800ms linear infinite',
+  border: '2px solid currentColor',
+  borderRightColor: 'transparent',
+  borderRadius: designTokens.borderRadius.full,
+  display: 'inline-flex',
+  height: 14,
+  marginRight: 8,
+  width: 14
+};
+
+const feedbackStyle = {
+  alignItems: 'center',
+  background: designTokens.colors.neutral[50],
+  border: `1px solid ${designTokens.colors.neutral[200]}`,
+  borderRadius: designTokens.borderRadius.lg,
+  color: designTokens.colors.neutral[700],
+  display: 'flex',
+  gap: designTokens.spacing[3],
+  padding: designTokens.spacing[3]
+};
+
+const feedbackErrorStyle = {
+  ...feedbackStyle,
+  background: designTokens.colors.error.bg,
+  border: `1px solid ${designTokens.colors.error.light}`,
+  color: designTokens.colors.error.dark
+};
+
+const feedbackDotStyle = {
+  background: designTokens.colors.success.main,
+  borderRadius: designTokens.borderRadius.full,
+  flexShrink: 0,
+  height: 10,
+  width: 10
+};
+
+const feedbackErrorDotStyle = {
+  ...feedbackDotStyle,
+  background: designTokens.colors.error.main
+};
+
+const feedbackTextStyle = {
+  fontSize: designTokens.fontSize.sm,
+  lineHeight: designTokens.lineHeight.snug,
+  margin: 0
 };
 
 const previewSectionStyle = {
@@ -796,12 +1272,10 @@ const audioStyle = {
 };
 
 const preflightSectionStyle = {
-  background: 'rgba(255,250,241,0.92)',
-  border: `3px dashed ${sketchColors.muted}`,
-  borderRadius: 14,
+  ...createCardStyleV2('medium'),
   display: 'grid',
-  gap: 16,
-  padding: 18
+  gap: designTokens.spacing[4],
+  padding: designTokens.spacing[5]
 };
 
 const preflightGridStyle = {
@@ -817,9 +1291,9 @@ const preflightListStyle = {
 
 const preflightItemStyle = {
   alignItems: 'center',
-  background: '#fffaf1',
-  border: `2px solid ${sketchColors.muted}`,
-  borderRadius: 8,
+  background: designTokens.colors.neutral[50],
+  border: `1px solid ${designTokens.colors.neutral[200]}`,
+  borderRadius: designTokens.borderRadius.lg,
   display: 'flex',
   gap: 10,
   padding: '12px 14px'
@@ -848,15 +1322,51 @@ const preflightItemTextStyle = {
 };
 
 const preflightCardStyle = {
-  background: sketchColors.note,
-  border: '2px solid rgba(42,36,29,0.2)',
-  borderRadius: 4,
-  color: sketchColors.ink,
+  background: designTokens.colors.warning.bg,
+  border: `1px solid ${designTokens.colors.warning.light}`,
+  borderRadius: designTokens.borderRadius.xl,
+  color: designTokens.colors.neutral[900],
   display: 'grid',
   gap: 8,
-  padding: 16,
-  transform: 'rotate(1deg)'
+  padding: 16
 };
+
+const alertStyle = {
+  background: designTokens.colors.error.bg,
+  border: `1px solid ${designTokens.colors.error.light}`,
+  borderRadius: designTokens.borderRadius.lg,
+  color: designTokens.colors.error.dark,
+  margin: 0,
+  padding: designTokens.spacing[4]
+};
+
+const formMotionStyles = `
+  ${keyframesV2}
+
+  @keyframes buttonSpinner {
+    from {
+      transform: rotate(0deg);
+    }
+
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @media (max-width: 960px) {
+    [data-form-workspace="content-with-preview"] {
+      grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    [data-form-preview="live-summary"] {
+      position: static !important;
+    }
+
+    [data-form-rail="creation-steps"] {
+      position: static !important;
+    }
+  }
+`;
 
 const formatVoice = (voice: VoiceOption) => {
   const labels: Record<VoiceOption, string> = {
