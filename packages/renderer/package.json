@@ -2,5 +2,8 @@
   "name": "@edu/renderer",
   "version": "0.0.1",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "katex": "^0.16.11"
+  }
 }
