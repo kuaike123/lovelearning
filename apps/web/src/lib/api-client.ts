@@ -56,6 +56,28 @@ const readApiErrorMessage = async (response: Response) => {
   return `API_${response.status}`;
 };
 
+export const withRetry = async <T>(
+  operation: () => Promise<T>,
+  options: {retries?: number} = {}
+) => {
+  const retries = options.retries ?? 1;
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error;
+
+      if (attempt === retries) {
+        break;
+      }
+    }
+  }
+
+  throw lastError instanceof Error ? lastError : new Error('API_UNREACHABLE');
+};
+
 export const createJob = async (input: ProblemInput) => {
   return requestJson(`${getApiBaseUrl()}/jobs`, {
     method: 'POST',

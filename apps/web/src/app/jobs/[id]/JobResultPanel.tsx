@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import React, {useEffect, useState} from 'react';
 
 import {getJob, getLessonPlan, regenerateJob} from '../../../lib/api-client';
@@ -343,7 +344,19 @@ export function JobAssetPreview({job}: {job: Job}) {
             <a href={job.videoUrl}>{copy.assetVideo}</a>
           </video>
         ) : null}
-        {job.coverUrl ? <img alt={copy.coverAlt} src={job.coverUrl} style={coverStyle} /> : null}
+        {job.coverUrl ? (
+          <span data-image-optimized="next-image" style={coverFrameStyle}>
+            <Image
+              alt={copy.coverAlt}
+              height={640}
+              loading="lazy"
+              src={job.coverUrl}
+              style={coverStyle}
+              unoptimized
+              width={360}
+            />
+          </span>
+        ) : null}
       </div>
     </section>
   );
@@ -804,9 +817,18 @@ const videoStyle = {
 };
 
 const coverStyle = {
+  borderRadius: 14,
+  height: 'auto',
+  width: '100%'
+};
+
+const coverFrameStyle = {
+  aspectRatio: '9 / 16',
   border: `3px solid ${sketchColors.ink}`,
   borderRadius: 14,
+  display: 'block',
   maxWidth: 220,
+  overflow: 'hidden',
   width: '100%'
 };
 
