@@ -1,4 +1,4 @@
-import {Injectable} from '@nestjs/common';
+import {BadRequestException, Injectable} from '@nestjs/common';
 import {randomUUID} from 'node:crypto';
 import {join} from 'node:path';
 
@@ -23,6 +23,13 @@ export class JobsService {
 
   create(input: unknown) {
     const parsedInput = CreateJobDto.parse(input);
+
+    if (parsedInput.subject !== 'math') {
+      throw new BadRequestException(
+        `${getSubjectLabel(parsedInput.subject)}\u5b66\u79d1\u6682\u672a\u5f00\u653e\u751f\u6210\uff0c\u5f53\u524d\u8bf7\u5148\u4f7f\u7528\u6570\u5b66\u9898\u3002`
+      );
+    }
+
     const recommendation = buildRecommendation(parsedInput);
 
     const job = {
@@ -32,6 +39,9 @@ export class JobsService {
       createdAt: new Date().toISOString(),
       taskName: buildTaskName(parsedInput),
       problemText: parsedInput.content,
+      generationPrompt: parsedInput.generationPrompt,
+      model: parsedInput.model ?? 'standard',
+      outputType: parsedInput.outputType ?? 'video',
       voice: parsedInput.voice ?? recommendation.voice,
       speechRate: parsedInput.speechRate ?? recommendation.speechRate,
       narrationTone: recommendation.narrationTone,
@@ -136,6 +146,9 @@ export class JobsService {
             metadata: {
               problemText: input.content,
               taskName: buildTaskName(input),
+              generationPrompt: input.generationPrompt,
+              model: input.model ?? 'standard',
+              outputType: input.outputType ?? 'video',
               voice: input.voice ?? recommendation.voice,
               speechRate: input.speechRate ?? recommendation.speechRate,
               narrationTone: recommendation.narrationTone,
@@ -180,4 +193,12 @@ const normalizeDuration = (duration: number | undefined): 30 | 45 | 60 => {
   }
 
   return 45;
+};
+
+const getSubjectLabel = (subject: ProblemInput['subject']) => {
+  if (subject === 'physics') return '\u7269\u7406';
+  if (subject === 'english') return '\u82f1\u8bed';
+  if (subject === 'chinese') return '\u8bed\u6587';
+
+  return '\u6570\u5b66';
 };

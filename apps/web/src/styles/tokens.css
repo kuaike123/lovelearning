@@ -1,0 +1,49 @@
+:root {
+  --ll-color-primary: #111827;
+  --ll-color-primary-hover: #0F172A;
+  --ll-color-secondary: #F97316;
+  --ll-color-secondary-hover: #EA580C;
+  --ll-color-success: #047857;
+  --ll-color-warning: #B45309;
+  --ll-color-danger: #B91C1C;
+  --ll-color-surface: #FFFFFF;
+  --ll-color-surface-muted: #F8FAFC;
+  --ll-color-border: #D1D5DB;
+  --ll-color-neutral-50: #F9FAFB;
+  --ll-color-neutral-100: #F3F4F6;
+  --ll-color-neutral-300: #D1D5DB;
+  --ll-color-neutral-600: #4B5563;
+  --ll-color-neutral-700: #374151;
+  --ll-color-neutral-900: #111827;
+
+  --ll-spacing-1: 4px;
+  --ll-spacing-2: 8px;
+  --ll-spacing-3: 12px;
+  --ll-spacing-4: 16px;
+  --ll-spacing-5: 24px;
+  --ll-spacing-6: 32px;
+  --ll-spacing-7: 48px;
+  --ll-spacing-8: 64px;
+
+  --ll-font-body: "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  --ll-font-heading: "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  --ll-font-size-sm: 14px;
+  --ll-font-size-md: 16px;
+  --ll-font-size-lg: 20px;
+  --ll-font-size-xl: 28px;
+  --ll-line-tight: 1.25;
+  --ll-line-normal: 1.6;
+  --ll-font-weight-regular: 400;
+  --ll-font-weight-medium: 500;
+  --ll-font-weight-bold: 700;
+
+  --ll-shadow-none: none;
+  --ll-shadow-low: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --ll-shadow-medium: 0 12px 28px rgba(15, 23, 42, 0.12);
+  --ll-shadow-high: 0 24px 56px rgba(15, 23, 42, 0.18);
+
+  --ll-radius-sm: 8px;
+  --ll-radius-md: 14px;
+  --ll-radius-lg: 20px;
+  --ll-radius-full: 999px;
+}

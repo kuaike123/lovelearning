@@ -26,37 +26,28 @@ describe('app router page props', () => {
     );
 
     expect(markup).toContain('Solve equation: 2x + 3 = 11');
-    expect(markup).toContain('data-home-layout="workspace"');
-    expect(markup).toContain('data-home-typography="product-editorial"');
-    expect(markup).toContain('data-home-visual-system="studio-shell"');
-    expect(markup).toContain('data-home-banner="studio-hero"');
-    expect(markup).toContain('\u4e2d\u56fd\u6559\u57f9\u56e2\u961f\u7684 AI \u8bb2\u89e3\u89c6\u9891\u5de5\u4f5c\u53f0');
-    expect(markup).toContain('\u628a\u4e00\u9053\u9898\uff0c\u505a\u6210\u4e00\u6761\u4f1a\u8bb2\u8bfe\u7684\u77ed\u89c6\u9891');
-    expect(markup).toContain('data-home-entry="create"');
-    expect(markup).toContain('data-home-entry="samples"');
-    expect(markup).toContain('data-home-entry="jobs"');
-    expect(markup).toContain('data-home-panel="create"');
-    expect(markup).toContain('data-home-illustration="create"');
-    expect(markup).toContain('data-home-motion="panel-hero"');
-    expect(markup).toContain('\u65b0\u5efa\u89c6\u9891');
-    expect(markup).toContain('\u6d4f\u89c8\u6837\u7247');
-    expect(markup).toContain('\u67e5\u770b\u8fdb\u5ea6');
-    expect(markup).toContain('data-saas-shell="home-workspace"');
-    expect(markup).toContain('data-saas-sidebar="project-nav"');
-    expect(markup).toContain('data-saas-page="create"');
-    expect(markup).toContain('data-design-mode="professional"');
+    expect(markup).toContain('data-chat-shell="landing"');
+    expect(markup).toContain('data-navigation="app-shell"');
+    expect(markup).toContain('data-navigation-region="desktop-sidebar"');
+    expect(markup).toContain('data-chat-composer="problem-input"');
     expect(markup).toContain('data-theme-toggle="mode-switch"');
-    expect(markup).toContain('\u56fa\u5b9a\u9879\u76ee\u680f');
-    expect(markup).toContain('data-sketch-portal="wireframe"');
-    expect(markup).toContain('data-home-callout="priority-focus"');
-    expect(markup).toContain('data-home-callout="roadmap-focus"');
-    expect(markup).toContain('LoveLearning AI Studio');
-    expect(markup).toContain('PRODUCT BETA');
-    expect(markup).toContain('00 ALL');
-    expect(markup).toContain('01');
-    expect(markup).toContain('\u65b0\u5efa\u8bb2\u89e3');
-    expect(markup).toContain('data-sketch-canvas="home-dashboard"');
-    expect(markup).toContain('lovelearning.ai / studio / dashboard');
-    expect(markup).toContain('\u4eca\u65e5\u91cd\u70b9\uff1a\u8ba9\u8001\u5e08\u5feb\u901f\u5f00\u59cb\u751f\u6210');
+    expect(markup).toContain('输入题目，生成讲解视频');
+    expect(markup).toContain('开始生成');
+    expect(markup).toContain('高级设置');
+    expect(markup).not.toContain('data-saas-shell="home-workspace"');
+    expect(markup).not.toContain('PRODUCT BETA');
+  });
+
+  it('resolves the home view from searchParams without leaving the chat shell', async () => {
+    const markup = renderToStaticMarkup(
+      await HomePage({
+        searchParams: Promise.resolve({view: 'samples'} as never)
+      } as never)
+    );
+
+    expect(markup).toContain('data-chat-shell="landing"');
+    expect(markup).toContain('data-chat-panel="samples"');
+    expect(markup).toContain('\u6837\u7247\u5e93');
+    expect(markup).not.toContain('data-home-panel="samples"');
   });
 });

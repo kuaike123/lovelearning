@@ -1,0 +1,44 @@
+@import './tokens.css';
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  background: var(--ll-color-surface-muted);
+  color: var(--ll-color-neutral-900);
+  font-family: var(--ll-font-body);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--ll-color-surface-muted);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  outline-color: var(--ll-color-secondary);
+  outline-offset: 2px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ll-color-secondary);
+}
+
+a {
+  color: inherit;
+}

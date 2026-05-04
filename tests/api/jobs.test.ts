@@ -50,6 +50,35 @@ describe('jobs api', () => {
     expect(response.body.jobId).toEqual(expect.any(String));
   }, 30000);
 
+  it('rejects unopened subjects with a controlled Chinese error', async () => {
+    const response = await request(app.getHttpServer()).post('/jobs').send({
+      subject: 'physics',
+      sourceType: 'text',
+      content: '\u8bb2\u89e3\u725b\u987f\u7b2c\u4e8c\u5b9a\u5f8b'
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toContain('\u7269\u7406');
+    expect(response.body.message).toContain('\u6682\u672a\u5f00\u653e');
+  }, 30000);
+
+  it('keeps model and output prompt metadata on the created job', async () => {
+    const response = await request(app.getHttpServer()).post('/jobs').send({
+      subject: 'math',
+      sourceType: 'text',
+      content: 'Solve equation: 2x + 3 = 11',
+      generationPrompt: '\u8f93\u51fa\u7c7b\u578b\uff1aPPT\u3002\u8bf7\u751f\u6210\u8bfe\u4ef6\u9875\u7ed3\u6784\u3002',
+      model: 'deep',
+      outputType: 'ppt'
+    });
+
+    expect(response.status).toBe(201);
+    expect(response.body.model).toBe('deep');
+    expect(response.body.outputType).toBe('ppt');
+    expect(response.body.generationPrompt).toContain('PPT');
+    expect(response.body.problemText).toBe('Solve equation: 2x + 3 = 11');
+  }, 30000);
+
   it('returns a created job over HTTP', async () => {
     const created = await request(app.getHttpServer()).post('/jobs').send({
       subject: 'math',

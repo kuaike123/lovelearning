@@ -134,50 +134,30 @@ export function HomeWorkspaceSwitcher({
         <div style={sidebarBrandBlockStyle}>
           <span style={sidebarBrandEyebrowStyle}>LoveLearning</span>
           <strong style={sidebarBrandTitleStyle}>全科 AI</strong>
-          <p style={sidebarBrandBodyStyle}>固定项目栏 · 右侧切换页面</p>
         </div>
 
         <div style={projectNavListStyle}>
-        {viewCards.map((entry) => {
-          const selected = entry.id === activeView;
+          {viewCards.map((entry) => {
+            const selected = entry.id === activeView;
 
-          return (
-            <button
-              key={entry.id}
-              type="button"
-              data-home-entry={entry.id}
-              data-saas-nav={entry.id}
-              onClick={() => setActiveView(entry.id)}
-              style={{
-                ...projectNavButtonStyle,
-                ...(selected ? createActiveProjectNavButtonStyle(entry.accent) : {})
-              }}
-            >
-              <div style={entryTopRowStyle}>
-                <span style={createIconBadgeStyle(entry.accent, selected)}>
-                  <ModeGlyph accent={entry.accent} mode={entry.id} />
+            return (
+              <button
+                key={entry.id}
+                type="button"
+                data-home-entry={entry.id}
+                data-saas-nav={entry.id}
+                onClick={() => setActiveView(entry.id)}
+                style={{
+                  ...projectNavButtonStyle,
+                  ...(selected ? createActiveProjectNavButtonStyle(entry.accent) : {})
+                }}
+              >
+                <span style={{...entryTitleStyle, color: selected ? entry.accent : '#102A43'}}>
+                  {entry.navLabel ?? entry.title}
                 </span>
-                <span
-                  style={
-                    selected
-                      ? {...createPillStyle({tone: 'accent'}), width: 'fit-content'}
-                      : {...entryHintStyle, color: entry.accent}
-                  }
-                >
-                  {selected ? '当前工作区' : '点击进入'}
-                </span>
-              </div>
-              <span style={{...entryEyebrowStyle, color: entry.accent}}>{entry.eyebrow}</span>
-              <p style={entryTitleStyle}>{entry.navLabel ?? entry.title}</p>
-              <p style={entryBodyStyle}>{entry.body}</p>
-            </button>
-          );
-        })}
-      </div>
-
-        <div style={sidebarFooterStyle}>
-          <span style={sidebarFooterKickerStyle}>V1 能力边界</span>
-          <p style={sidebarFooterBodyStyle}>先稳定数学题讲解，再扩展全学科和动画数字人。</p>
+              </button>
+            );
+          })}
         </div>
       </aside>
 
@@ -192,7 +172,6 @@ export function HomeWorkspaceSwitcher({
           <div style={panelHeroContentStyle}>
             <span style={panelHeroEyebrowStyle}>{activeCard.eyebrow}</span>
             <h3 style={panelHeroTitleStyle}>{activeCard.panelTitle}</h3>
-            <p style={panelHeroBodyStyle}>{activeCard.panelBody}</p>
             <div style={panelHeroActionRowStyle}>
               {viewCards.map((entry) => (
                 <button
@@ -212,9 +191,7 @@ export function HomeWorkspaceSwitcher({
               <span style={{...createPillStyle({tone: 'accent'}), width: 'fit-content'}}>
                 {activeCard.title}
               </span>
-              <span style={panelHeroHelperBadgeStyle}>教培视频工作流</span>
             </div>
-            <p style={panelHeroHelperStyle}>{activeCard.helper}</p>
             <div data-home-illustration={activeCard.id} style={panelIllustrationFrameStyle}>
               <ModeIllustration accent={activeCard.accent} mode={activeCard.id} />
             </div>
@@ -442,7 +419,7 @@ const workspaceShellStyle = {
   alignItems: 'start',
   display: 'grid',
   gap: 24,
-  gridTemplateColumns: '260px minmax(0, 1fr)'
+  gridTemplateColumns: '180px minmax(0, 1fr)'
 };
 
 const projectSidebarStyle = {
@@ -452,8 +429,8 @@ const projectSidebarStyle = {
   borderRadius: designTokens.borderRadius.xl,
   boxShadow: designTokens.shadows.lg,
   display: 'grid',
-  gap: 18,
-  padding: designTokens.spacing[4],
+  gap: 14,
+  padding: designTokens.spacing[3],
   position: 'sticky' as const,
   top: 20
 };
@@ -477,8 +454,10 @@ const sidebarBrandEyebrowStyle = {
 
 const sidebarBrandTitleStyle = {
   color: designTokens.colors.neutral[900],
-  fontFamily: designTokens.fonts.sans,
+  fontFamily:
+    '"Avenir Next", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif',
   fontSize: designTokens.fontSize['3xl'],
+  fontWeight: 800,
   fontStyle: 'normal' as const,
   lineHeight: 1
 };
@@ -502,8 +481,9 @@ const projectNavButtonStyle = {
   borderRadius: designTokens.borderRadius.lg,
   boxShadow: 'none',
   cursor: 'pointer',
-  gap: 8,
-  padding: designTokens.spacing[4],
+  display: 'flex',
+  justifyContent: 'flex-start',
+  padding: '12px 14px',
   textAlign: 'left' as const,
   transition: `transform ${designTokens.transitions.base}, box-shadow ${designTokens.transitions.base}, border-color ${designTokens.transitions.base}`
 };
@@ -511,8 +491,7 @@ const projectNavButtonStyle = {
 const createActiveProjectNavButtonStyle = (accent: string) => ({
   background: designTokens.colors.neutral[50],
   border: `1px solid ${accent}`,
-  boxShadow: designTokens.shadows.md,
-  transform: 'translateY(-1px)'
+  boxShadow: designTokens.shadows.sm
 });
 
 const sidebarFooterStyle = {
@@ -649,9 +628,11 @@ const entryEyebrowStyle = {
 
 const entryTitleStyle = {
   color: '#102A43',
-  fontFamily: 'Georgia, "Times New Roman", serif',
-  fontSize: 24,
-  lineHeight: 1.2,
+  fontFamily:
+    '"Avenir Next", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif',
+  fontSize: 15,
+  fontWeight: 800,
+  lineHeight: 1.4,
   margin: 0
 };
 
@@ -700,9 +681,12 @@ const panelHeroEyebrowStyle = {
 };
 
 const panelHeroTitleStyle = {
-  fontFamily: 'Georgia, "Times New Roman", serif',
-  fontSize: 32,
-  lineHeight: 1.12,
+  fontFamily:
+    '"Avenir Next", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif',
+  fontSize: 30,
+  fontWeight: 800,
+  letterSpacing: '-0.03em',
+  lineHeight: 1.18,
   margin: 0
 };
 

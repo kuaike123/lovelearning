@@ -14,6 +14,9 @@ type StoreArtifactsInput = {
   metadata?: {
     problemText?: string;
     taskName?: string;
+    generationPrompt?: string;
+    model?: 'standard' | 'deep' | 'fast';
+    outputType?: 'video' | 'ppt' | 'lesson_plan' | 'exam';
     voice?: 'female_warm' | 'female_clear' | 'male_calm';
     speechRate?: 'slow' | 'normal' | 'fast';
     narrationTone?: string;

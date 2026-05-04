@@ -1,4 +1,5 @@
 import {ThemeProvider} from './ThemeProvider';
+import '../styles/globals.css';
 
 export const metadata = {
   title: '数学讲解视频生成器',

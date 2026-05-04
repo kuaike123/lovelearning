@@ -1,7 +1,7 @@
 import {problemInputSchema} from '../../../../../packages/shared-types/src/problem-input';
 
 export class CreateJobDto {
-  subject!: 'math';
+  subject!: 'math' | 'physics' | 'english' | 'chinese';
   sourceType!: 'text';
   content!: string;
 
