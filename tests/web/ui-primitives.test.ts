@@ -19,15 +19,15 @@ import {
   optionGridStyle,
   textareaControlStyle,
   workspaceGridStyle
-} from '../../apps/web/src/app/ui-primitives';
+} from '../../apps/web/src/styles/ui-helpers';
 import {
-  createButtonStyle as createButtonStyleV2,
-  createCardStyle as createCardStyleV2,
+  createProfessionalButtonStyle as createButtonStyleV2,
+  createProfessionalCardStyle as createCardStyleV2,
   createInputStyle as createInputStyleV2,
   designTokens,
   getThemeColors,
   keyframes as keyframesV2
-} from '../../apps/web/src/app/ui-primitives-v2';
+} from '../../apps/web/src/styles/ui-helpers';
 
 describe('web UI primitives', () => {
   it('exposes shared page, card, button, form, and section styles for product pages', () => {

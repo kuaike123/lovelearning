@@ -8,19 +8,36 @@ import {Card} from './Card';
 import {FormPreview} from './FormPreview';
 import {Input} from './Input';
 
+type TaskFormValues = {
+  content: string;
+  outputType: string;
+  subject: string;
+  targetDurationSec: number;
+  taskName?: string;
+};
+
 type TaskFormProps = {
   initialContent?: string;
-  onSubmit?: (values: {content: string; outputType: string; subject: string; targetDurationSec: number}) => void;
+  initialTargetDurationSec?: 30 | 45 | 60;
+  initialTaskName?: string;
+  onSubmit?: (values: TaskFormValues) => void | Promise<void>;
 };
 
 const draftKey = 'lovelearning.task-form.draft';
 
-export function TaskForm({initialContent = '', onSubmit}: TaskFormProps) {
+export function TaskForm({
+  initialContent = '',
+  initialTargetDurationSec = 45,
+  initialTaskName = '',
+  onSubmit
+}: TaskFormProps) {
   const [content, setContent] = useState(initialContent);
+  const [taskName, setTaskName] = useState(initialTaskName);
   const [subject, setSubject] = useState('数学');
   const [outputType, setOutputType] = useState('讲解视频');
-  const [targetDurationSec, setTargetDurationSec] = useState(45);
+  const [targetDurationSec, setTargetDurationSec] = useState(initialTargetDurationSec);
   const trimmedContent = content.trim();
+  const trimmedTaskName = taskName.trim();
   const contentError = trimmedContent ? undefined : '题目内容不能为空';
 
   useEffect(() => {
@@ -46,7 +63,13 @@ export function TaskForm({initialContent = '', onSubmit}: TaskFormProps) {
       return;
     }
 
-    onSubmit?.({content: trimmedContent, outputType, subject, targetDurationSec});
+    void onSubmit?.({
+      content: trimmedContent,
+      outputType,
+      subject,
+      targetDurationSec,
+      ...(trimmedTaskName ? {taskName: trimmedTaskName} : {})
+    });
   };
 
   return (
@@ -59,15 +82,44 @@ export function TaskForm({initialContent = '', onSubmit}: TaskFormProps) {
     >
       <div style={formColumnStyle}>
         <Card data-task-form-step="content" elevation="low" header="1. 输入内容">
-          <Input
-            error={contentError}
-            helpText="输入一道题目或一个知识点，系统会自动推荐生成配置。"
-            id="task-content"
-            label="题目内容"
-            name="content"
-            onChange={(event) => setContent(event.target.value)}
-            value={content}
-          />
+          <div style={contentFieldsStyle}>
+            <Input
+              id="task-name"
+              label="任务名称"
+              name="taskName"
+              onChange={(event) => setTaskName(event.target.value)}
+              placeholder="例如：初一方程标准讲解"
+              value={taskName}
+            />
+            <label htmlFor="task-content" style={textareaLabelStyle}>
+              题目内容
+            </label>
+            <textarea
+              aria-describedby={contentError ? 'task-content-error' : 'task-content-help'}
+              aria-invalid={contentError ? true : undefined}
+              id="task-content"
+              name="content"
+              onChange={(event) => setContent(event.target.value)}
+              placeholder="请输入题目内容"
+              style={{
+                ...textareaStyle,
+                border: `1px solid ${contentError ? designTokens.colors.danger : designTokens.colors.border}`
+              }}
+              value={content}
+            />
+            <p
+              id={contentError ? 'task-content-error' : 'task-content-help'}
+              role={contentError ? 'alert' : undefined}
+              style={{
+                color: contentError ? designTokens.colors.danger : designTokens.colors.neutral600,
+                fontSize: designTokens.typography.sizeSm,
+                lineHeight: designTokens.typography.lineNormal,
+                margin: 0
+              }}
+            >
+              {contentError ?? '输入一道题目或一个知识点，系统会自动推荐生成配置。'}
+            </p>
+          </div>
         </Card>
 
         <Card data-task-form-step="settings" elevation="low" header="2. 生成设置">
@@ -93,7 +145,7 @@ export function TaskForm({initialContent = '', onSubmit}: TaskFormProps) {
             <label style={fieldStyle}>
               目标时长
               <select
-                onChange={(event) => setTargetDurationSec(Number(event.target.value))}
+                onChange={(event) => setTargetDurationSec(Number(event.target.value) as 30 | 45 | 60)}
                 style={selectStyle}
                 value={targetDurationSec}
               >
@@ -146,6 +198,11 @@ const formColumnStyle = {
   gap: designTokens.spacing[4]
 };
 
+const contentFieldsStyle = {
+  display: 'grid',
+  gap: designTokens.spacing[3]
+};
+
 const settingsGridStyle = {
   display: 'grid',
   gap: designTokens.spacing[4],
@@ -160,10 +217,29 @@ const fieldStyle = {
   gap: designTokens.spacing[2]
 };
 
-const selectStyle = {
+const textareaLabelStyle = {
+  color: designTokens.colors.neutral900,
+  fontSize: designTokens.typography.sizeSm,
+  fontWeight: designTokens.typography.weightBold
+};
+
+const controlBaseStyle = {
   background: designTokens.colors.surface,
   border: `1px solid ${designTokens.colors.border}`,
   borderRadius: designTokens.radii.md,
+  color: designTokens.colors.neutral900,
+  font: 'inherit',
   minHeight: '44px',
-  padding: `${designTokens.spacing[3]} ${designTokens.spacing[4]}`
+  padding: `${designTokens.spacing[3]} ${designTokens.spacing[4]}`,
+  width: '100%'
+};
+
+const selectStyle = {
+  ...controlBaseStyle
+};
+
+const textareaStyle = {
+  ...controlBaseStyle,
+  minHeight: '132px',
+  resize: 'vertical' as const
 };

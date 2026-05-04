@@ -6,12 +6,12 @@ import {FeaturedSampleShowcase} from './FeaturedSampleShowcase';
 import {RecentJobsPanel} from './RecentJobsPanel';
 import {SubmitJobForm} from './SubmitJobForm';
 import {SupportedScope} from './SupportedScope';
-import {createButtonStyle, createCardStyle, createPillStyle, uiColors} from './ui-primitives';
+import {createButtonStyle, createCardStyle, createPillStyle, uiColors} from '../styles/ui-helpers';
 import {
-  createCardStyle as createProfessionalCardStyle,
+  createProfessionalCardStyle,
   designTokens,
   keyframes as professionalKeyframes
-} from './ui-primitives-v2';
+} from '../styles/ui-helpers';
 
 type ViewId = 'dashboard' | 'create' | 'samples' | 'jobs' | 'materials' | 'roadmap';
 

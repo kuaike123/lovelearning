@@ -2,7 +2,7 @@
 
 import React, {useState} from 'react';
 
-import {createSketchButtonStyle, createSketchEyebrowStyle, sketchColors} from '../../ui-primitives';
+import {createSketchButtonStyle, createSketchEyebrowStyle, sketchColors} from '../../../styles/ui-helpers';
 
 type SampleWorkbenchActionsProps = {
   generationHref: string;

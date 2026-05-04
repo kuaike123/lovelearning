@@ -6,8 +6,8 @@ import {
   createSketchCardStyle,
   createSketchEyebrowStyle,
   sketchColors
-} from '../../ui-primitives';
-import {designTokens} from '../../ui-primitives-v2';
+} from '../../../styles/ui-helpers';
+import {designTokens} from '../../../styles/ui-helpers';
 import {JobResultPanel} from './JobResultPanel';
 
 type JobResultPageProps = {

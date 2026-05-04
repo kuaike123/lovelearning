@@ -14,6 +14,7 @@ import {
   type ChatModel,
   type ChatOutputType
 } from './chat-output-prompts';
+import * as chatStyles from './ChatLandingPage.styles';
 import {ThemeToggle} from './ThemeToggle';
 
 type StyleValue = 'teacher' | 'kids' | 'exam';
@@ -197,9 +198,9 @@ export function ChatLandingPage({
           />
         }
       >
-      <section data-chat-main="composer-surface" style={mainStyle}>
-        <header style={topbarStyle}>
-          <span style={productNameStyle}>LoveLearning AI</span>
+      <section data-chat-main="composer-surface" style={chatStyles.mainStyle}>
+        <header style={chatStyles.topbarStyle}>
+          <span style={chatStyles.productNameStyle}>LoveLearning AI</span>
           <ThemeToggle />
         </header>
 
@@ -242,17 +243,17 @@ export function ChatLandingPage({
 
 function JobsPanel({jobs, status}: {jobs: JobSummary[]; status: 'idle' | 'loading' | 'loaded' | 'error'}) {
   return (
-    <div data-chat-panel="jobs" style={panelStageStyle}>
-      <section style={panelHeaderStyle}>
-        <h1 data-visual-hierarchy="page-title" style={panelTitleStyle}>历史任务</h1>
+    <div data-chat-panel="jobs" style={chatStyles.panelStageStyle}>
+      <section style={chatStyles.panelHeaderStyle}>
+        <h1 data-visual-hierarchy="page-title" style={chatStyles.panelTitleStyle}>历史任务</h1>
       </section>
-      <div data-chat-jobs-list="history" style={panelListStyle}>
+      <div data-chat-jobs-list="history" style={chatStyles.panelListStyle}>
         {status === 'loading' ? (
-          <div style={emptyPanelStyle}>正在加载任务...</div>
+          <div style={chatStyles.emptyPanelStyle}>正在加载任务...</div>
         ) : status === 'error' ? (
-          <div style={emptyPanelStyle}>无法加载任务，请确认 API 已启动。</div>
+          <div style={chatStyles.emptyPanelStyle}>无法加载任务，请确认 API 已启动。</div>
         ) : jobs.length === 0 ? (
-          <div style={emptyPanelStyle}>暂无历史任务</div>
+          <div style={chatStyles.emptyPanelStyle}>暂无历史任务</div>
         ) : (
           <TaskList tasks={jobs.map(mapJobToTaskListItem)} />
         )}
@@ -311,29 +312,29 @@ function CreatePanel({
   voice: VoiceValue;
 }) {
   return (
-    <div data-chat-panel="create" style={centerStageStyle}>
-      <section style={heroStyle}>
-        <h1 data-visual-hierarchy="page-title" style={titleStyle}>输入题目，生成讲解视频</h1>
-        <p style={supportStyle}>当前支持：一元一次方程、数量关系</p>
+    <div data-chat-panel="create" style={chatStyles.centerStageStyle}>
+      <section style={chatStyles.heroStyle}>
+        <h1 data-visual-hierarchy="page-title" style={chatStyles.titleStyle}>输入题目，生成讲解视频</h1>
+        <p style={chatStyles.supportStyle}>当前支持：一元一次方程、数量关系</p>
       </section>
 
-      <form data-chat-composer="problem-input" onSubmit={handleSubmit} style={composerStyle}>
+      <form data-chat-composer="problem-input" onSubmit={handleSubmit} style={chatStyles.composerStyle}>
         <textarea
           aria-label="题目内容"
           name="content"
           onChange={(event) => setContent(event.target.value)}
           placeholder="请输入题目内容"
-          style={textareaStyle}
+          style={chatStyles.textareaStyle}
           value={content}
         />
-        <div style={composerControlsStyle}>
-          <label style={subjectFieldStyle}>
+        <div style={chatStyles.composerControlsStyle}>
+          <label style={chatStyles.subjectFieldStyle}>
             模型
             <select
               data-chat-model-select="model"
               name="model"
               onChange={(event) => setModel(event.target.value as ChatModel)}
-              style={subjectSelectStyle}
+              style={chatStyles.subjectSelectStyle}
               value={model}
             >
               {chatModelOptions.map((option) => (
@@ -346,18 +347,18 @@ function CreatePanel({
           <button
             aria-label="麦克风"
             data-chat-mic-button="voice-input"
-            style={micButtonStyle}
+            style={chatStyles.micButtonStyle}
             type="button"
           >
             麦克风
           </button>
-          <label style={subjectFieldStyle}>
+          <label style={chatStyles.subjectFieldStyle}>
             视频风格
             <select
               data-chat-video-style-select="sample-style"
               name="sampleStyle"
               onChange={(event) => setVideoStyle(event.target.value)}
-              style={subjectSelectStyle}
+              style={chatStyles.subjectSelectStyle}
               value={videoStyle}
             >
               <option value="custom">自定义</option>
@@ -368,13 +369,13 @@ function CreatePanel({
               ))}
             </select>
           </label>
-          <label style={subjectFieldStyle}>
+          <label style={chatStyles.subjectFieldStyle}>
             学科
             <select
               data-chat-subject-select="subject"
               name="subject"
               onChange={(event) => setSubject(event.target.value as SubjectValue)}
-              style={subjectSelectStyle}
+              style={chatStyles.subjectSelectStyle}
               value={subject}
             >
               <option value="math">数学</option>
@@ -384,27 +385,27 @@ function CreatePanel({
             </select>
           </label>
         </div>
-        <div data-chat-output-options="output-types" style={outputTypesStyle}>
+        <div data-chat-output-options="output-types" style={chatStyles.outputTypesStyle}>
           {outputTypeOptions.map((item) => (
             <button
               key={item.value}
               onClick={() => setOutputType(item.value)}
-              style={item.value === outputType ? activeOutputTypeStyle : outputTypeStyle}
+              style={item.value === outputType ? chatStyles.activeOutputTypeStyle : chatStyles.outputTypeStyle}
               type="button"
             >
               {item.label}
             </button>
           ))}
         </div>
-        <details data-chat-advanced-settings="collapsed-panel" style={advancedStyle}>
-          <summary style={summaryStyle}>高级设置</summary>
-          <div style={settingsGridStyle}>
-            <label style={fieldStyle}>
+        <details data-chat-advanced-settings="collapsed-panel" style={chatStyles.advancedStyle}>
+          <summary style={chatStyles.summaryStyle}>高级设置</summary>
+          <div style={chatStyles.settingsGridStyle}>
+            <label style={chatStyles.fieldStyle}>
               讲解风格
               <select
                 name="style"
                 onChange={(event) => setStyle(event.target.value as StyleValue)}
-                style={selectStyle}
+                style={chatStyles.selectStyle}
                 value={style}
               >
                 <option value="teacher">老师讲解</option>
@@ -412,12 +413,12 @@ function CreatePanel({
                 <option value="exam">应试提分</option>
               </select>
             </label>
-            <label style={fieldStyle}>
+            <label style={chatStyles.fieldStyle}>
               视频时长
               <select
                 name="targetDurationSec"
                 onChange={(event) => setTargetDurationSec(Number(event.target.value) as DurationValue)}
-                style={selectStyle}
+                style={chatStyles.selectStyle}
                 value={String(targetDurationSec)}
               >
                 <option value="30">30 秒</option>
@@ -425,12 +426,12 @@ function CreatePanel({
                 <option value="60">60 秒</option>
               </select>
             </label>
-            <label style={fieldStyle}>
+            <label style={chatStyles.fieldStyle}>
               配音音色
               <select
                 name="voice"
                 onChange={(event) => setVoice(event.target.value as VoiceValue)}
-                style={selectStyle}
+                style={chatStyles.selectStyle}
                 value={voice}
               >
                 <option value="female_warm">温柔女声</option>
@@ -438,12 +439,12 @@ function CreatePanel({
                 <option value="male_calm">沉稳男声</option>
               </select>
             </label>
-            <label style={fieldStyle}>
+            <label style={chatStyles.fieldStyle}>
               语速
               <select
                 name="speechRate"
                 onChange={(event) => setSpeechRate(event.target.value as SpeechRateValue)}
-                style={selectStyle}
+                style={chatStyles.selectStyle}
                 value={speechRate}
               >
                 <option value="slow">慢速</option>
@@ -453,15 +454,15 @@ function CreatePanel({
             </label>
           </div>
         </details>
-        <div style={submitRowStyle}>
-          <span aria-live="polite" style={statusStyle}>
+        <div style={chatStyles.submitRowStyle}>
+          <span aria-live="polite" style={chatStyles.statusStyle}>
             {status}
           </span>
           <button
             data-action-prominence="highest"
             data-visual-hierarchy="primary-action"
             disabled={isSubmitting}
-            style={submitButtonStyle}
+            style={chatStyles.submitButtonStyle}
             type="submit"
           >
             {isSubmitting ? '生成中...' : '开始生成'}
@@ -484,15 +485,15 @@ function LibraryPanel({
   const panel = panelContent[view];
 
   return (
-    <div data-chat-panel={view} style={panelStageStyle}>
-      <section style={panelHeaderStyle}>
-        <h1 data-visual-hierarchy="page-title" style={panelTitleStyle}>{panel.title}</h1>
+    <div data-chat-panel={view} style={chatStyles.panelStageStyle}>
+      <section style={chatStyles.panelHeaderStyle}>
+        <h1 data-visual-hierarchy="page-title" style={chatStyles.panelTitleStyle}>{panel.title}</h1>
       </section>
-      <div style={panelListStyle}>
+      <div style={chatStyles.panelListStyle}>
         {panel.items.map((item) => (
-          <article key={item.title} style={panelCardStyle}>
-            <strong style={panelCardTitleStyle}>{item.title}</strong>
-            {item.meta ? <span style={panelMetaStyle}>{item.meta}</span> : null}
+          <article key={item.title} style={chatStyles.panelCardStyle}>
+            <strong style={chatStyles.panelCardTitleStyle}>{item.title}</strong>
+            {item.meta ? <span style={chatStyles.panelMetaStyle}>{item.meta}</span> : null}
           </article>
         ))}
         {view === 'samples' ? <SampleGallery samples={sampleStyles.map(mapSampleToGalleryItem)} /> : null}
@@ -502,21 +503,21 @@ function LibraryPanel({
                 data-chat-sample-preset={sample.slug}
                 href={buildSamplePresetHref(sample)}
                 key={sample.slug}
-                style={jobLinkStyle}
+                style={chatStyles.jobLinkStyle}
               >
-                <span style={jobTitleStackStyle}>
-                  <strong style={panelCardTitleStyle}>{sample.title}</strong>
-                  <span style={panelMetaStyle}>{sample.content}</span>
+                <span style={chatStyles.jobTitleStackStyle}>
+                  <strong style={chatStyles.panelCardTitleStyle}>{sample.title}</strong>
+                  <span style={chatStyles.panelMetaStyle}>{sample.content}</span>
                 </span>
-                <span style={statusBadgeStyle}>套用</span>
+                <span style={chatStyles.statusBadgeStyle}>套用</span>
               </a>
             ))
           : null}
         {view === 'samples'
           ? examplePrompts.slice(0, 3).map((example) => (
-              <article key={example} style={panelCardStyle}>
-                <strong style={panelCardTitleStyle}>{example}</strong>
-                <span style={panelMetaStyle}>一元一次方程</span>
+              <article key={example} style={chatStyles.panelCardStyle}>
+                <strong style={chatStyles.panelCardTitleStyle}>{example}</strong>
+                <span style={chatStyles.panelMetaStyle}>一元一次方程</span>
               </article>
             ))
           : null}
@@ -626,391 +627,4 @@ const formatJobStatus = (status: string | undefined) => {
   if (status === 'queued') return '排队中';
 
   return '未知';
-};
-
-const shellStyle = {
-  background: '#f7f7f5',
-  color: '#171717',
-  display: 'grid',
-  fontFamily: '"PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif',
-  gridTemplateColumns: '220px minmax(0, 1fr)',
-  minHeight: '100vh'
-};
-
-const sidebarStyle = {
-  background: '#ffffff',
-  borderRight: '1px solid #e7e5e4',
-  display: 'grid',
-  gridTemplateRows: 'auto auto 1fr auto',
-  minHeight: '100vh',
-  padding: '18px 14px'
-};
-
-const brandStyle = {
-  color: '#111827',
-  fontSize: 16,
-  fontWeight: 700,
-  padding: '10px 8px',
-  textDecoration: 'none'
-};
-
-const navStyle = {
-  display: 'grid',
-  gap: 4,
-  marginTop: 18
-};
-
-const navItemStyle = {
-  borderRadius: 10,
-  color: '#525252',
-  display: 'block',
-  fontSize: 14,
-  padding: '10px 9px',
-  textDecoration: 'none'
-};
-
-const activeNavItemStyle = {
-  ...navItemStyle,
-  background: '#f0f0ef',
-  color: '#111827',
-  fontWeight: 700
-};
-
-const recentSectionStyle = {
-  alignSelf: 'start',
-  display: 'grid',
-  gap: 8,
-  marginTop: 26
-};
-
-const sectionLabelStyle = {
-  color: '#8a8a8a',
-  fontSize: 12,
-  padding: '0 9px'
-};
-
-const recentListStyle = {
-  display: 'grid',
-  gap: 2
-};
-
-const recentItemStyle = {
-  ...navItemStyle,
-  fontSize: 13
-};
-
-const sidebarFooterStyle = {
-  borderTop: '1px solid #eeeeec',
-  display: 'grid',
-  gap: 2,
-  paddingTop: 10
-};
-
-const mainStyle = {
-  display: 'grid',
-  gridTemplateRows: 'auto 1fr',
-  minHeight: '100vh'
-};
-
-const topbarStyle = {
-  alignItems: 'center',
-  display: 'flex',
-  justifyContent: 'space-between',
-  padding: '18px 28px'
-};
-
-const productNameStyle = {
-  color: '#525252',
-  fontSize: 14,
-  fontWeight: 600
-};
-
-const centerStageStyle = {
-  alignContent: 'center',
-  display: 'grid',
-  gap: 22,
-  justifyItems: 'center',
-  padding: '36px 24px 80px'
-};
-
-const heroStyle = {
-  display: 'grid',
-  gap: 10,
-  justifyItems: 'center',
-  textAlign: 'center' as const
-};
-
-const titleStyle = {
-  color: '#111827',
-  fontSize: 34,
-  fontWeight: 700,
-  letterSpacing: '-0.03em',
-  lineHeight: 1.2,
-  margin: 0
-};
-
-const supportStyle = {
-  color: '#737373',
-  fontSize: 14,
-  margin: 0
-};
-
-const composerStyle = {
-  background: '#ffffff',
-  border: '2px solid #111827',
-  borderRadius: 24,
-  boxShadow: '0 20px 50px rgba(15, 23, 42, 0.1)',
-  display: 'grid',
-  gap: 14,
-  maxWidth: 820,
-  padding: 16,
-  width: '100%'
-};
-
-const textareaStyle = {
-  border: 0,
-  color: '#171717',
-  fontFamily: 'inherit',
-  fontSize: 17,
-  lineHeight: 1.7,
-  minHeight: 138,
-  outline: 'none',
-  resize: 'vertical' as const,
-  width: '100%'
-};
-
-const micButtonStyle = {
-  background: '#ffffff',
-  border: '1px solid #dedbd6',
-  borderRadius: 12,
-  color: '#171717',
-  cursor: 'pointer',
-  fontFamily: 'inherit',
-  fontSize: 13,
-  padding: '8px 11px'
-};
-
-const outputTypesStyle = {
-  display: 'flex',
-  flexWrap: 'wrap' as const,
-  gap: 8
-};
-
-const outputTypeStyle = {
-  background: '#ffffff',
-  border: '1px solid #dedbd6',
-  borderRadius: 999,
-  color: '#525252',
-  cursor: 'pointer',
-  fontFamily: 'inherit',
-  fontSize: 13,
-  padding: '8px 12px'
-};
-
-const activeOutputTypeStyle = {
-  ...outputTypeStyle,
-  background: '#111827',
-  borderColor: '#111827',
-  color: '#ffffff'
-};
-
-const chipsStyle = {
-  display: 'flex',
-  flexWrap: 'wrap' as const,
-  gap: 8
-};
-
-const chipStyle = {
-  background: '#f6f6f4',
-  border: '1px solid #eceae7',
-  borderRadius: 999,
-  color: '#44403c',
-  cursor: 'pointer',
-  fontSize: 13,
-  padding: '7px 11px'
-};
-
-const examplesStyle = {
-  display: 'grid',
-  gap: 8
-};
-
-const composerControlsStyle = {
-  alignItems: 'center',
-  display: 'flex',
-  flexWrap: 'wrap' as const,
-  gap: 10
-};
-
-const subjectFieldStyle = {
-  alignItems: 'center',
-  background: '#f8f8f7',
-  border: '1px solid #eeeeec',
-  borderRadius: 12,
-  color: '#737373',
-  display: 'inline-flex',
-  fontSize: 13,
-  gap: 8,
-  padding: '7px 9px'
-};
-
-const subjectSelectStyle = {
-  background: '#ffffff',
-  border: '1px solid #dedbd6',
-  borderRadius: 9,
-  color: '#171717',
-  fontFamily: 'inherit',
-  fontSize: 13,
-  padding: '6px 8px'
-};
-
-const exampleButtonStyle = {
-  background: 'transparent',
-  border: '1px solid #eeeeec',
-  borderRadius: 12,
-  color: '#57534e',
-  cursor: 'pointer',
-  fontFamily: 'inherit',
-  fontSize: 13,
-  lineHeight: 1.5,
-  padding: '9px 11px',
-  textAlign: 'left' as const
-};
-
-const advancedStyle = {
-  borderTop: '1px solid #eeeeec',
-  paddingTop: 10
-};
-
-const summaryStyle = {
-  color: '#525252',
-  cursor: 'pointer',
-  fontSize: 14,
-  fontWeight: 600
-};
-
-const settingsGridStyle = {
-  display: 'grid',
-  gap: 10,
-  gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-  paddingTop: 12
-};
-
-const fieldStyle = {
-  color: '#737373',
-  display: 'grid',
-  fontSize: 12,
-  gap: 6
-};
-
-const selectStyle = {
-  background: '#ffffff',
-  border: '1px solid #dedbd6',
-  borderRadius: 10,
-  color: '#171717',
-  fontFamily: 'inherit',
-  fontSize: 14,
-  padding: '9px 10px'
-};
-
-const submitRowStyle = {
-  alignItems: 'center',
-  display: 'flex',
-  gap: 12,
-  justifyContent: 'space-between'
-};
-
-const statusStyle = {
-  color: '#78716c',
-  fontSize: 13
-};
-
-const submitButtonStyle = {
-  background: '#111827',
-  border: 0,
-  borderRadius: 14,
-  color: '#ffffff',
-  cursor: 'pointer',
-  fontSize: 15,
-  fontWeight: 700,
-  padding: '12px 18px'
-};
-
-const panelStageStyle = {
-  alignContent: 'start',
-  display: 'grid',
-  gap: 18,
-  justifySelf: 'center',
-  maxWidth: 820,
-  padding: '84px 24px',
-  width: '100%'
-};
-
-const panelHeaderStyle = {
-  display: 'grid',
-  gap: 8
-};
-
-const panelTitleStyle = {
-  color: '#111827',
-  fontSize: 28,
-  fontWeight: 700,
-  letterSpacing: '-0.02em',
-  margin: 0
-};
-
-const panelListStyle = {
-  display: 'grid',
-  gap: 10
-};
-
-const panelCardStyle = {
-  background: '#ffffff',
-  border: '1px solid #e7e5e4',
-  borderRadius: 16,
-  display: 'flex',
-  gap: 12,
-  justifyContent: 'space-between',
-  padding: '15px 16px'
-};
-
-const panelCardTitleStyle = {
-  color: '#171717',
-  fontSize: 15,
-  fontWeight: 650
-};
-
-const panelMetaStyle = {
-  color: '#737373',
-  fontSize: 13
-};
-
-const emptyPanelStyle = {
-  background: '#ffffff',
-  border: '1px solid #e7e5e4',
-  borderRadius: 16,
-  color: '#737373',
-  padding: '18px 16px'
-};
-
-const jobLinkStyle = {
-  ...panelCardStyle,
-  color: '#171717',
-  textDecoration: 'none'
-};
-
-const jobTitleStackStyle = {
-  display: 'grid',
-  gap: 4,
-  minWidth: 0
-};
-
-const statusBadgeStyle = {
-  alignSelf: 'start',
-  background: '#f6f6f4',
-  borderRadius: 999,
-  color: '#525252',
-  flexShrink: 0,
-  fontSize: 12,
-  padding: '5px 9px'
 };

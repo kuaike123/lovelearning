@@ -2,7 +2,7 @@
 
 import React, {createContext, useContext, useState} from 'react';
 
-import type {ThemeMode} from './ui-primitives-v2';
+import type {ThemeMode} from '../styles/ui-helpers';
 
 type ThemeContextValue = {
   mode: ThemeMode;

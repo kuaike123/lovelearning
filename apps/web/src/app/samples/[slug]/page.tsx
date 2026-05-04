@@ -17,7 +17,7 @@ import {
   createSketchPageStyle,
   createSketchPillStyle,
   sketchColors
-} from '../../ui-primitives';
+} from '../../../styles/ui-helpers';
 import {SampleWorkbenchActions} from './SampleWorkbenchActions';
 
 type SampleDetailPageProps = {

@@ -3,7 +3,7 @@
 import React from 'react';
 
 import {useTheme} from './ThemeProvider';
-import {createButtonStyle, designTokens} from './ui-primitives-v2';
+import {createProfessionalButtonStyle, designTokens} from '../styles/ui-helpers';
 
 export function ThemeToggle() {
   const {mode, setMode} = useTheme();
@@ -24,7 +24,7 @@ export function ThemeToggle() {
 }
 
 const themeToggleStyle = {
-  ...createButtonStyle('outline', 'sm'),
+  ...createProfessionalButtonStyle('outline', 'sm'),
   background: 'rgba(255,255,255,0.72)',
   borderColor: designTokens.colors.neutral[300],
   color: designTokens.colors.neutral[800],

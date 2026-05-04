@@ -20,7 +20,7 @@ import {
   createSketchPillStyle,
   createSketchSectionStyle,
   sketchColors
-} from './ui-primitives';
+} from '../styles/ui-helpers';
 
 const categoryOptions: {label: string; value: ProblemCategoryFilter}[] = [
   {label: '\u5168\u90e8', value: 'all'},

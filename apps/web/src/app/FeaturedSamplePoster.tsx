@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type {FeaturedSample} from './featured-samples';
-import {createSketchGridBackground, createSketchPillStyle, sketchColors} from './ui-primitives';
+import {createSketchGridBackground, createSketchPillStyle, sketchColors} from '../styles/ui-helpers';
 
 type FeaturedSamplePosterProps = {
   sample: FeaturedSample;

@@ -3,7 +3,7 @@
 import React, {useEffect, useState} from 'react';
 
 import {deleteJob, listJobs, regenerateJob} from '../lib/api-client';
-import {createButtonStyle, createCardStyle, createEyebrowStyle, formControlStyle} from './ui-primitives';
+import {createButtonStyle, createCardStyle, createEyebrowStyle, formControlStyle} from '../styles/ui-helpers';
 
 type RecentJob = {
   error?: string;

@@ -11,7 +11,7 @@ import {
   createSketchGridBackground,
   createSketchPillStyle,
   sketchColors
-} from '../../ui-primitives';
+} from '../../../styles/ui-helpers';
 
 type Job = {
   jobId: string;
