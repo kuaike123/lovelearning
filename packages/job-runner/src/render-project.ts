@@ -39,7 +39,7 @@ export const renderProject = async (project: VideoProject, options: RenderProjec
       coverPath,
       onProgress: options.onProgress,
       outputDir,
-      scale: options.scale ?? 0.35,
+      scale: resolveRenderScale(options),
       videoPath
     });
   }
@@ -49,6 +49,20 @@ export const renderProject = async (project: VideoProject, options: RenderProjec
 
 const getRenderMode = (options: RenderProjectOptions) => {
   return options.mode ?? (process.env.EDU_RENDER_MODE === 'placeholder' ? 'placeholder' : 'remotion');
+};
+
+export const resolveRenderScale = (options: Pick<RenderProjectOptions, 'scale'>) => {
+  if (typeof options.scale === 'number') {
+    return options.scale;
+  }
+
+  const envScale = Number(process.env.EDU_RENDER_SCALE);
+
+  if (Number.isFinite(envScale) && envScale > 0 && envScale <= 1) {
+    return envScale;
+  }
+
+  return 1;
 };
 
 const renderWithRemotion = async (

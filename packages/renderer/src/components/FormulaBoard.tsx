@@ -1,4 +1,5 @@
 import React from 'react';
+import {MathText} from './MathText';
 
 type FormulaBoardProps = {
   formulas: string[];
@@ -25,7 +26,7 @@ export const FormulaBoard: React.FC<FormulaBoardProps> = ({formulas, highlights,
                 {getFormulaRoleLabel(formula, index, sceneType, activeHighlights.includes(formula))}
               </strong>
               {activeHighlights.includes(formula) ? <strong style={highlightLabelStyle}>{'\u5173\u952e\u53d8\u5f62'}</strong> : null}
-              <span style={formulaTextStyle(formula)}>{formula}</span>
+              <MathText text={formula} style={formulaTextStyle(formula)} />
             </div>
           </div>
         ))}

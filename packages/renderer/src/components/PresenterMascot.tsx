@@ -77,6 +77,10 @@ export const getPresenterStateForScene = (sceneType: string): PresenterState => 
   return sceneStateMap[sceneType] ?? 'idle_teach';
 };
 
+export const getPresenterFloatY = (progress: number) => {
+  return Math.sin(progress * Math.PI * 4) * 2;
+};
+
 const clampProgress = (progress: number | undefined) => {
   if (typeof progress !== 'number' || Number.isNaN(progress)) return 0;
 
@@ -105,15 +109,15 @@ export const PresenterMascot: React.FC<PresenterMascotProps> = ({
   const targetLabel = teachingTargetCopy[target];
   const progress = clampProgress(sceneProgress);
   const phase = progress * Math.PI * 2;
-  const floatY = Math.sin(phase * 2) * 5;
+  const floatY = getPresenterFloatY(progress);
   const blinkScale = progress > 0.18 && progress < 0.24 ? 0.16 : progress > 0.68 && progress < 0.74 ? 0.16 : 1;
   const isSpeaking = speechActivity === 'speaking' && isProgressInsideSpeechWindow(progress, speechWindows);
   const speechState = speechActivity === 'resting' ? 'resting' : isSpeaking ? 'speaking' : 'paused';
   const mouthSync = speechState === 'speaking' ? 'tts' : speechState === 'paused' ? 'pause' : 'idle';
   const speechLabel = speechState === 'speaking' ? '\u0054\u0054\u0053\u53e3\u64ad\u540c\u6b65' : speechState === 'paused' ? '\u53e3\u64ad\u505c\u987f' : '\u9759\u97f3\u966a\u4f34';
   const mouthOpen = isSpeaking && progress > 0.08 && progress < 0.92 && Math.sin(phase * 7) > -0.2;
-  const leftArmMotion = Math.sin(phase) * 7;
-  const rightArmMotion = Math.cos(phase) * 7;
+  const leftArmMotion = Math.sin(phase) * 3;
+  const rightArmMotion = Math.cos(phase) * 3;
   const isWarning = presenterState === 'warning_alert';
   const isPointing = presenterState === 'point_explain';
   const isWelcoming = presenterState === 'welcome_wave';

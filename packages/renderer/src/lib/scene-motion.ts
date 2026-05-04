@@ -1,41 +1,75 @@
-export type MotionPreset = 'compare' | 'emphasis' | 'none' | 'reveal' | 'transform';
+export type MotionPreset = 'compare' | 'emphasis' | 'none' | 'reveal' | 'transform' | 'elastic_entry';
 
 export type MotionProfile = {
   opacity: number;
   scale: number;
   translateX: number;
   translateY: number;
+  rotate: number;
+};
+
+/**
+ * 实现更平滑的缓动函数
+ * 基于 cubic-bezier 的物理模拟
+ */
+const easeOutBack = (x: number): number => {
+  const c1 = 1.70158;
+  const c3 = c1 + 1;
+  return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+};
+
+const easeOutQuint = (x: number): number => {
+  return 1 - Math.pow(1 - x, 5);
 };
 
 export const getMotionProfile = (preset: MotionPreset | undefined, progress: number): MotionProfile => {
   const safeProgress = Math.min(1, Math.max(0, progress));
 
+  // 基础进入效果：淡入 + 缩放
+  const entryProgress = Math.min(1, safeProgress * 2.5); // 在前 40% 的时间内完成进入
+  const entryEase = easeOutBack(entryProgress);
+  const quintEase = easeOutQuint(safeProgress);
+
   if (preset === 'compare') {
     return {
-      opacity: clamp(0.45 + safeProgress * 0.85),
-      scale: 0.95 + safeProgress * 0.04,
-      translateX: (1 - safeProgress) * 26,
-      translateY: (1 - safeProgress) * 16
+      opacity: clamp(entryProgress),
+      scale: 0.95 + entryEase * 0.05,
+      translateX: (1 - entryEase) * 20,
+      translateY: 0,
+      rotate: (1 - entryEase) * -1
     };
   }
 
   if (preset === 'emphasis') {
-    const settle = safeProgress > 0.75 ? (safeProgress - 0.75) / 0.25 : 0;
-
+    // 强调效果：轻微抖动或呼吸感
+    const pulse = Math.sin(safeProgress * Math.PI * 2) * 0.01;
     return {
-      opacity: clamp(0.55 + safeProgress * 0.65),
-      scale: 0.96 + settle * 0.06,
+      opacity: 1,
+      scale: 1 + pulse,
       translateX: 0,
-      translateY: (1 - safeProgress) * 14
+      translateY: 0,
+      rotate: 0
     };
   }
 
   if (preset === 'transform') {
+    // 推导过渡：平滑位移
     return {
-      opacity: clamp(0.45 + safeProgress * 0.7),
-      scale: 0.97 + safeProgress * 0.02,
-      translateX: (1 - safeProgress) * 10,
-      translateY: (1 - safeProgress) * 22
+      opacity: clamp(entryProgress),
+      scale: 1,
+      translateX: (1 - quintEase) * 30,
+      translateY: 0,
+      rotate: 0
+    };
+  }
+
+  if (preset === 'elastic_entry') {
+    return {
+      opacity: clamp(entryProgress),
+      scale: 0.8 + entryEase * 0.2,
+      translateX: 0,
+      translateY: (1 - entryEase) * 40,
+      rotate: 0
     };
   }
 
@@ -44,15 +78,18 @@ export const getMotionProfile = (preset: MotionPreset | undefined, progress: num
       opacity: 1,
       scale: 1,
       translateX: 0,
-      translateY: 0
+      translateY: 0,
+      rotate: 0
     };
   }
 
+  // 默认：Reveal 效果
   return {
-    opacity: clamp(0.5 + safeProgress * 0.6),
-    scale: 0.98 + safeProgress * 0.01,
+    opacity: clamp(entryProgress),
+    scale: 0.98 + entryEase * 0.02,
     translateX: 0,
-    translateY: (1 - safeProgress) * 18
+    translateY: (1 - entryEase) * 15,
+    rotate: 0
   };
 };
 

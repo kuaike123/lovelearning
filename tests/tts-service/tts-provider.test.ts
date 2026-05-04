@@ -42,4 +42,33 @@ describe('tts provider registry', () => {
     expect(existsSync(audioPath)).toBe(true);
     expect((await readFile(audioPath)).subarray(0, 4).toString('ascii')).toBe('RIFF');
   });
+
+  it('uses real Windows speech output instead of the sine-wave fallback when SAPI is available', async () => {
+    if (process.platform !== 'win32') {
+      return;
+    }
+
+    const outputDir = await mkdtemp(join(tmpdir(), 'edu-tts-provider-'));
+    tempDirs.push(outputDir);
+    const provider = createTtsProvider('windows_sapi');
+
+    const audio = await provider.synthesize({
+      id: 'windows-scene-1',
+      outputDir,
+      speechRate: 'normal',
+      text: '这是一次本地语音测试。',
+      voice: 'female_warm'
+    });
+
+    const audioPath = audio.audioPath as string;
+    const wav = await readFile(audioPath);
+    const firstSamples = [];
+
+    for (let offset = 44; offset < Math.min(wav.length, 44 + 40); offset += 2) {
+      firstSamples.push(wav.readInt16LE(offset));
+    }
+
+    expect(wav.length).toBeGreaterThan(1000);
+    expect(firstSamples).not.toEqual([0, 0, 0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 13, 14, 15, 15, 16, 16, 15]);
+  });
 });

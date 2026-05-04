@@ -3,7 +3,7 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {afterEach, describe, expect, it} from 'vitest';
 
-import {renderProject} from '../../packages/job-runner/src/render-project';
+import {renderProject, resolveRenderScale} from '../../packages/job-runner/src/render-project';
 
 let renderDir: string | null = null;
 
@@ -46,5 +46,9 @@ describe('renderProject', () => {
     expect(result.coverPath).toBe(join(renderDir, 'cover.png'));
     expect(video).toContain('Equation lesson');
     expect(Array.from(cover.subarray(0, 8))).toEqual([137, 80, 78, 71, 13, 10, 26, 10]);
+  });
+
+  it('defaults to full-resolution exports instead of low-scale preview rendering', () => {
+    expect(resolveRenderScale({})).toBe(1);
   });
 });

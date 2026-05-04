@@ -82,7 +82,7 @@ const SceneFrame: React.FC<{
             display: 'grid',
             gap: 30,
             opacity: Math.min(1, easedIn * motion.opacity),
-            transform: `translate3d(${motion.translateX}px, ${motion.translateY}px, 0) scale(${motion.scale})`
+            transform: `translate3d(${motion.translateX}px, ${motion.translateY}px, 0) scale(${motion.scale}) rotate(${motion.rotate}deg)`
           }}
         >
           <SceneTypePill sceneType={scene.sceneType} layoutLabel={visuals.layoutLabel} />

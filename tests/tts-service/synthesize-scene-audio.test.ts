@@ -39,6 +39,32 @@ describe('synthesizeSceneAudio', () => {
     expect((await readFile(audioPath)).subarray(0, 4).toString('ascii')).toBe('RIFF');
   });
 
+  it('writes a silent fallback wav instead of an audible busy-tone placeholder', async () => {
+    const outputDir = await mkdtemp(join(tmpdir(), 'edu-tts-test-'));
+    tempDirs.push(outputDir);
+
+    const audio = await synthesizeSceneAudio(
+      {
+        id: 'silent-fallback',
+        subtitle: '这是一个静音占位测试'
+      },
+      {
+        mode: 'placeholder_wav',
+        outputDir
+      }
+    );
+
+    const audioPath = audio.audioPath as string;
+    const wav = await readFile(audioPath);
+    const firstSamples = [];
+
+    for (let offset = 44; offset < Math.min(wav.length, 44 + 160); offset += 2) {
+      firstSamples.push(wav.readInt16LE(offset));
+    }
+
+    expect(firstSamples.every((sample) => sample === 0)).toBe(true);
+  });
+
   it('uses the selected speech rate when estimating placeholder audio duration', async () => {
     const outputDir = await mkdtemp(join(tmpdir(), 'edu-tts-test-'));
     tempDirs.push(outputDir);

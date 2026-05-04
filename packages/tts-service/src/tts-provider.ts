@@ -1,5 +1,6 @@
 import {execFile} from 'node:child_process';
-import {mkdir, readFile, writeFile} from 'node:fs/promises';
+import {mkdir, mkdtemp, readFile, rm, writeFile} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {promisify} from 'node:util';
@@ -96,6 +97,7 @@ const windowsSapiTtsProvider: TtsProvider = {
 
     try {
       await synthesizeWithWindowsSapi(input.text, audioPath, input.voice, input.speechRate);
+      await assertWavLooksUsable(audioPath);
       const actualDurationSec = await readWavDurationSec(audioPath);
 
       return {
@@ -159,21 +161,38 @@ const synthesizeWithWindowsSapi = async (
   const voiceRate = voice === 'female_clear' ? 0 : voice === 'male_calm' ? -2 : -1;
   const speechRateOffset = speechRate === 'slow' ? -2 : speechRate === 'fast' ? 2 : 0;
   const rate = Math.max(-10, Math.min(10, voiceRate + speechRateOffset));
+  const tempDir = await mkdtemp(join(tmpdir(), 'edu-tts-sapi-'));
+  const scriptPath = join(tempDir, 'sapi-synthesize.ps1');
+  const textPath = join(tempDir, 'speech-input.txt');
   const script = [
+    'param(',
+    '  [string]$OutputPath,',
+    '  [string]$TextPath,',
+    '  [int]$Rate',
+    ')',
     'Add-Type -AssemblyName System.Speech',
     '$synth = New-Object System.Speech.Synthesis.SpeechSynthesizer',
-    `$synth.Rate = ${rate}`,
+    '$synth.Rate = $Rate',
     '$synth.Volume = 100',
     '$preferredVoice = $env:EDU_TTS_SAPI_VOICE',
     'if ($preferredVoice) { try { $synth.SelectVoice($preferredVoice) } catch {} }',
-    '$synth.SetOutputToWaveFile($args[0])',
-    '$synth.Speak($args[1]) | Out-Null',
+    '$text = [System.IO.File]::ReadAllText($TextPath, [System.Text.Encoding]::UTF8)',
+    '$synth.SetOutputToWaveFile($OutputPath)',
+    '$synth.Speak($text)',
     '$synth.Dispose()'
-  ].join('; ');
+  ].join('\n');
 
-  await execFileAsync('powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', script, audioPath, text], {
-    windowsHide: true
-  });
+  try {
+    await writeFile(scriptPath, Buffer.from(`\uFEFF${script}`, 'utf16le'));
+    await writeFile(textPath, text, 'utf8');
+    await execFileAsync(
+      'powershell.exe',
+      ['-NoProfile', '-Sta', '-ExecutionPolicy', 'Bypass', '-File', scriptPath, '-OutputPath', audioPath, '-TextPath', textPath, '-Rate', String(rate)],
+      {windowsHide: true}
+    );
+  } finally {
+    await rm(tempDir, {force: true, recursive: true});
+  }
 };
 
 const writePlaceholderWav = async (audioPath: string, durationSec: number) => {
@@ -198,12 +217,6 @@ const writePlaceholderWav = async (audioPath: string, durationSec: number) => {
   buffer.write('data', 36, 'ascii');
   buffer.writeUInt32LE(dataSize, 40);
 
-  for (let index = 0; index < sampleCount; index++) {
-    const envelope = Math.min(1, index / 1200, (sampleCount - index) / 1200);
-    const tone = Math.sin((index / sampleRate) * Math.PI * 2 * 440) * 1200 * envelope;
-    buffer.writeInt16LE(Math.round(tone), 44 + index * 2);
-  }
-
   await writeFile(audioPath, buffer);
 };
 
@@ -220,4 +233,12 @@ const readWavDurationSec = async (audioPath: string) => {
   if (byteRate <= 0) return 0;
 
   return dataSize / byteRate;
+};
+
+const assertWavLooksUsable = async (audioPath: string) => {
+  const buffer = await readFile(audioPath);
+
+  if (buffer.length < 1000) {
+    throw new Error('WAV_TOO_SMALL');
+  }
 };
