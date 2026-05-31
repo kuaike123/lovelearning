@@ -124,4 +124,6 @@ pnpm verify:v1
 
 ## License
 
-当前仓库尚未声明开源许可证。公开仓库前如需开放复用，请补充明确的 LICENSE 文件。
+本项目采用 [MIT License](LICENSE) 开源。
+
+LoveLearning 希望用技术降低优质教育内容的生产门槛，让更多人拥有学习、理解和获得教育机会的可能。
