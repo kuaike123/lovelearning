@@ -15,6 +15,7 @@ apps/api/artifacts/
 .superpowers/
 .logs/
 docs/superpowers/
+优化示例-改进版表单.tsx
 data/textbooks/manifests/*
 !data/textbooks/manifests/.gitkeep
 data/textbooks/merged-pdfs/*
